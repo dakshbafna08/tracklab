@@ -12,11 +12,3 @@ class Car:
 
         self.velocity = self.velocity + acceleration * self.dt
         self.position = self.position + self.velocity + self.dt
-
-
-car = Car()
-for i in range (10):
-    car.step((2.0, 1.0))
-
-print(f'position: {car.position}')
-print(f'velocity: {car.velocity}')
