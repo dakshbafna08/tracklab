@@ -11,4 +11,4 @@ class Car:
         acceleration = np.array(acceleration, dtype = float)
 
         self.velocity = self.velocity + acceleration * self.dt
-        self.position = self.position + self.velocity + self.dt
+        self.position = self.position + self.velocity  self.dt
