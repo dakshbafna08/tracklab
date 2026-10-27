@@ -14,9 +14,6 @@ COLUMNS = ["Driver", "LapNumber", "LapTime", "Compound", "TyreLife",
 
 @app.get("/race-data")
 def race_data(year: int, event: str):
-    if year < 2018 or year > 2022:
-        raise HTTPException(status_code=400,
-                            detail="Only 2018-2022 races are supported right now.")
     try:
         race = fastf1.get_session(year, event, "R")
         race.load(laps=True, telemetry=False, weather=False, messages=False)
