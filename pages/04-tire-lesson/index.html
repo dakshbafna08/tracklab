@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 4. Tire Lesson</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn nav-btn-active">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-4" class="screen w-full max-w-2xl panel f1-border-top p-8">
+      <div class="section-tag">Part 1 // Educational Briefing</div>
+      <h2 class="text-2xl font-bold uppercase mb-4">Understanding Tyre Compounds</h2>
+      <p class="body-copy mb-6">
+        Teams choose between 3 dry slick compounds. Softer rubber heats up quickly and provides more grip in corners, but wears down rapidly over consecutive laps.
+      </p>
+
+      <div class="space-y-3 mb-6">
+        <div class="sub-box flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="tire-ring tire-soft"></div>
+            <div>
+              <div class="font-bold uppercase">Soft Compound (C3)</div>
+              <div class="text-xs muted-text">Fastest initial pace. High thermal degradation.</div>
+            </div>
+          </div>
+          <div class="mono text-xs text-right">
+            <div>PACE: <span class="text-white font-semibold">BASE (0.0s)</span></div>
+            <div class="muted-text">LIFE: ~14–18 LAPS</div>
+          </div>
+        </div>
+
+        <div class="sub-box flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="tire-ring tire-medium"></div>
+            <div>
+              <div class="font-bold uppercase">Medium Compound (C2)</div>
+              <div class="text-xs muted-text">Balanced pace and durability across medium stints.</div>
+            </div>
+          </div>
+          <div class="mono text-xs text-right">
+            <div>PACE: <span class="text-white font-semibold">+0.45s / LAP</span></div>
+            <div class="muted-text">LIFE: ~22–30 LAPS</div>
+          </div>
+        </div>
+
+        <div class="sub-box flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="tire-ring tire-hard"></div>
+            <div>
+              <div class="font-bold uppercase">Hard Compound (C1)</div>
+              <div class="text-xs muted-text">Slowest warm-up and peak grip, lowest wear rate.</div>
+            </div>
+          </div>
+          <div class="mono text-xs text-right">
+            <div>PACE: <span class="text-white font-semibold">+0.85s / LAP</span></div>
+            <div class="muted-text">LIFE: ~32–45 LAPS</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box mb-6">
+        <strong class="uppercase text-white">FIA Sporting Regulation:</strong> Every driver must use at least 2 different dry compounds during a dry race.
+      </div>
+
+      <div class="flex justify-between">
+        <button data-goto="3" class="btn-outline">&larr; Back</button>
+        <button data-goto="5" class="btn-primary">Select Your Compounds &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

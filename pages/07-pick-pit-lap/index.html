@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 7. Pick Pit Lap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn nav-btn-active">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-7" class="screen w-full max-w-2xl panel f1-border-top p-8">
+      <div class="mono text-xs muted-text uppercase mb-1">Part 2 // Strategy Builder</div>
+      <h2 class="text-2xl font-bold uppercase mb-2">When Do You Want to Pit Stop?</h2>
+      <p class="text-sm muted-text mb-6">Drag the pit window slider to choose the exact lap to box for your second compound.</p>
+
+      <div class="sub-box p-6 mb-6">
+        <div class="flex justify-between items-center mono text-sm mb-2">
+          <span>START (LAP 1)</span>
+          <span class="text-[#E10600] font-bold text-base">BOX ON LAP <span id="pit-lap-val">18</span></span>
+          <span>FINISH (LAP <span class="total-laps-label">58</span>)</span>
+        </div>
+
+        <input type="range" id="pit-slider" min="5" max="52" value="18" class="w-full my-4">
+
+        <div class="w-full h-10 flex border border-[#38383F] mono text-xs font-bold mt-2">
+          <div id="bar-s1" style="width: 31%;" class="stint-bar-1">SOFT (18L)</div>
+          <div id="bar-s2" style="width: 69%;" class="stint-bar-2">HARD (40L)</div>
+        </div>
+
+        <div id="wear-warning" class="mt-4 mono text-xs muted-text">
+          STATUS: Optimal window for Soft compound (14-20 laps). Low cliff risk.
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button data-goto="6" class="btn-outline">&larr; Back to Lesson</button>
+        <button data-goto="8" class="btn-primary">Review Final Strategy &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

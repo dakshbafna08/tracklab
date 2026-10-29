@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 9. Race Sim</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn nav-btn-active">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-9" class="screen w-full max-w-3xl panel f1-border-top p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <div class="section-tag">Live Telemetry Simulation</div>
+          <h2 class="text-2xl font-bold uppercase">Let's Race: User vs. RL Agent</h2>
+        </div>
+        <div class="mono text-right">
+          <div class="text-xs muted-text">LAP COUNTER</div>
+          <div class="text-2xl font-bold"><span id="sim-lap">1</span> / <span class="total-laps-label">58</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="col-span-2 sub-box h-64 flex flex-col items-center justify-center relative p-4">
+          <svg viewBox="0 0 300 140" class="w-full h-full stroke-[#55555F] fill-none" stroke-width="5">
+            <path d="M 40 100 L 140 100 L 180 75 L 250 85 L 270 45 L 200 20 L 90 30 L 45 55 Z"/>
+          </svg>
+          <div class="absolute bottom-3 left-4 mono text-xs flex gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-white inline-block"></span> YOU (USER)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#E10600] inline-block"></span> RL AGENT</span>
+          </div>
+        </div>
+
+        <div class="sub-box p-4 mono text-xs flex flex-col justify-between">
+          <div>
+            <div class="muted-text border-b border-[#38383F] pb-2 mb-3 uppercase">Timing Tower</div>
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span>P1 // RL AGENT</span>
+                <span class="text-[#E10600] font-bold">LEADER</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>P2 // YOU</span>
+                <span id="sim-gap">+1.42s</span>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-[#38383F] pt-3 muted-text">
+            Awaiting backend telemetry from src/racecar/sim...
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button data-goto="10" class="btn-primary">View Post-Race Telemetry &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>
