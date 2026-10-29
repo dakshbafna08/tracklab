@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 1. Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn nav-btn-active">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-1" class="screen w-full max-w-sm panel f1-border-top p-8">
+      <h1 class="text-2xl font-bold uppercase tracking-wide mb-6">Log In</h1>
+      <div class="space-y-4">
+        <div>
+          <label class="field-label">Username</label>
+          <input type="text" placeholder="driver_01" class="text-input">
+        </div>
+        <div>
+          <label class="field-label">Password</label>
+          <input type="password" value="••••••••" class="text-input">
+        </div>
+        <button data-goto="2" class="btn-primary w-full mt-2">Log In</button>
+        <div class="flex justify-between items-center text-xs muted-text pt-2">
+          <label class="flex items-center gap-1.5"><input type="checkbox"> Remember me</label>
+          <a href="#" class="underline">Forgot Password?</a>
+        </div>
+        <div class="border-t border-[#38383F] pt-4 text-center">
+          <button data-goto="2" class="text-xs uppercase font-semibold text-white underline">Create an Account</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/shared-state.js"></script>
+</body>
+</html>

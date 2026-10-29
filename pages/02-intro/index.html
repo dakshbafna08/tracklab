@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 2. Intro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn nav-btn-active">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-2" class="screen w-full max-w-2xl panel f1-border-top p-8">
+      <div class="section-tag">Onboarding // Briefing</div>
+      <h1 class="text-3xl font-bold uppercase mb-4">F1 Race Strategy Walkthrough</h1>
+      <p class="body-copy mb-6">
+        Winning a Grand Prix isn't just about raw car speed—it comes down to calling the right tyres on the right lap. We will build a baseline race strategy together in 3 parts and test it against our reinforcement learning model.
+      </p>
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="sub-box">
+          <div class="mono text-xs muted-text">PART 01</div>
+          <div class="font-bold uppercase mt-1">Circuit Selection</div>
+          <p class="text-xs muted-text mt-1">Select the track layout and baseline lap count.</p>
+        </div>
+        <div class="sub-box">
+          <div class="mono text-xs muted-text">PART 02</div>
+          <div class="font-bold uppercase mt-1">Tyre Compounds</div>
+          <p class="text-xs muted-text mt-1">Balance peak grip against tyre degradation rules.</p>
+        </div>
+        <div class="sub-box">
+          <div class="mono text-xs muted-text">PART 03</div>
+          <div class="font-bold uppercase mt-1">Pit Stop Window</div>
+          <p class="text-xs muted-text mt-1">Choose the exact lap to box before hitting the wear cliff.</p>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <button data-goto="11" class="btn-outline">Skip to Dashboard</button>
+        <button data-goto="3" class="btn-primary">Let's Build One Together &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

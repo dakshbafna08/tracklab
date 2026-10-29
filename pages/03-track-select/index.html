@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 3. Track Select</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn nav-btn-active">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-3" class="screen w-full max-w-3xl panel f1-border-top p-8">
+      <div class="mono text-xs muted-text uppercase mb-1">Step 1 of 3 // Circuit Selection</div>
+      <h2 class="text-2xl font-bold uppercase mb-6">Choose the Track</h2>
+      <div class="grid grid-cols-2 gap-6 mb-8">
+        <div id="track-mel" data-track="MELBOURNE" data-laps="58" class="track-card track-selected">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="text-xs mono muted-text">ROUND 01 // AUSTRALIA</div>
+              <div class="text-xl font-bold uppercase">Melbourne — Albert Park</div>
+            </div>
+            <span id="badge-mel" class="selected-badge">SELECTED</span>
+          </div>
+          <div class="track-map-box">
+            <svg viewBox="0 0 200 90" class="w-40 h-20 stroke-white fill-none" stroke-width="3">
+              <path d="M 20 60 L 80 60 L 110 45 L 160 50 L 175 30 L 130 15 L 60 20 L 30 35 Z"/>
+            </svg>
+          </div>
+          <div class="track-meta">
+            <div><span class="meta-label">LAPS</span>58</div>
+            <div><span class="meta-label">PIT LOSS</span>21.2s</div>
+            <div><span class="meta-label">TYRE STRESS</span>MEDIUM</div>
+          </div>
+        </div>
+
+        <div id="track-aus" data-track="AUSTIN (COTA)" data-laps="56" class="track-card">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <div class="text-xs mono muted-text">ROUND 19 // USA</div>
+              <div class="text-xl font-bold uppercase">Austin — COTA</div>
+            </div>
+            <span id="badge-aus" class="selected-badge hidden">SELECTED</span>
+          </div>
+          <div class="track-map-box">
+            <svg viewBox="0 0 200 90" class="w-40 h-20 stroke-[#8E8E93] fill-none" stroke-width="3">
+              <path d="M 20 70 L 70 20 L 120 35 L 175 20 L 160 65 L 110 55 L 90 75 Z"/>
+            </svg>
+          </div>
+          <div class="track-meta">
+            <div><span class="meta-label">LAPS</span>56</div>
+            <div><span class="meta-label">PIT LOSS</span>20.4s</div>
+            <div><span class="meta-label">TYRE STRESS</span>HIGH</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <button data-goto="2" class="btn-outline">&larr; Back</button>
+        <button data-goto="4" class="btn-primary">Confirm Track &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

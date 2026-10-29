@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 5. Pick Tires</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn nav-btn-active">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-5" class="screen w-full max-w-2xl panel f1-border-top p-8">
+      <div class="mono text-xs muted-text uppercase mb-1">Part 1 // Strategy Builder</div>
+      <h2 class="text-2xl font-bold uppercase mb-2">What Tyres Do You Want to Add?</h2>
+      <p class="text-sm muted-text mb-6">Choose your starting compound (Stint 1) and the compound you will switch to at your pit stop (Stint 2).</p>
+
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="sub-box">
+          <div class="mono text-xs muted-text mb-3 uppercase">Stint 01 // Starting Tyre</div>
+          <div class="space-y-2">
+            <button data-stint="1" data-compound="SOFT" id="s1-SOFT" class="compound-btn compound-active">
+              <span>Soft</span><span class="mono text-xs">14-18 Laps</span>
+            </button>
+            <button data-stint="1" data-compound="MEDIUM" id="s1-MEDIUM" class="compound-btn">
+              <span>Medium</span><span class="mono text-xs">22-30 Laps</span>
+            </button>
+            <button data-stint="1" data-compound="HARD" id="s1-HARD" class="compound-btn">
+              <span>Hard</span><span class="mono text-xs">32-45 Laps</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sub-box">
+          <div class="mono text-xs muted-text mb-3 uppercase">Stint 02 // Pit Stop Tyre</div>
+          <div class="space-y-2">
+            <button data-stint="2" data-compound="SOFT" id="s2-SOFT" class="compound-btn">
+              <span>Soft</span><span class="mono text-xs">14-18 Laps</span>
+            </button>
+            <button data-stint="2" data-compound="MEDIUM" id="s2-MEDIUM" class="compound-btn">
+              <span>Medium</span><span class="mono text-xs">22-30 Laps</span>
+            </button>
+            <button data-stint="2" data-compound="HARD" id="s2-HARD" class="compound-btn compound-active">
+              <span>Hard</span><span class="mono text-xs">32-45 Laps</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-box mb-6">
+        <div class="mono text-xs muted-text mb-2 uppercase">Building Your Strategy // Compound Sequence</div>
+        <div class="flex items-center gap-3 mono text-sm font-bold">
+          <span id="preview-s1" class="px-3 py-1 border border-[#E10600]">STINT 1: SOFT</span>
+          <span>&rarr;</span>
+          <span id="preview-s2" class="px-3 py-1 border border-white">STINT 2: HARD</span>
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button data-goto="4" class="btn-outline">&larr; Back to Lesson</button>
+        <button data-goto="6" class="btn-primary">Next: Pit Stop Timing &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

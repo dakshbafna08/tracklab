@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 11. Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn nav-btn-active">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-11" class="screen w-full max-w-5xl space-y-6">
+      <div class="panel f1-border-top p-6 flex justify-between items-center">
+        <div>
+          <div class="mono text-xs muted-text uppercase">Driver Hub // Saved Telemetry</div>
+          <h1 class="text-2xl font-bold uppercase">Strategy Dashboard</h1>
+        </div>
+        <div class="flex gap-3">
+          <button data-goto="2" class="btn-outline">1. Replay Tutorial</button>
+          <button data-goto="5" class="btn-primary">2. + Create New Race Strategy</button>
+        </div>
+      </div>
+
+      <div class="panel p-6">
+        <div class="mono text-xs muted-text uppercase mb-4">3. Choose a Different Track</div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="sub-box flex justify-between items-center">
+            <div>
+              <div class="font-bold uppercase">Melbourne — Albert Park</div>
+              <div class="text-xs mono muted-text">58 Laps // Pit Loss: 21.2s</div>
+            </div>
+            <button data-quicktrack="MELBOURNE" data-quicklaps="58" class="btn-outline text-xs">Build Strategy</button>
+          </div>
+          <div class="sub-box flex justify-between items-center">
+            <div>
+              <div class="font-bold uppercase">Austin — Circuit of the Americas</div>
+              <div class="text-xs mono muted-text">56 Laps // Pit Loss: 20.4s</div>
+            </div>
+            <button data-quicktrack="AUSTIN (COTA)" data-quicklaps="56" class="btn-outline text-xs">Build Strategy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel p-6">
+        <div class="mono text-xs muted-text uppercase mb-4">4. Past User Race Strategies</div>
+        <table class="w-full text-left border-collapse mono text-xs">
+          <thead>
+            <tr class="border-b border-[#38383F] muted-text uppercase">
+              <th class="py-3 px-4">Track</th>
+              <th class="py-3 px-4">Compound Stints</th>
+              <th class="py-3 px-4">Pit Stop Lap</th>
+              <th class="py-3 px-4">Vs. RL Agent</th>
+              <th class="py-3 px-4 text-right">5. Replay Simulation</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#38383F]">
+            <tr class="bg-[#15151E]">
+              <td class="py-3 px-4 font-bold">MELBOURNE</td>
+              <td class="py-3 px-4">SOFT &rarr; HARD</td>
+              <td class="py-3 px-4">LAP 18</td>
+              <td class="py-3 px-4 text-[#E10600]">+6.8s (LOSS)</td>
+              <td class="py-3 px-4 text-right">
+                <button class="replay-sim-btn">Run Simulation Again &rarr;</button>
+              </td>
+            </tr>
+            <tr class="bg-[#15151E]">
+              <td class="py-3 px-4 font-bold">AUSTIN (COTA)</td>
+              <td class="py-3 px-4">MEDIUM &rarr; HARD</td>
+              <td class="py-3 px-4">LAP 23</td>
+              <td class="py-3 px-4 text-white font-bold">-1.2s (WIN)</td>
+              <td class="py-3 px-4 text-right">
+                <button class="replay-sim-btn">Run Simulation Again &rarr;</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>

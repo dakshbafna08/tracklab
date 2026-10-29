@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 10. Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn nav-btn-active">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-10" class="screen w-full max-w-4xl panel f1-border-top p-8">
+      <div class="flex justify-between items-start border-b border-[#38383F] pb-4 mb-6">
+        <div>
+          <div class="section-tag">Post-Race Analysis // FastF1 Telemetry Validation</div>
+          <h2 class="text-2xl font-bold uppercase">Strategy Comparison: Yours vs. RL Model</h2>
+        </div>
+        <div class="sub-box px-3 py-2 mono text-xs">
+          DATA SOURCE: <strong class="text-white">FastF1 Historical Telemetry + TUM Racetrack Data</strong>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6 mono text-xs">
+        <div class="sub-box p-4">
+          <div class="flex justify-between mb-2">
+            <span class="font-bold text-white">1. RL AGENT STRATEGY (WINNER — 1:23:54.2)</span>
+            <span class="text-[#E10600]">TRAINED ON GYMNASIUM RL ENVIRONMENT</span>
+          </div>
+          <div class="w-full h-6 flex border border-[#38383F]">
+            <div style="width: 41%" class="bg-[#4A3B10] border-r border-white flex items-center px-2">MEDIUM (L1–24)</div>
+            <div style="width: 59%" class="bg-[#2A2A32] flex items-center px-2">HARD (L25–58)</div>
+          </div>
+        </div>
+
+        <div class="sub-box p-4">
+          <div class="flex justify-between mb-2">
+            <span class="font-bold text-white">2. YOUR STRATEGY (+6.8s BEHIND — 1:24:01.0)</span>
+            <span id="result-user-summary" class="muted-text">PIT STOP ON LAP 18</span>
+          </div>
+          <div class="w-full h-6 flex border border-[#38383F]">
+            <div style="width: 31%" class="bg-[#4A1515] border-r border-white flex items-center px-2">SOFT (L1–18)</div>
+            <div style="width: 69%" class="bg-[#2A2A32] flex items-center px-2">HARD (L19–58)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box mb-6">
+        <div class="mono text-xs text-[#E10600] uppercase font-bold mb-1">Race Engineer Debrief</div>
+        <p class="text-sm body-copy">
+          Starting on Softs gave an early pace advantage, but thermal degradation forced an early Lap 18 stop, leaving a 40-lap stint on Hards. The RL Agent extended Stint 1 to Lap 24 on Mediums to minimize late-race drop-off.
+        </p>
+      </div>
+
+      <div class="flex justify-between items-center border-t border-[#38383F] pt-4">
+        <div class="text-sm muted-text">Do you want to try again or return to your dashboard?</div>
+        <div class="flex gap-4">
+          <button data-goto="5" class="btn-outline">Try Again</button>
+          <button data-goto="11" class="btn-primary">View Dashboard &rarr;</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>
