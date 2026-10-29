@@ -44,7 +44,7 @@ function goTo(screenNum) {
 document.addEventListener('DOMContentLoaded', () => {
   let state = getState();
 
-  // --- AUTO-INJECT "NEW TO F1?" LINK INTO HEADER ON ALL PAGES ---
+  // 1. Auto-inject "NEW TO F1?" tab in the header (NOT in the Screen Switcher bar)
   const headerLinksContainer = document.querySelector('.app-header .text-sm');
   if (headerLinksContainer && !headerLinksContainer.querySelector('[data-goto="12"]')) {
     const f1Btn = document.createElement('button');
@@ -60,17 +60,25 @@ document.addEventListener('DOMContentLoaded', () => {
     headerLinksContainer.prepend(f1Btn);
   }
 
-  // --- AUTO-INJECT "12. F1 EXPLAINED" INTO DEV BAR ON ALL PAGES ---
-  const devNav = document.querySelector('.dev-nav');
-  if (devNav && !devNav.querySelector('[data-target="12"]')) {
-    const devBtn = document.createElement('button');
-    devBtn.setAttribute('data-target', '12');
-    devBtn.className = 'nav-btn';
-    devBtn.textContent = '12. F1 Explained';
-    devNav.appendChild(devBtn);
+  // 2. Auto-inject Official F1 Legal & Copyright Footer at the bottom of every page
+  if (!document.querySelector('.f1-legal-footer')) {
+    const footer = document.createElement('footer');
+    footer.className = 'f1-legal-footer border-t border-[#38383F] bg-[#0D0D12] py-4 px-8 text-center mono text-xs muted-text mt-auto';
+    footer.innerHTML = `
+      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+          <span class="f1-badge text-xs">F1</span>
+          <span class="text-white font-bold uppercase">TrackLab Strategy Telemetry</span>
+        </div>
+        <div>
+          &copy; 2003-2026 Formula One World Championship Limited. The F1 FORMULA 1 logo, F1 logo, FORMULA 1, F1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX and related marks are trademarks of Formula One Licensing BV, a Formula 1 company. All rights reserved.
+        </div>
+      </div>
+    `;
+    document.body.appendChild(footer);
   }
 
-  // 1. Wire up Dev Wireframe Bar & Navigation Buttons
+  // 3. Wire up Dev Wireframe Bar & Navigation Buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => goTo(Number(btn.dataset.target)));
   });
@@ -84,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = state.totalLaps;
   });
 
-  // 2. Screen 3: Track Selection Logic
+  // 4. Screen 3: Track Selection Logic
   const trackMel = document.getElementById('track-mel');
   const trackAus = document.getElementById('track-aus');
   if (trackMel && trackAus) {
@@ -108,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Screen 5: Tire Compound Selection Logic
+  // 5. Screen 5: Tire Compound Selection Logic
   const previewS1 = document.getElementById('preview-s1');
   if (previewS1) {
     const renderTires = () => {
@@ -133,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 4. Screen 7: Pit Stop Slider Logic
+  // 6. Screen 7: Pit Stop Slider Logic
   const slider = document.getElementById('pit-slider');
   if (slider) {
     slider.max = state.totalLaps - 5;
@@ -168,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     slider.addEventListener('input', e => renderPitWindow(e.target.value));
   }
 
-  // 5. Screen 8: Confirm Strategy Summary
+  // 7. Screen 8: Confirm Strategy Summary
   const summaryTrack = document.getElementById('summary-track');
   if (summaryTrack) {
     summaryTrack.textContent = `${state.track} (${state.totalLaps} LAPS)`;
@@ -182,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startRaceBtn.addEventListener('click', () => goTo(9));
   }
 
-  // 6. Screen 9: Race Simulation Timer
+  // 8. Screen 9: Race Simulation Timer
   const simLap = document.getElementById('sim-lap');
   if (simLap) {
     let lap = 1;
@@ -197,13 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 180);
   }
 
-  // 7. Screen 10: Results Summary
+  // 9. Screen 10: Results Summary
   const resSummary = document.getElementById('result-user-summary');
   if (resSummary) {
     resSummary.textContent = `PIT STOP ON LAP ${state.pitLap}`;
   }
 
-  // 8. Screen 11: Dashboard Quick Buttons
+  // 10. Screen 11: Dashboard Quick Buttons
   document.querySelectorAll('[data-quicktrack]').forEach(btn => {
     btn.addEventListener('click', () => {
       saveState({
