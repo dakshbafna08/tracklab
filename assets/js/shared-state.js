@@ -17,7 +17,8 @@ const SCREEN_PATHS = {
   8: 'pages/08-confirm/index.html',
   9: 'pages/09-race-sim/index.html',
   10: 'pages/10-results/index.html',
-  11: 'pages/11-dashboard/index.html'
+  11: 'pages/11-dashboard/index.html',
+  12: 'pages/12-f1-explained/index.html'
 };
 
 function getState() {
@@ -42,6 +43,32 @@ function goTo(screenNum) {
 
 document.addEventListener('DOMContentLoaded', () => {
   let state = getState();
+
+  // --- AUTO-INJECT "NEW TO F1?" LINK INTO HEADER ON ALL PAGES ---
+  const headerLinksContainer = document.querySelector('.app-header .text-sm');
+  if (headerLinksContainer && !headerLinksContainer.querySelector('[data-goto="12"]')) {
+    const f1Btn = document.createElement('button');
+    f1Btn.setAttribute('data-goto', '12');
+    f1Btn.className = 'header-link';
+    f1Btn.textContent = 'New to F1?';
+
+    const divider = document.createElement('span');
+    divider.className = 'divider';
+    divider.textContent = '|';
+
+    headerLinksContainer.prepend(divider);
+    headerLinksContainer.prepend(f1Btn);
+  }
+
+  // --- AUTO-INJECT "12. F1 EXPLAINED" INTO DEV BAR ON ALL PAGES ---
+  const devNav = document.querySelector('.dev-nav');
+  if (devNav && !devNav.querySelector('[data-target="12"]')) {
+    const devBtn = document.createElement('button');
+    devBtn.setAttribute('data-target', '12');
+    devBtn.className = 'nav-btn';
+    devBtn.textContent = '12. F1 Explained';
+    devNav.appendChild(devBtn);
+  }
 
   // 1. Wire up Dev Wireframe Bar & Navigation Buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {
