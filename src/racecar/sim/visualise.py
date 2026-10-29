@@ -1,5 +1,7 @@
 import numpy as np
 from racecar.src.racecar.envs.vehicle_env import RaceCarEnv
+import matplotlib
+matplotlib.use("macosx")
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
