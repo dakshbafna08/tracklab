@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // Formula 1 Explained & Strategy Encyclopedia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- DEV WIREFRAME BAR (Strictly Screens 1 to 11 only) -->
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <!-- MAIN APPLICATION HEADER -->
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="12" class="header-link text-white underline">New to F1?</button>
+      <span class="divider">|</span>
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-1 flex flex-col items-center p-8 max-w-6xl mx-auto w-full space-y-6">
+
+    <!-- HERO BANNER WITH THE OFFICIAL F1 LOGO IMAGE -->
+    <section class="w-full panel f1-border-top overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3">
+        <div class="p-8 md:col-span-2 flex flex-col justify-between">
+          <div>
+            <div class="section-tag">Telemetry Encyclopedia // Pit Wall Reference</div>
+            <h1 class="text-3xl font-bold uppercase mb-3">Formula 1 Explained: Rules, Teams &amp; Strategy</h1>
+            <p class="body-copy text-sm">
+              Formula 1 race strategy is the continuous optimization of lap time, track position, and tire degradation within rigid regulatory and physical constraints. Every strategic decision balances time lost in the pit lane against the lap-time penalty of running worn rubber or dirty air.
+            </p>
+          </div>
+
+          <!-- SUB-TAB NAVIGATION -->
+          <div class="flex flex-wrap gap-3 mt-6 pt-4 border-t border-[#38383F]">
+            <button data-subtab="tab-strategy" class="subtab-btn btn-primary text-xs">
+              01 // Race Strategy Guide
+            </button>
+            <button data-subtab="tab-basics" class="subtab-btn btn-outline text-xs">
+              02 // What is F1 &amp; 2026 Teams
+            </button>
+            <button data-subtab="tab-standings" class="subtab-btn btn-outline text-xs">
+              03 // Live 2026 Standings &amp; Schedule
+            </button>
+          </div>
+        </div>
+
+        <!-- OFFICIAL F1 LOGO IMAGE CONTAINER -->
+        <div class="bg-[#0D0D12] border-l border-[#38383F] p-6 flex flex-col items-center justify-between text-center">
+          <div class="mono text-xs muted-text uppercase self-end">OFFICIAL TELEMETRY GUIDE</div>
+          <div class="my-6 flex flex-col items-center justify-center">
+            <!-- Official F1 Logo Image -->
+            <img src="https://1000logos.net/wp-content/uploads/2021/06/F1-logo.png" alt="Formula 1 Logo" class="w-44 object-contain filter drop-shadow">
+            <div class="text-xs mono uppercase tracking-widest text-white mt-3 font-bold">FIA Formula One World Championship</div>
+          </div>
+          <div class="w-full border-t border-[#38383F] pt-3 mono text-xs muted-text flex justify-between">
+            <span>11 CONSTRUCTORS</span>
+            <span>22 DRIVERS</span>
+            <span>24 ROUNDS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SUB-TAB 1: COMPLETE RACE STRATEGY GUIDE
+         ========================================== -->
+    <div id="tab-strategy" class="subtab-panel w-full space-y-6">
+
+      <!-- 1. CORE MECHANICS & REGULATORY CONSTRAINTS -->
+      <section class="panel p-6">
+        <div class="section-tag">Section 01 // Regulatory &amp; Physical Constraints</div>
+        <h2 class="text-xl font-bold uppercase mb-4">Core Mechanics &amp; Neutralization Deltas</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="sub-box">
+            <div class="mono text-xs text-[#E10600] font-bold uppercase mb-1">Mandatory 2-Compound Rule</div>
+            <p class="text-xs body-copy">
+              In dry races, every driver must run at least two different slick tire specifications (Soft, Medium, Hard). In wet conditions (Intermediate or Full Wet), this compound requirement is waived.
+            </p>
+          </div>
+          <div class="sub-box">
+            <div class="mono text-xs text-[#E10600] font-bold uppercase mb-1">The Pit Loss Delta</div>
+            <p class="text-xs body-copy">
+              Entering and exiting the pit lane incurs a baseline time loss (typically 18 to 25 seconds depending on pit-lane speed limits and length) plus stationary stop time (~2.0 to 3.0 seconds). Fresh rubber must erase that delta.
+            </p>
+          </div>
+          <div class="sub-box">
+            <div class="mono text-xs text-[#E10600] font-bold uppercase mb-1">Fuel &amp; Weight Effect</div>
+            <p class="text-xs body-copy">
+              In-race refueling has been banned since 2010. Cars start with up to 110 kg of fuel, gaining roughly <strong class="text-white">0.3 to 0.4s per lap</strong> for every 10 kg burned. As the car gets lighter, tire wear shifts dynamically.
+            </p>
+          </div>
+        </div>
+
+        <!-- NEUTRALIZATION TABLE -->
+        <div class="mono text-xs muted-text uppercase mb-2">Neutralization State vs. Average Pit Lane Delta</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse mono text-xs border border-[#38383F]">
+            <thead>
+              <tr class="bg-[#15151E] border-b border-[#38383F] muted-text uppercase">
+                <th class="py-3 px-4">Neutralization State</th>
+                <th class="py-3 px-4">Average Pit Delta</th>
+                <th class="py-3 px-4">Field Pace</th>
+                <th class="py-3 px-4">Strategic Impact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#38383F]">
+              <tr class="bg-[#1A1A22]">
+                <td class="py-3 px-4 font-bold text-green-400">GREEN FLAG</td>
+                <td class="py-3 px-4 font-bold">18s – 25s</td>
+                <td class="py-3 px-4">100% Race Pace</td>
+                <td class="py-3 px-4 body-copy">Full time penalty; requires clean air to recover position.</td>
+              </tr>
+              <tr class="bg-[#15151E]">
+                <td class="py-3 px-4 font-bold text-[#F5C518]">VIRTUAL SAFETY CAR (VSC)</td>
+                <td class="py-3 px-4 font-bold">11s – 14s</td>
+                <td class="py-3 px-4">~70% Pace (Delta Locked)</td>
+                <td class="py-3 px-4 body-copy">Reduced loss ("cheap pit stop"); ideal window for proactive stops.</td>
+              </tr>
+              <tr class="bg-[#1A1A22]">
+                <td class="py-3 px-4 font-bold text-[#F5C518]">FULL SAFETY CAR (SC)</td>
+                <td class="py-3 px-4 font-bold">9s – 12s</td>
+                <td class="py-3 px-4">~60% Pace (Bunched)</td>
+                <td class="py-3 px-4 body-copy">Minimal loss; packs the field, neutralizing gap advantage.</td>
+              </tr>
+              <tr class="bg-[#15151E]">
+                <td class="py-3 px-4 font-bold text-[#E10600]">RED FLAG STOPPAGE</td>
+                <td class="py-3 px-4 font-bold text-white">0s (FREE)</td>
+                <td class="py-3 px-4">Session Suspended</td>
+                <td class="py-3 px-4 body-copy">Free tire change in pit lane; fulfills mandatory compound rule.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2. TIRE PHYSICS & STINT ECONOMICS -->
+      <section class="panel p-6">
+        <div class="section-tag">Section 02 // Tire Physics &amp; Stint Economics</div>
+        <h2 class="text-xl font-bold uppercase mb-2">Pirelli Dry Spectrum (C0 Hardest – C6 Softest)</h2>
+        <p class="text-xs muted-text mb-4">Pirelli nominates three dry slick compounds per race weekend from their homologated spectrum:</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="sub-box border-t-2 border-t-[#E10600]">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="tire-ring tire-soft"></div>
+              <div class="font-bold uppercase">Soft (Red)</div>
+            </div>
+            <div class="mono text-xs text-[#E10600] mb-2">FASTEST PACE // HIGH WEAR</div>
+            <p class="text-xs body-copy">
+              Maximum mechanical grip; fastest single-lap pace. Vulnerable to overheating and blistering. <br><br>
+              <strong class="text-white">Primary Use:</strong> Aggressive race starts, undercut pushes, late-race fastest lap attempts.
+            </p>
+          </div>
+
+          <div class="sub-box border-t-2 border-t-[#F5C518]">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="tire-ring tire-medium"></div>
+              <div class="font-bold uppercase">Medium (Yellow)</div>
+            </div>
+            <div class="mono text-xs text-[#F5C518] mb-2">~0.4–0.8s SLOWER // LINEAR WEAR</div>
+            <p class="text-xs body-copy">
+              Balanced baseline grip and thermal durability with a predictable degradation profile. <br><br>
+              <strong class="text-white">Primary Use:</strong> Versatile opening stint or flexible middle stint backbone.
+            </p>
+          </div>
+
+          <div class="sub-box border-t-2 border-t-white">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="tire-ring tire-hard"></div>
+              <div class="font-bold uppercase">Hard (White)</div>
+            </div>
+            <div class="mono text-xs text-white mb-2">~0.5–1.0s SLOWER // LOWEST WEAR</div>
+            <p class="text-xs body-copy">
+              Lowest baseline grip, slowest warm-up, widest operating temperature window. <br><br>
+              <strong class="text-white">Primary Use:</strong> Extended stints, one-stop foundations, overcut defenses.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="callout-box">
+            <div class="mono text-xs text-white font-bold uppercase mb-1">Thermal Degradation vs. Mechanical Wear</div>
+            <p class="text-xs body-copy">
+              Drivers rarely wear tires down to the canvas; instead, thermal degradation overheats the surface rubber, accelerating slide-induced grip loss. Managing slip angles, brake bias, and surface temperatures dictates stint longevity.
+            </p>
+          </div>
+          <div class="callout-box">
+            <div class="mono text-xs text-[#E10600] font-bold uppercase mb-1">The Degradation "Cliff"</div>
+            <p class="text-xs body-copy">
+              The non-linear inflection point where tire grip drops abruptly by <strong class="text-white">1.5 to 3.0+ seconds per lap</strong>. Pitting one lap before hitting the cliff is critical to avoid catastrophic track position loss.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. OFFENSIVE & TACTICAL PLAYS -->
+      <section class="panel p-6">
+        <div class="section-tag">Section 03 // Offensive &amp; Tactical Plays</div>
+        <h2 class="text-xl font-bold uppercase mb-4">The Undercut, The Overcut &amp; Dirty Air</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="sub-box">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-bold uppercase text-base text-[#E10600]">The Undercut</span>
+              <span class="mono text-xs px-2 py-0.5 border border-[#E10600]">PIT 1–2 LAPS EARLY</span>
+            </div>
+            <p class="text-xs body-copy mb-3">
+              <strong class="text-white">Mechanism:</strong> Pitting one or two laps earlier than the rival ahead. The car on fresh out-lap rubber gains immediate mechanical grip and outpaces the rival staying out on worn tires. When the leader pits a lap later, they exit behind.
+            </p>
+            <div class="mono text-xs muted-text border-t border-[#38383F] pt-2">
+              <strong class="text-white">WHEN TO USE:</strong> High tire-degradation circuits (Bahrain, Barcelona, Austin) where fresh rubber pace exceeds out-lap warm-up penalty.
+            </div>
+          </div>
+
+          <div class="sub-box">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-bold uppercase text-base text-white">The Overcut</span>
+              <span class="mono text-xs px-2 py-0.5 border border-white">STAY OUT IN CLEAN AIR</span>
+            </div>
+            <p class="text-xs body-copy mb-3">
+              <strong class="text-white">Mechanism:</strong> Staying on track longer than the rival that just pitted. The leading car runs fast laps in clean air with low fuel weight while the pitted rival struggles with cold Hard-tire warm-up or midfield traffic on their out-lap.
+            </p>
+            <div class="mono text-xs muted-text border-t border-[#38383F] pt-2">
+              <strong class="text-white">WHEN TO USE:</strong> Low-degradation street circuits (Monaco, Singapore) or damp/cold conditions with slow tire warm-up.
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-box">
+          <div class="mono text-xs text-[#E10600] uppercase font-bold mb-1">Track Position vs. Tire Delta (Dirty Air Penalty)</div>
+          <p class="text-xs body-copy">
+            Following another car within <strong class="text-white">1.5 seconds</strong> causes turbulent wake ("dirty air"), reducing aerodynamic downforce, inducing corner sliding, and spiking tire surface temperatures. On tight circuits (Monaco, Hungaroring), track position trumps tire delta. On high-speed DRS circuits (Spa, Monza, COTA), a tire pace delta of <strong class="text-white">0.7–1.0s/lap</strong> easily overcomes track deficit.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4. RACE ENGINEER EXECUTION CHECKLIST -->
+      <section class="panel p-6">
+        <div class="section-tag">Section 04 // Pit Wall Protocol</div>
+        <h2 class="text-xl font-bold uppercase mb-4">Execution Checklist for Race Day Strategy</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mono text-xs">
+          <div class="sub-box">
+            <div class="text-[#E10600] font-bold mb-1">STEP 01</div>
+            <div class="font-bold text-white uppercase mb-1">Calculate Pit Delta</div>
+            <p class="muted-text">Define exact pit-lane entry-to-exit loss under Green, VSC, and Safety Car conditions.</p>
+          </div>
+          <div class="sub-box">
+            <div class="text-[#E10600] font-bold mb-1">STEP 02</div>
+            <div class="font-bold text-white uppercase mb-1">Map Traffic Windows</div>
+            <p class="muted-text">Identify clear 3-second gaps in the midfield pack so out-laps don't emerge behind DRS trains.</p>
+          </div>
+          <div class="sub-box">
+            <div class="text-[#E10600] font-bold mb-1">STEP 03</div>
+            <div class="font-bold text-white uppercase mb-1">Monitor Track Temp</div>
+            <p class="muted-text">Asphalt heating or cooling by 5&deg;C shifts degradation balance between front and rear axles.</p>
+          </div>
+          <div class="sub-box">
+            <div class="text-[#E10600] font-bold mb-1">STEP 04</div>
+            <div class="font-bold text-white uppercase mb-1">Plan A / Plan B Triggers</div>
+            <p class="muted-text">Set lap-time threshold deltas that mandate switching from a 1-stop to a 2-stop race.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         SUB-TAB 2: WHAT IS F1 & 2026 TEAMS
+         ========================================== -->
+    <div id="tab-basics" class="subtab-panel hidden w-full space-y-6">
+
+      <!-- GRAND PRIX WEEKEND FORMAT & POINTS -->
+      <section class="panel p-6">
+        <div class="section-tag">F1 101 // Weekend Structure &amp; Scoring</div>
+        <h2 class="text-xl font-bold uppercase mb-4">How a Formula 1 Grand Prix Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="sub-box">
+            <div class="mono text-xs muted-text">FRIDAY // TELEMETRY</div>
+            <div class="font-bold uppercase mt-1">Free Practice (FP1–FP3)</div>
+            <p class="text-xs body-copy mt-1">Teams run aerodynamic rake tests, high-fuel long runs to measure tire degradation rates, and low-fuel qualifying simulations.</p>
+          </div>
+          <div class="sub-box">
+            <div class="mono text-xs muted-text">SATURDAY // KNOCKOUT</div>
+            <div class="font-bold uppercase mt-1">Qualifying (Q1, Q2, Q3)</div>
+            <p class="text-xs body-copy mt-1">Three-stage knockout session on Soft tires to set the Sunday starting grid. Fastest driver in Q3 takes Pole Position (P1).</p>
+          </div>
+          <div class="sub-box">
+            <div class="mono text-xs muted-text">SUNDAY // 305 KM</div>
+            <div class="font-bold uppercase mt-1">The Grand Prix</div>
+            <p class="text-xs body-copy mt-1">A 305 km (190-mile) race where strategy, pit stops, tire compounds, and energy management decide the podium.</p>
+          </div>
+        </div>
+
+        <div class="callout-box mono text-xs">
+          <strong class="text-white uppercase">FIA Championship Points System (Top 10 Finishers):</strong>
+          P1: <span class="text-[#E10600] font-bold">25 pts</span> | P2: 18 pts | P3: 15 pts | P4: 12 pts | P5: 10 pts | P6: 8 pts | P7: 6 pts | P8: 4 pts | P9: 2 pts | P10: 1 pt
+        </div>
+      </section>
+
+      <!-- 2026 CONSTRUCTORS & DRIVERS GRID -->
+      <section class="panel p-6">
+        <div class="section-tag">2026 Grid // 11 Constructors &amp; 22 Drivers</div>
+        <h2 class="text-xl font-bold uppercase mb-4">2026 Formula 1 Teams &amp; Lineups</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="sub-box border-l-4 border-l-[#27F4D2]">
+            <div class="font-bold uppercase text-white">Mercedes-AMG Petronas</div>
+            <div class="mono text-xs muted-text mt-1">#12 Andrea Kimi Antonelli &bull; #63 George Russell</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#E8002D]">
+            <div class="font-bold uppercase text-white">Scuderia Ferrari</div>
+            <div class="mono text-xs muted-text mt-1">#44 Lewis Hamilton &bull; #16 Charles Leclerc</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#3671C6]">
+            <div class="font-bold uppercase text-white">Red Bull Racing</div>
+            <div class="mono text-xs muted-text mt-1">#3 Max Verstappen &bull; #6 Isack Hadjar</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#FF8000]">
+            <div class="font-bold uppercase text-white">McLaren F1 Team</div>
+            <div class="mono text-xs muted-text mt-1">#1 Lando Norris &bull; #81 Oscar Piastri</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#6692FF]">
+            <div class="font-bold uppercase text-white">Racing Bulls</div>
+            <div class="mono text-xs muted-text mt-1">#30 Liam Lawson &bull; #41 Arvid Lindblad</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#FF87BC]">
+            <div class="font-bold uppercase text-white">Alpine F1 Team</div>
+            <div class="mono text-xs muted-text mt-1">#10 Pierre Gasly &bull; #43 Franco Colapinto</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#B6BABD]">
+            <div class="font-bold uppercase text-white">Haas F1 Team</div>
+            <div class="mono text-xs muted-text mt-1">#87 Oliver Bearman &bull; #31 Esteban Ocon</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#F50537]">
+            <div class="font-bold uppercase text-white">Audi F1 Team</div>
+            <div class="mono text-xs muted-text mt-1">#27 Nico H&uuml;lkenberg &bull; #5 Gabriel Bortoleto</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#64C4FF]">
+            <div class="font-bold uppercase text-white">Atlassian Williams</div>
+            <div class="mono text-xs muted-text mt-1">#55 Carlos Sainz &bull; #23 Alex Albon</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#229971]">
+            <div class="font-bold uppercase text-white">Aston Martin Aramco</div>
+            <div class="mono text-xs muted-text mt-1">#14 Fernando Alonso &bull; #18 Lance Stroll</div>
+          </div>
+          <div class="sub-box border-l-4 border-l-[#D4AF37]">
+            <div class="font-bold uppercase text-white">Cadillac F1 Team</div>
+            <div class="mono text-xs muted-text mt-1">#77 Valtteri Bottas &bull; #11 Sergio P&eacute;rez</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         SUB-TAB 3: LIVE 2026 STANDINGS & SCHEDULE
+         ========================================== -->
+    <div id="tab-standings" class="subtab-panel hidden w-full space-y-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- DRIVERS CHAMPIONSHIP -->
+        <section class="panel p-6">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <div class="section-tag">2026 World Championship</div>
+              <h2 class="text-lg font-bold uppercase">Drivers' Standings (Top 10)</h2>
+            </div>
+            <span id="api-status-badge" class="mono text-xs px-2 py-1 bg-[#15151E] border border-[#38383F] text-green-400">LIVE API SYNC</span>
+          </div>
+          <table class="w-full text-left border-collapse mono text-xs">
+            <thead>
+              <tr class="border-b border-[#38383F] muted-text uppercase">
+                <th class="py-2 px-3">Pos</th>
+                <th class="py-2 px-3">Driver</th>
+                <th class="py-2 px-3">Team</th>
+                <th class="py-2 px-3 text-right">Pts</th>
+              </tr>
+            </thead>
+            <tbody id="driver-standings-body" class="divide-y divide-[#38383F]">
+              <tr><td class="py-2 px-3 font-bold text-[#E10600]">1</td><td class="py-2 px-3 font-bold">Kimi Antonelli</td><td class="py-2 px-3 muted-text">Mercedes</td><td class="py-2 px-3 text-right font-bold">365</td></tr>
+              <tr><td class="py-2 px-3 font-bold">2</td><td class="py-2 px-3 font-bold">George Russell</td><td class="py-2 px-3 muted-text">Mercedes</td><td class="py-2 px-3 text-right font-bold">242</td></tr>
+              <tr><td class="py-2 px-3 font-bold">3</td><td class="py-2 px-3 font-bold">Lewis Hamilton</td><td class="py-2 px-3 muted-text">Ferrari</td><td class="py-2 px-3 text-right font-bold">241</td></tr>
+              <tr><td class="py-2 px-3 font-bold">4</td><td class="py-2 px-3 font-bold">Max Verstappen</td><td class="py-2 px-3 muted-text">Red Bull</td><td class="py-2 px-3 text-right font-bold">236</td></tr>
+              <tr><td class="py-2 px-3 font-bold">5</td><td class="py-2 px-3 font-bold">Charles Leclerc</td><td class="py-2 px-3 muted-text">Ferrari</td><td class="py-2 px-3 text-right font-bold">233</td></tr>
+              <tr><td class="py-2 px-3 font-bold">6</td><td class="py-2 px-3 font-bold">Lando Norris</td><td class="py-2 px-3 muted-text">McLaren</td><td class="py-2 px-3 text-right font-bold">211</td></tr>
+              <tr><td class="py-2 px-3 font-bold">7</td><td class="py-2 px-3 font-bold">Oscar Piastri</td><td class="py-2 px-3 muted-text">McLaren</td><td class="py-2 px-3 text-right font-bold">144</td></tr>
+              <tr><td class="py-2 px-3 font-bold">8</td><td class="py-2 px-3 font-bold">Isack Hadjar</td><td class="py-2 px-3 muted-text">Red Bull</td><td class="py-2 px-3 text-right font-bold">105</td></tr>
+              <tr><td class="py-2 px-3 font-bold">9</td><td class="py-2 px-3 font-bold">Liam Lawson</td><td class="py-2 px-3 muted-text">Racing Bulls</td><td class="py-2 px-3 text-right font-bold">77</td></tr>
+              <tr><td class="py-2 px-3 font-bold">10</td><td class="py-2 px-3 font-bold">Pierre Gasly</td><td class="py-2 px-3 muted-text">Alpine</td><td class="py-2 px-3 text-right font-bold">42</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- CONSTRUCTORS CHAMPIONSHIP -->
+        <section class="panel p-6">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <div class="section-tag">2026 World Championship</div>
+              <h2 class="text-lg font-bold uppercase">Constructors' Standings</h2>
+            </div>
+            <span class="mono text-xs px-2 py-1 bg-[#15151E] border border-[#38383F] muted-text">AFTER ROUND 19 (COTA)</span>
+          </div>
+          <table class="w-full text-left border-collapse mono text-xs">
+            <thead>
+              <tr class="border-b border-[#38383F] muted-text uppercase">
+                <th class="py-2 px-3">Pos</th>
+                <th class="py-2 px-3">Constructor</th>
+                <th class="py-2 px-3 text-right">Wins</th>
+                <th class="py-2 px-3 text-right">Pts</th>
+              </tr>
+            </thead>
+            <tbody id="constructor-standings-body" class="divide-y divide-[#38383F]">
+              <tr><td class="py-2 px-3 font-bold text-[#E10600]">1</td><td class="py-2 px-3 font-bold">Mercedes-AMG Petronas</td><td class="py-2 px-3 text-right">12</td><td class="py-2 px-3 text-right font-bold">607</td></tr>
+              <tr><td class="py-2 px-3 font-bold">2</td><td class="py-2 px-3 font-bold">Scuderia Ferrari</td><td class="py-2 px-3 text-right">2</td><td class="py-2 px-3 text-right font-bold">474</td></tr>
+              <tr><td class="py-2 px-3 font-bold">3</td><td class="py-2 px-3 font-bold">Red Bull Racing</td><td class="py-2 px-3 text-right">2</td><td class="py-2 px-3 text-right font-bold">355</td></tr>
+              <tr><td class="py-2 px-3 font-bold">4</td><td class="py-2 px-3 font-bold">McLaren F1 Team</td><td class="py-2 px-3 text-right">2</td><td class="py-2 px-3 text-right font-bold">355</td></tr>
+              <tr><td class="py-2 px-3 font-bold">5</td><td class="py-2 px-3 font-bold">Racing Bulls</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">102</td></tr>
+              <tr><td class="py-2 px-3 font-bold">6</td><td class="py-2 px-3 font-bold">Alpine F1 Team</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">69</td></tr>
+              <tr><td class="py-2 px-3 font-bold">7</td><td class="py-2 px-3 font-bold">Haas F1 Team</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">30</td></tr>
+              <tr><td class="py-2 px-3 font-bold">8</td><td class="py-2 px-3 font-bold">Audi F1 Team</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">23</td></tr>
+              <tr><td class="py-2 px-3 font-bold">9</td><td class="py-2 px-3 font-bold">Atlassian Williams</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">12</td></tr>
+              <tr><td class="py-2 px-3 font-bold">10</td><td class="py-2 px-3 font-bold">Aston Martin Aramco</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">7</td></tr>
+              <tr><td class="py-2 px-3 font-bold">11</td><td class="py-2 px-3 font-bold">Cadillac F1 Team</td><td class="py-2 px-3 text-right">0</td><td class="py-2 px-3 text-right font-bold">0</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- 2026 RACE CALENDAR & RESULTS -->
+      <section class="panel p-6">
+        <div class="section-tag">2026 FIA Formula 1 Calendar</div>
+        <h2 class="text-lg font-bold uppercase mb-4">Recent Results &amp; Upcoming Finales</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mono text-xs">
+          <div class="sub-box">
+            <div class="muted-text">ROUND 01 // 08 MAR 2026</div>
+            <div class="font-bold text-white uppercase mt-1">Australian GP (Melbourne)</div>
+            <div class="text-green-400 mt-1">WINNER: George Russell (Mercedes)</div>
+          </div>
+          <div class="sub-box">
+            <div class="muted-text">ROUND 19 // 25 OCT 2026</div>
+            <div class="font-bold text-white uppercase mt-1">United States GP (Austin COTA)</div>
+            <div class="text-green-400 mt-1">WINNER: Kimi Antonelli (Mercedes)</div>
+          </div>
+          <div class="sub-box border-[#E10600]">
+            <div class="text-[#E10600] font-bold">NEXT UP // 01 NOV 2026</div>
+            <div class="font-bold text-white uppercase mt-1">Mexico City GP (Hermanos Rodr&iacute;guez)</div>
+            <div class="muted-text mt-1">71 Laps &bull; High Altitude Cooling Stress</div>
+          </div>
+          <div class="sub-box">
+            <div class="muted-text">08 NOV 2026 // INTERLAGOS</div>
+            <div class="font-bold text-white uppercase mt-1">S&atilde;o Paulo GP (Brazil)</div>
+            <div class="muted-text mt-1">71 Laps &bull; High Weather Variability</div>
+          </div>
+          <div class="sub-box">
+            <div class="muted-text">21 NOV 2026 // NEVADA</div>
+            <div class="font-bold text-white uppercase mt-1">Las Vegas GP</div>
+            <div class="muted-text mt-1">50 Laps &bull; Cold Night Graining Risk</div>
+          </div>
+          <div class="sub-box">
+            <div class="muted-text">29 NOV &amp; 06 DEC 2026</div>
+            <div class="font-bold text-white uppercase mt-1">Qatar GP &amp; Abu Dhabi Finale</div>
+            <div class="muted-text mt-1">Lusail &amp; Yas Marina Double-Header</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- BOTTOM ACTION CALLOUT -->
+    <section class="w-full panel p-6 flex justify-between items-center">
+      <div>
+        <div class="mono text-xs text-[#E10600] uppercase font-bold">Ready to Test Your Pit Wall Instincts?</div>
+        <div class="text-sm body-copy">Apply the two-compound rule and undercut window in our interactive simulator.</div>
+      </div>
+      <div class="flex gap-3">
+        <button data-goto="3" class="btn-primary">Build Strategy Now &rarr;</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    // 1. Sub-tab switcher inside Screen 12
+    document.querySelectorAll('.subtab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.dataset.subtab;
+        document.querySelectorAll('.subtab-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(targetId).classList.remove('hidden');
+
+        document.querySelectorAll('.subtab-btn').forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('btn-primary', active);
+          b.classList.toggle('btn-outline', !active);
+        });
+      });
+    });
+
+    // 2. Live F1 Standings Fetch (Jolpica / Ergast Open F1 API with seamless fallback)
+    async function syncLiveF1Standings() {
+      try {
+        const res = await fetch('https://api.jolpi.ca/ergast/f1/current/driverStandings.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        const lists = data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
+        if (lists && lists.length > 0) {
+          const tbody = document.getElementById('driver-standings-body');
+          tbody.innerHTML = lists.slice(0, 10).map((item, idx) => `
+            <tr>
+              <td class="py-2 px-3 font-bold ${idx === 0 ? 'text-[#E10600]' : ''}">${item.position}</td>
+              <td class="py-2 px-3 font-bold">${item.Driver.givenName} ${item.Driver.familyName}</td>
+              <td class="py-2 px-3 muted-text">${item.Constructors?.[0]?.name || ''}</td>
+              <td class="py-2 px-3 text-right font-bold">${item.points}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        // Uses pre-loaded telemetry table if offline
+      }
+    }
+    syncLiveF1Standings();
+  </script>
+</body>
+</html>
