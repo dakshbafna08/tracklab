@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab // 6. Pit Lesson</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col">
+  <nav class="dev-nav">
+    <span class="dev-nav-label">Screen Switcher:</span>
+    <button data-target="1" class="nav-btn">1. Login</button>
+    <button data-target="2" class="nav-btn">2. Intro</button>
+    <button data-target="3" class="nav-btn">3. Track Select</button>
+    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
+    <button data-target="5" class="nav-btn">5. Pick Tires</button>
+    <button data-target="6" class="nav-btn nav-btn-active">6. Pit Lesson</button>
+    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
+    <button data-target="8" class="nav-btn">8. Confirm</button>
+    <button data-target="9" class="nav-btn">9. Race Sim</button>
+    <button data-target="10" class="nav-btn">10. Results</button>
+    <button data-target="11" class="nav-btn">11. Dashboard</button>
+  </nav>
+
+  <header class="app-header">
+    <div class="flex items-center gap-4">
+      <div class="f1-badge">F1</div>
+      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <button data-goto="2" class="header-link">Replay Tutorial</button>
+      <span class="divider">|</span>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center p-8">
+    <section id="screen-6" class="screen w-full max-w-2xl panel f1-border-top p-8">
+      <div class="section-tag">Part 2 // Educational Briefing</div>
+      <h2 class="text-2xl font-bold uppercase mb-4">Pit Stop Delta &amp; The Degradation Cliff</h2>
+      <p class="body-copy mb-6">
+        Every pit stop costs roughly <strong class="text-white">21 seconds</strong> driving down the pit lane. You only win that time back if your old tyres are losing significant time compared to fresh rubber.
+      </p>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="sub-box">
+          <div class="section-tag mb-1">01 // THE WEAR CLIFF</div>
+          <div class="font-bold uppercase text-sm mb-2">Pitting Too Late</div>
+          <p class="text-xs muted-text">
+            Once a tyre passes its optimal lap window, grip drops non-linearly ("hitting the cliff"), costing 1.5s to 2.5s per lap.
+          </p>
+        </div>
+        <div class="sub-box">
+          <div class="section-tag mb-1">02 // FUEL WEIGHT EFFECT</div>
+          <div class="font-bold uppercase text-sm mb-2">Fuel Burn Advantage</div>
+          <p class="text-xs muted-text">
+            Cars burn ~1.8kg of fuel per lap. Every 10kg burned makes the car ~0.3s faster per lap as the race progresses.
+          </p>
+        </div>
+      </div>
+
+      <div class="sub-box mb-6">
+        <div class="mono text-xs muted-text mb-2 uppercase">Lap Time Degradation Curve (Soft vs Hard)</div>
+        <svg viewBox="0 0 400 100" class="w-full h-24 stroke-white fill-none">
+          <line x1="30" y1="10" x2="30" y2="85" stroke="#38383F" stroke-width="1"/>
+          <line x1="30" y1="85" x2="380" y2="85" stroke="#38383F" stroke-width="1"/>
+          <path d="M 35 70 Q 140 68 180 55 T 250 15" stroke="#E10600" stroke-width="2.5"/>
+          <path d="M 35 50 L 360 40" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="4"/>
+          <text x="190" y="25" fill="#E10600" font-size="10" font-family="monospace">SOFT CLIFF (BOX WINDOW)</text>
+          <text x="280" y="55" fill="#FFFFFF" font-size="10" font-family="monospace">HARD PACE</text>
+        </svg>
+      </div>
+
+      <div class="flex justify-between">
+        <button data-goto="5" class="btn-outline">&larr; Back</button>
+        <button data-goto="7" class="btn-primary">Choose Your Pit Lap &rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>
