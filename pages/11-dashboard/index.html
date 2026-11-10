@@ -70,42 +70,80 @@
       </div>
 
       <div class="panel p-6">
-        <div class="mono text-xs muted-text uppercase mb-4">4. Past User Race Strategies</div>
+        <div class="mono text-xs muted-text uppercase mb-4">4. Past Race Strategies</div>
         <table class="w-full text-left border-collapse mono text-xs">
           <thead>
             <tr class="border-b border-[#38383F] muted-text uppercase">
               <th class="py-3 px-4">Track</th>
               <th class="py-3 px-4">Compound Stints</th>
               <th class="py-3 px-4">Pit Stop Lap</th>
-              <th class="py-3 px-4">Vs. RL Agent</th>
-              <th class="py-3 px-4 text-right">5. Replay Simulation</th>
+              <th class="py-3 px-4">Your Time</th>
+              <th class="py-3 px-4">Vs. Optimal</th>
+              <th class="py-3 px-4 text-right">5. Replay</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#38383F]">
-            <tr class="bg-[#15151E]">
-              <td class="py-3 px-4 font-bold">MELBOURNE</td>
-              <td class="py-3 px-4">SOFT &rarr; HARD</td>
-              <td class="py-3 px-4">LAP 18</td>
-              <td class="py-3 px-4 text-[#E10600]">+6.8s (LOSS)</td>
-              <td class="py-3 px-4 text-right">
-                <button class="replay-sim-btn">Run Simulation Again &rarr;</button>
-              </td>
-            </tr>
-            <tr class="bg-[#15151E]">
-              <td class="py-3 px-4 font-bold">AUSTIN (COTA)</td>
-              <td class="py-3 px-4">MEDIUM &rarr; HARD</td>
-              <td class="py-3 px-4">LAP 23</td>
-              <td class="py-3 px-4 text-white font-bold">-1.2s (WIN)</td>
-              <td class="py-3 px-4 text-right">
-                <button class="replay-sim-btn">Run Simulation Again &rarr;</button>
-              </td>
-            </tr>
+          <tbody id="history-tbody" class="divide-y divide-[#38383F]">
+            <!-- filled by JS -->
           </tbody>
         </table>
+        <div id="history-empty" class="hidden py-6 text-center muted-text mono text-xs">
+          No saved races yet — complete a race and hit "Save to Dashboard" on the Results screen.
+        </div>
       </div>
     </section>
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+  (function () {
+    const history = JSON.parse(localStorage.getItem('tracklab_race_history') || '[]');
+    const tbody   = document.getElementById('history-tbody');
+    const empty   = document.getElementById('history-empty');
+
+    if (history.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    history.forEach(entry => {
+      const won    = entry.gapSec <= 0;
+      const gapStr = (entry.gapSec >= 0 ? '+' : '') + entry.gapSec.toFixed(1) + 's';
+      const result = won ? gapStr + ' (WIN 🏆)' : gapStr + ' (LOSS)';
+      const userTimeStr = TrackLabSim.formatTime(entry.userTime);
+      const tr = document.createElement('tr');
+      tr.className = 'bg-[#15151E]';
+      tr.innerHTML = `
+        <td class="py-3 px-4 font-bold">${entry.track}</td>
+        <td class="py-3 px-4">${entry.stint1} &rarr; ${entry.stint2}</td>
+        <td class="py-3 px-4">LAP ${entry.pitLap}</td>
+        <td class="py-3 px-4 text-white">${userTimeStr}</td>
+        <td class="py-3 px-4 ${won ? 'text-green-400 font-bold' : 'text-[#E10600]'}">${result}</td>
+        <td class="py-3 px-4 text-right">
+          <button class="replay-sim-btn" data-track="${entry.track}" data-s1="${entry.stint1}" data-s2="${entry.stint2}" data-pitlap="${entry.pitLap}">
+            Replay &rarr;
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Replay buttons: load strategy into state then go to sim
+    document.querySelectorAll('.replay-sim-btn[data-track]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        saveState({
+          track:   btn.dataset.track,
+          totalLaps: TrackLabSim.getTrack(btn.dataset.track)?.laps || 58,
+          stint1:  btn.dataset.s1,
+          stint2:  btn.dataset.s2,
+          pitLap:  Number(btn.dataset.pitlap),
+          simUserResult: null,
+          simOptResult:  null,
+        });
+        goTo(9);
+      });
+    });
+  })();
+  </script>
 </body>
 </html>

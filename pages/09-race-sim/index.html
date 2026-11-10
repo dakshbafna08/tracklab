@@ -7,6 +7,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    /* Lap-time sparkline bars */
+    .spark-bar {
+      display: inline-block;
+      width: 3px;
+      border-radius: 1px;
+      transition: height 0.1s;
+    }
+    /* Car dot animation along track path */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+    .car-dot { animation: pulse-dot 1s ease-in-out infinite; }
+
+    /* Live event flash */
+    @keyframes flash-red {
+      0%   { background-color: #E10600; color: #fff; }
+      100% { background-color: transparent; color: inherit; }
+    }
+    .pit-flash { animation: flash-red 1.2s ease-out forwards; border-radius: 2px; padding: 0 4px; }
+  </style>
 </head>
 <body class="min-h-screen flex flex-col">
   <nav class="dev-nav">
@@ -36,56 +58,364 @@
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-9" class="screen w-full max-w-3xl panel f1-border-top p-8">
-      <div class="flex justify-between items-center mb-6">
+  <main class="flex-1 flex items-center justify-center p-6">
+    <section id="screen-9" class="screen w-full max-w-4xl panel f1-border-top p-6">
+
+      <!-- Header row -->
+      <div class="flex justify-between items-start mb-5">
         <div>
           <div class="section-tag">Live Telemetry Simulation</div>
-          <h2 class="text-2xl font-bold uppercase">Let's Race: User vs. RL Agent</h2>
+          <h2 class="text-2xl font-bold uppercase">Your Strategy vs. Optimal</h2>
+          <div id="sim-track-label" class="mono text-xs muted-text mt-1">— / —</div>
         </div>
         <div class="mono text-right">
           <div class="text-xs muted-text">LAP COUNTER</div>
-          <div class="text-2xl font-bold"><span id="sim-lap">1</span> / <span class="total-laps-label">58</span></div>
+          <div class="text-3xl font-bold">
+            <span id="sim-lap">1</span>
+            <span class="text-lg muted-text"> / </span>
+            <span class="total-laps-label text-lg">58</span>
+          </div>
+          <div id="sim-phase" class="text-xs text-[#E10600] font-bold uppercase mt-1">PRE-RACE</div>
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-6 mb-6">
-        <div class="col-span-2 sub-box h-64 flex flex-col items-center justify-center relative p-4">
-          <svg viewBox="0 0 300 140" class="w-full h-full stroke-[#55555F] fill-none" stroke-width="5">
-            <path d="M 40 100 L 140 100 L 180 75 L 250 85 L 270 45 L 200 20 L 90 30 L 45 55 Z"/>
-          </svg>
-          <div class="absolute bottom-3 left-4 mono text-xs flex gap-4">
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-white inline-block"></span> YOU (USER)</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#E10600] inline-block"></span> RL AGENT</span>
-          </div>
-        </div>
+      <!-- Main grid: track map + timing tower -->
+      <div class="grid grid-cols-3 gap-5 mb-5">
 
-        <div class="sub-box p-4 mono text-xs flex flex-col justify-between">
-          <div>
-            <div class="muted-text border-b border-[#38383F] pb-2 mb-3 uppercase">Timing Tower</div>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center">
-                <span>P1 // RL AGENT</span>
-                <span class="text-[#E10600] font-bold">LEADER</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span>P2 // YOU</span>
-                <span id="sim-gap">+1.42s</span>
-              </div>
+        <!-- Track map (col-span-2) -->
+        <div class="col-span-2 sub-box relative overflow-hidden" style="height:200px;">
+          <!-- Melbourne SVG -->
+          <svg id="track-svg-mel" viewBox="0 0 300 140" class="w-full h-full stroke-[#38383F] fill-none" stroke-width="6">
+            <path id="track-path" d="M 40 100 L 140 100 L 180 75 L 250 85 L 270 45 L 200 20 L 90 30 L 45 55 Z"/>
+            <!-- User car -->
+            <circle id="car-user" cx="40" cy="100" r="5" fill="#FFFFFF" class="car-dot" stroke="none"/>
+            <!-- Optimal car -->
+            <circle id="car-opt" cx="40" cy="100" r="5" fill="#E10600" class="car-dot" stroke="none" style="animation-delay:0.5s"/>
+          </svg>
+          <!-- Austin SVG (hidden by default) -->
+          <svg id="track-svg-aus" viewBox="0 0 300 140" class="w-full h-full stroke-[#38383F] fill-none hidden absolute inset-0" stroke-width="6">
+            <path d="M 20 70 L 70 20 L 120 35 L 175 20 L 160 65 L 110 55 L 90 75 Z"/>
+            <circle id="car-user-aus" cx="20" cy="70" r="5" fill="#FFFFFF" class="car-dot" stroke="none"/>
+            <circle id="car-opt-aus"  cx="20" cy="70" r="5" fill="#E10600" class="car-dot" stroke="none" style="animation-delay:0.5s"/>
+          </svg>
+
+          <!-- Legend -->
+          <div class="absolute bottom-2 left-3 mono text-xs flex gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-white inline-block rounded-full"></span> YOU</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#E10600] inline-block rounded-full"></span> OPTIMAL</span>
+          </div>
+
+          <!-- Current tire indicator -->
+          <div class="absolute top-2 right-3 mono text-xs flex flex-col items-end gap-1">
+            <div class="flex items-center gap-1.5">
+              <span class="muted-text">YOU:</span>
+              <span id="sim-user-tire" class="font-bold text-white">SOFT</span>
+              <span id="sim-user-tire-ring" class="w-3 h-3 rounded-full border-4 border-[#E10600]"></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="muted-text">OPT:</span>
+              <span id="sim-opt-tire" class="font-bold text-[#E10600]">—</span>
+              <span id="sim-opt-tire-ring" class="w-3 h-3 rounded-full border-4 border-[#E10600]"></span>
             </div>
           </div>
-          <div class="border-t border-[#38383F] pt-3 muted-text">
-            Awaiting backend telemetry from src/racecar/sim...
+        </div>
+
+        <!-- Timing tower -->
+        <div class="sub-box p-4 mono text-xs flex flex-col gap-3">
+          <div class="muted-text border-b border-[#38383F] pb-2 uppercase">Timing Tower</div>
+
+          <!-- P1 -->
+          <div>
+            <div id="p1-label" class="text-[#E10600] font-bold">P1 // OPTIMAL</div>
+            <div id="p1-time" class="text-white font-bold text-sm">—</div>
+            <div id="p1-laptime" class="muted-text">Last lap: —</div>
+          </div>
+
+          <!-- P2 -->
+          <div>
+            <div id="p2-label" class="font-bold">P2 // YOU</div>
+            <div class="flex items-center gap-2">
+              <span id="sim-gap" class="text-base font-bold">+0.0s</span>
+            </div>
+            <div id="p2-laptime" class="muted-text">Last lap: —</div>
+          </div>
+
+          <div class="border-t border-[#38383F] pt-2 space-y-1">
+            <div class="flex justify-between">
+              <span class="muted-text">USER PIT LAP:</span>
+              <span id="tower-user-pit" class="text-white">—</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="muted-text">OPT PIT LAP:</span>
+              <span id="tower-opt-pit" class="text-[#E10600]">—</span>
+            </div>
+          </div>
+
+          <!-- Live event ticker -->
+          <div id="sim-event-ticker" class="border-t border-[#38383F] pt-2 muted-text text-[10px] leading-relaxed min-h-[2.5rem]">
+            Calculating strategies…
           </div>
         </div>
       </div>
 
-      <div class="flex justify-end">
-        <button data-goto="10" class="btn-primary">View Post-Race Telemetry &rarr;</button>
+      <!-- Lap-time sparkline -->
+      <div class="sub-box p-3 mb-5">
+        <div class="mono text-xs muted-text uppercase mb-2">Lap Time Comparison (per lap)</div>
+        <div class="flex gap-1 items-end" id="spark-container" style="height:48px;">
+          <!-- filled by JS -->
+        </div>
+        <div class="flex gap-4 mono text-[10px] muted-text mt-2">
+          <span class="flex items-center gap-1"><span class="w-2 h-2 bg-white inline-block"></span> You</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 bg-[#E10600] inline-block"></span> Optimal</span>
+          <span id="spark-lap-label" class="ml-auto"></span>
+        </div>
       </div>
+
+      <!-- Bottom row: stint progress bar + CTA -->
+      <div class="flex gap-4 items-end">
+        <div class="flex-1">
+          <div class="mono text-xs muted-text mb-1">RACE PROGRESS</div>
+          <div class="w-full h-5 flex border border-[#38383F] mono text-[10px] font-bold">
+            <div id="prog-s1" class="bg-[#3A1414] border-r border-white flex items-center justify-center transition-all duration-200" style="width:31%">S1</div>
+            <div id="prog-s2" class="bg-[#25252E] flex items-center justify-center transition-all duration-200" style="width:69%">S2</div>
+          </div>
+        </div>
+        <button id="view-results-btn" data-goto="10" class="btn-primary opacity-50 cursor-not-allowed" disabled>
+          View Results →
+        </button>
+      </div>
+
     </section>
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+  (function () {
+    // ── 1. Load state & run simulations ──────────────────────────
+    const state   = getState();
+    const trackKey = state.track || 'MELBOURNE';
+    const track   = TrackLabSim.getTrack(trackKey);
+
+    // User strategy from state
+    const userStrategy = {
+      trackKey,
+      stint1:  state.stint1  || 'SOFT',
+      stint2:  state.stint2  || 'HARD',
+      pitLap:  state.pitLap  || 18,
+    };
+
+    const userResult = TrackLabSim.simulate(userStrategy);
+    const optResult  = TrackLabSim.optimise(trackKey);
+
+    // Persist simulation results to localStorage for Screen 10
+    saveState({
+      simUserResult:  JSON.stringify(userResult),
+      simOptResult:   JSON.stringify(optResult),
+      simUserStrategy: JSON.stringify(userStrategy),
+      simOptStrategy:  JSON.stringify(optResult.strategy),
+    });
+
+    // ── 2. Set static labels ──────────────────────────────────────
+    document.getElementById('sim-track-label').textContent =
+      (track ? track.name : trackKey) + '  //  ' + (track ? track.laps : '—') + ' LAPS';
+
+    document.getElementById('tower-user-pit').textContent = 'LAP ' + userStrategy.pitLap;
+    document.getElementById('tower-opt-pit').textContent  = 'LAP ' + optResult.strategy.pitLap;
+
+    // Show correct track SVG
+    const isMel = trackKey === 'MELBOURNE';
+    document.getElementById('track-svg-mel').classList.toggle('hidden', !isMel);
+    document.getElementById('track-svg-aus').classList.toggle('hidden', isMel);
+    document.getElementById('track-svg-aus').classList.toggle('absolute', !isMel);
+
+    // ── 3. Build sparkline placeholders (all laps) ──────────────
+    const totalLaps  = track ? track.laps : 58;
+    const sparkCont  = document.getElementById('spark-container');
+    const userLaps   = userResult.laps;
+    const optLaps    = optResult.laps;
+
+    // Find min/max lap times across both for scaling
+    const allTimes = [...userLaps, ...optLaps].map(l => l.time);
+    const minT = Math.min(...allTimes);
+    const maxT = Math.max(...allTimes);
+    const range = maxT - minT || 1;
+
+    for (let i = 0; i < totalLaps; i++) {
+      const pair = document.createElement('div');
+      pair.className = 'flex gap-px items-end flex-shrink-0';
+
+      const uBar = document.createElement('div');
+      uBar.className = 'spark-bar bg-[#55555F]';
+      uBar.style.height = '4px';
+      uBar.id = `spark-u-${i + 1}`;
+
+      const oBar = document.createElement('div');
+      oBar.className = 'spark-bar bg-[#2A0A08]';
+      oBar.style.height = '4px';
+      oBar.id = `spark-o-${i + 1}`;
+
+      pair.appendChild(uBar);
+      pair.appendChild(oBar);
+      sparkCont.appendChild(pair);
+    }
+
+    // ── 4. Animation state ────────────────────────────────────────
+    const LAPS_PER_TICK = 1;          // advance 1 lap at a time
+    const TICK_MS       = 160;        // ms between updates (~9s for 58 laps)
+
+    let currentLap = 0;
+    let simDone    = false;
+
+    // Track-path waypoints for car-dot animation (simple polyline keyframes)
+    const MEL_WAYPOINTS = [
+      [40,100],[140,100],[180,75],[250,85],[270,45],[200,20],[90,30],[45,55],[40,100]
+    ];
+    const AUS_WAYPOINTS = [
+      [20,70],[70,20],[120,35],[175,20],[160,65],[110,55],[90,75],[20,70]
+    ];
+    const WAYPOINTS = isMel ? MEL_WAYPOINTS : AUS_WAYPOINTS;
+    const totalPathLen = WAYPOINTS.length - 1;
+
+    function getCarPos(progress /* 0–1 */) {
+      const scaled = progress * totalPathLen;
+      const seg    = Math.min(Math.floor(scaled), totalPathLen - 1);
+      const t      = scaled - seg;
+      const [x1, y1] = WAYPOINTS[seg];
+      const [x2, y2] = WAYPOINTS[seg + 1];
+      return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t];
+    }
+
+    const carUserEl = isMel
+      ? document.getElementById('car-user')
+      : document.getElementById('car-user-aus');
+    const carOptEl  = isMel
+      ? document.getElementById('car-opt')
+      : document.getElementById('car-opt-aus');
+
+    // Tire ring colour map
+    const TIRE_COLORS = { SOFT: '#E10600', MEDIUM: '#F5C518', HARD: '#FFFFFF' };
+
+    function tireRingStyle(compound) {
+      return `border-color: ${TIRE_COLORS[compound] || '#888'}`;
+    }
+
+    // ── 5. Tick function ─────────────────────────────────────────
+    function tick() {
+      currentLap = Math.min(currentLap + LAPS_PER_TICK, totalLaps);
+
+      const uLap = userLaps[currentLap - 1];
+      const oLap = optLaps[currentLap - 1];
+
+      // Update lap counter
+      document.getElementById('sim-lap').textContent = currentLap;
+
+      // Cumulative times and gap
+      const uCum   = uLap.cumTime;
+      const oCum   = oLap.cumTime;
+      const gapSec = uCum - oCum;
+      const gapEl  = document.getElementById('sim-gap');
+      gapEl.textContent = TrackLabSim.formatGap(gapSec);
+      gapEl.className = gapSec > 0 ? 'text-base font-bold text-[#E10600]' : 'text-base font-bold text-green-400';
+
+      // Position labels
+      const userAhead = gapSec <= 0;
+      document.getElementById('p1-label').textContent = userAhead ? 'P1 // YOU' : 'P1 // OPTIMAL';
+      document.getElementById('p1-label').className   = userAhead ? 'font-bold text-white' : 'font-bold text-[#E10600]';
+      document.getElementById('p2-label').textContent = userAhead ? 'P2 // OPTIMAL' : 'P2 // YOU';
+
+      // Timing display
+      document.getElementById('p1-time').textContent =
+        TrackLabSim.formatTime(userAhead ? uCum : oCum);
+      document.getElementById('p1-laptime').textContent =
+        'Last lap: ' + TrackLabSim.formatLapTime(userAhead ? uLap.time : oLap.time);
+      document.getElementById('p2-laptime').textContent =
+        'Last lap: ' + TrackLabSim.formatLapTime(userAhead ? oLap.time : uLap.time);
+
+      // Sim phase
+      const phaseEl = document.getElementById('sim-phase');
+      if (currentLap < userStrategy.pitLap) {
+        phaseEl.textContent = 'STINT 1 — ' + userStrategy.stint1;
+      } else if (currentLap === userStrategy.pitLap) {
+        phaseEl.textContent = '🔧 PIT STOP — BOXING';
+        phaseEl.classList.add('pit-flash');
+        setTimeout(() => phaseEl.classList.remove('pit-flash'), 1200);
+      } else {
+        phaseEl.textContent = 'STINT 2 — ' + userStrategy.stint2;
+      }
+
+      // Tire indicators
+      document.getElementById('sim-user-tire').textContent = uLap.compound;
+      document.getElementById('sim-user-tire').style.color = TIRE_COLORS[uLap.compound] || '#fff';
+      document.getElementById('sim-user-tire-ring').style = tireRingStyle(uLap.compound);
+
+      document.getElementById('sim-opt-tire').textContent = oLap.compound;
+      document.getElementById('sim-opt-tire').style.color = TIRE_COLORS[oLap.compound] || '#E10600';
+      document.getElementById('sim-opt-tire-ring').style = tireRingStyle(oLap.compound);
+
+      // Event ticker
+      const events = [];
+      if (uLap.event === 'PIT') events.push('🔧 YOU pitted — switching to ' + userStrategy.stint2);
+      if (oLap.event === 'PIT') events.push('🔧 OPTIMAL pitted — switching to ' + optResult.strategy.stint2);
+      if (events.length) {
+        const ticker = document.getElementById('sim-event-ticker');
+        ticker.innerHTML = events.join('<br>');
+        ticker.classList.add('text-white');
+        setTimeout(() => { ticker.classList.remove('text-white'); }, 2000);
+      } else if (currentLap === 1) {
+        document.getElementById('sim-event-ticker').textContent = 'Lights out! Race started.';
+      }
+
+      // Sparkline update
+      const uH = Math.round(4 + ((uLap.time - minT) / range) * 44);
+      const oH = Math.round(4 + ((oLap.time - minT) / range) * 44);
+      const uBar = document.getElementById(`spark-u-${currentLap}`);
+      const oBar = document.getElementById(`spark-o-${currentLap}`);
+      if (uBar) { uBar.style.height = uH + 'px'; uBar.style.backgroundColor = '#FFFFFF'; }
+      if (oBar) { oBar.style.height = oH + 'px'; oBar.style.backgroundColor = '#E10600'; }
+
+      document.getElementById('spark-lap-label').textContent =
+        'LAP ' + currentLap + ' / ' + totalLaps;
+
+      // Progress stint bar
+      const pct1 = Math.min(currentLap, userStrategy.pitLap) / totalLaps * 100;
+      const pct2 = 100 - pct1;
+      document.getElementById('prog-s1').style.width = pct1 + '%';
+      document.getElementById('prog-s1').textContent = currentLap <= userStrategy.pitLap
+        ? userStrategy.stint1 + ' (' + currentLap + 'L)' : userStrategy.stint1;
+      document.getElementById('prog-s2').style.width = pct2 + '%';
+
+      // Car dot positions (progress = laps completed / total)
+      const userProgress = userResult.laps[currentLap - 1].cumTime / userResult.totalTime;
+      const optProgress  = optResult.laps[currentLap - 1].cumTime / optResult.totalTime;
+
+      // Invert: ahead means smaller cumTime ratio → further along track visually
+      const [ux, uy] = getCarPos((currentLap - 0.5) / totalLaps % 1);
+      const [ox, oy] = getCarPos((currentLap - 0.5 + (gapSec < 0 ? 0.5 : 0)) / totalLaps % 1);
+      if (carUserEl) { carUserEl.setAttribute('cx', ux); carUserEl.setAttribute('cy', uy); }
+      if (carOptEl)  { carOptEl.setAttribute('cx', ox);  carOptEl.setAttribute('cy', oy); }
+
+      // Done?
+      if (currentLap >= totalLaps) {
+        simDone = true;
+        phaseEl.textContent = 'RACE FINISHED — CHEQUERED FLAG 🏁';
+        document.getElementById('sim-event-ticker').innerHTML =
+          'Race complete!<br>Your time: ' + TrackLabSim.formatTime(userResult.totalTime) +
+          '&nbsp;&nbsp;Optimal: ' + TrackLabSim.formatTime(optResult.totalTime);
+
+        const btn = document.getElementById('view-results-btn');
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        return;
+      }
+
+      setTimeout(tick, TICK_MS);
+    }
+
+    // ── 6. Kick off ───────────────────────────────────────────────
+    setTimeout(tick, 400);
+
+  })();
+  </script>
 </body>
 </html>

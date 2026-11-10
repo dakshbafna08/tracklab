@@ -67,6 +67,19 @@
     </section>
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+  // Override the shared-state pit summary to use real track pit loss
+  document.addEventListener('DOMContentLoaded', () => {
+    const state = getState();
+    const track = TrackLabSim.getTrack(state.track);
+    const pitLoss = track ? track.pitLoss : 21.2;
+    const summaryPit = document.getElementById('summary-pit');
+    if (summaryPit) {
+      summaryPit.textContent = `END OF LAP ${state.pitLap} (+${pitLoss}s PIT LOSS)`;
+    }
+  });
+  </script>
 </body>
 </html>
