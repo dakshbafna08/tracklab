@@ -3,93 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 5. Pick Tires</title>
+  <title>TrackLab — Compound Allocation</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn nav-btn-active">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <button data-goto="3" class="header-link">Change Track</button>
       <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-5" class="screen w-full max-w-2xl panel f1-border-top p-8">
-      <div class="mono text-xs muted-text uppercase mb-1">Part 1 // Strategy Builder</div>
-      <h2 class="text-2xl font-bold uppercase mb-2">What Tyres Do You Want to Add?</h2>
-      <p class="text-sm muted-text mb-6">Choose your starting compound (Stint 1) and the compound you will switch to at your pit stop (Stint 2).</p>
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col justify-between">
 
-      <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="sub-box">
-          <div class="mono text-xs muted-text mb-3 uppercase">Stint 01 // Starting Tyre</div>
-          <div class="space-y-2">
-            <button data-stint="1" data-compound="SOFT" id="s1-SOFT" class="compound-btn compound-active">
-              <span>Soft</span><span class="mono text-xs">14-18 Laps</span>
-            </button>
-            <button data-stint="1" data-compound="MEDIUM" id="s1-MEDIUM" class="compound-btn">
-              <span>Medium</span><span class="mono text-xs">22-30 Laps</span>
-            </button>
-            <button data-stint="1" data-compound="HARD" id="s1-HARD" class="compound-btn">
-              <span>Hard</span><span class="mono text-xs">32-45 Laps</span>
-            </button>
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-10 animate-on-scroll">
+      <div>
+        <span class="section-tag">03 // Stint Allocation</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Select Compounds</h1>
+        <p class="body-copy text-base mt-2 max-w-2xl">
+          Choose your starting set for Lights Out and your replacement set for the pit window.
+        </p>
+      </div>
+      <div class="glass-panel px-5 py-3 mono text-xs">
+        <span class="text-zinc-500 uppercase block text-[10px]">Active Circuit</span>
+        <span id="active-track-label" class="text-white font-semibold">Norisring (72 Laps)</span>
+      </div>
+    </div>
+
+    <!-- Dual Stint Selector Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+
+      <!-- Stint 1 -->
+      <section class="panel p-7 animate-on-scroll slide-left">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <div class="mono text-xs text-[#E10600] font-semibold uppercase">Stint 01 // Grid Start</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Opening Compound</h2>
           </div>
+          <span class="mono text-[11px] text-zinc-500">Heavy Fuel (105kg)</span>
         </div>
 
-        <div class="sub-box">
-          <div class="mono text-xs muted-text mb-3 uppercase">Stint 02 // Pit Stop Tyre</div>
-          <div class="space-y-2">
-            <button data-stint="2" data-compound="SOFT" id="s2-SOFT" class="compound-btn">
-              <span>Soft</span><span class="mono text-xs">14-18 Laps</span>
-            </button>
-            <button data-stint="2" data-compound="MEDIUM" id="s2-MEDIUM" class="compound-btn">
-              <span>Medium</span><span class="mono text-xs">22-30 Laps</span>
-            </button>
-            <button data-stint="2" data-compound="HARD" id="s2-HARD" class="compound-btn compound-active">
-              <span>Hard</span><span class="mono text-xs">32-45 Laps</span>
-            </button>
+        <div class="space-y-3">
+          <button data-stint="1" data-compound="SOFT" id="s1-SOFT" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-soft"></span>
+              <span>
+                <strong class="block text-sm text-white">Soft (Red)</strong>
+                <span class="text-xs text-zinc-500">High launch grip • Optimal ~13L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">0.00s</span>
+          </button>
+
+          <button data-stint="1" data-compound="MEDIUM" id="s1-MEDIUM" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-medium"></span>
+              <span>
+                <strong class="block text-sm text-white">Medium (Yellow)</strong>
+                <span class="text-xs text-zinc-500">Balanced pace • Optimal ~22L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.48s</span>
+          </button>
+
+          <button data-stint="1" data-compound="HARD" id="s1-HARD" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-hard"></span>
+              <span>
+                <strong class="block text-sm text-white">Hard (White)</strong>
+                <span class="text-xs text-zinc-500">Deep overcut life • Optimal ~34L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.92s</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Stint 2 -->
+      <section class="panel p-7 animate-on-scroll slide-right">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <div class="mono text-xs text-zinc-400 font-semibold uppercase">Stint 02 // Post Pit Stop</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Closing Compound</h2>
           </div>
+          <span class="mono text-[11px] text-zinc-500">Light Fuel Run-In</span>
+        </div>
+
+        <div class="space-y-3">
+          <button data-stint="2" data-compound="SOFT" id="s2-SOFT" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-soft"></span>
+              <span>
+                <strong class="block text-sm text-white">Soft (Red)</strong>
+                <span class="text-xs text-zinc-500">Late sprint attack • ~13–18L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">0.00s</span>
+          </button>
+
+          <button data-stint="2" data-compound="MEDIUM" id="s2-MEDIUM" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-medium"></span>
+              <span>
+                <strong class="block text-sm text-white">Medium (Yellow)</strong>
+                <span class="text-xs text-zinc-500">Versatile closer • ~22–30L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.48s</span>
+          </button>
+
+          <button data-stint="2" data-compound="HARD" id="s2-HARD" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-hard"></span>
+              <span>
+                <strong class="block text-sm text-white">Hard (White)</strong>
+                <span class="text-xs text-zinc-500">Early undercut cover • ~34–46L</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.92s</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Live Sequence Pipeline Bar -->
+    <div class="glass-panel p-5 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 animate-on-scroll">
+      <div>
+        <div class="mono text-xs text-zinc-400 uppercase">Selected Tire Architecture</div>
+        <div id="fia-compound-warning" class="hidden text-xs text-amber-400 mono mt-1">
+          ⚠ FIA Regulation Notice: Two distinct compounds are required in dry races.
         </div>
       </div>
-
-      <div class="sub-box mb-6">
-        <div class="mono text-xs muted-text mb-2 uppercase">Building Your Strategy // Compound Sequence</div>
-        <div class="flex items-center gap-3 mono text-sm font-bold">
-          <span id="preview-s1" class="px-3 py-1 border border-[#E10600]">STINT 1: SOFT</span>
-          <span>&rarr;</span>
-          <span id="preview-s2" class="px-3 py-1 border border-white">STINT 2: HARD</span>
-        </div>
+      <div class="flex items-center gap-3 mono text-xs sm:text-sm font-semibold">
+        <span id="preview-s1" class="px-4 py-2 rounded-full border border-[#E10600]/60 bg-[#E10600]/15 text-white">STINT 1: SOFT</span>
+        <span class="text-zinc-500">&rarr;</span>
+        <span id="preview-s2" class="px-4 py-2 rounded-full border border-white/20 bg-white/5 text-white">STINT 2: HARD</span>
       </div>
+    </div>
 
-      <div class="flex justify-between">
-        <button data-goto="4" class="btn-outline">&larr; Back to Lesson</button>
-        <button data-goto="6" class="btn-primary">Next: Pit Stop Timing &rarr;</button>
+    <!-- Navigation -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+      <button id="btn-back" class="btn-outline w-full sm:w-auto">&larr; Back</button>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button data-goto="6" class="btn-ghost hidden sm:inline-flex text-xs">Read Pit Window Guide</button>
+        <button id="btn-next-pit" class="btn-primary w-full sm:w-auto px-8 py-3.5">
+          Set Pit Timing &rarr;
+        </button>
       </div>
-    </section>
+    </div>
+
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = getState();
+      const track = TrackLabSim.getTrack(state.track);
+      document.getElementById('active-track-label').textContent = `${track.name} (${track.laps} Laps)`;
+
+      document.getElementById('btn-back').addEventListener('click', () => {
+        goTo(getState().userMode === 'pro' ? 3 : 4);
+      });
+
+      document.getElementById('btn-next-pit').addEventListener('click', () => {
+        goTo(7);
+      });
+    });
+  </script>
 </body>
 </html>

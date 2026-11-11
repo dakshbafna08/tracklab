@@ -3,91 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 3. Track Select</title>
+  <title>TrackLab — Circuit Selection</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .track-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+      .track-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .track-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn nav-btn-active">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <span id="header-api-status" class="mono text-[10px] text-zinc-400 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> FastF1 Engine
+      </span>
+      <button data-goto="12" class="header-link">F1 Guide</button>
       <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-3" class="screen w-full max-w-3xl panel f1-border-top p-8">
-      <div class="mono text-xs muted-text uppercase mb-1">Step 1 of 3 // Circuit Selection</div>
-      <h2 class="text-2xl font-bold uppercase mb-6">Choose the Track</h2>
-      <div class="grid grid-cols-2 gap-6 mb-8">
-        <div id="track-mel" data-track="MELBOURNE" data-laps="58" class="track-card track-selected">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <div class="text-xs mono muted-text">ROUND 01 // AUSTRALIA</div>
-              <div class="text-xl font-bold uppercase">Melbourne — Albert Park</div>
-            </div>
-            <span id="badge-mel" class="selected-badge">SELECTED</span>
-          </div>
-          <div class="track-map-box">
-            <svg viewBox="0 0 200 90" class="w-40 h-20 stroke-white fill-none" stroke-width="3">
-              <path d="M 20 60 L 80 60 L 110 45 L 160 50 L 175 30 L 130 15 L 60 20 L 30 35 Z"/>
-            </svg>
-          </div>
-          <div class="track-meta">
-            <div><span class="meta-label">LAPS</span>58</div>
-            <div><span class="meta-label">PIT LOSS</span>21.2s</div>
-            <div><span class="meta-label">TYRE STRESS</span>MEDIUM</div>
-          </div>
-        </div>
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 flex flex-col justify-between">
 
-        <div id="track-aus" data-track="AUSTIN (COTA)" data-laps="56" class="track-card">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <div class="text-xs mono muted-text">ROUND 19 // USA</div>
-              <div class="text-xl font-bold uppercase">Austin — COTA</div>
-            </div>
-            <span id="badge-aus" class="selected-badge hidden">SELECTED</span>
-          </div>
-          <div class="track-map-box">
-            <svg viewBox="0 0 200 90" class="w-40 h-20 stroke-[#8E8E93] fill-none" stroke-width="3">
-              <path d="M 20 70 L 70 20 L 120 35 L 175 20 L 160 65 L 110 55 L 90 75 Z"/>
-            </svg>
-          </div>
-          <div class="track-meta">
-            <div><span class="meta-label">LAPS</span>56</div>
-            <div><span class="meta-label">PIT LOSS</span>20.4s</div>
-            <div><span class="meta-label">TYRE STRESS</span>HIGH</div>
-          </div>
+    <!-- Header Row -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-8">
+      <div>
+        <span class="section-tag">01 // Grand Prix Venue Menu</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Choose Your Circuit</h1>
+        <p class="body-copy text-base mt-2 max-w-2xl">
+          Select from the calibrated championship circuit menu below. Track layout, pit loss, and surface abrasiveness determine the fastest tire window.
+        </p>
+      </div>
+      <div class="glass-panel px-5 py-3.5 flex items-center gap-4">
+        <div>
+          <div class="mono text-[10px] uppercase text-zinc-400">Active Circuit</div>
+          <div id="selected-track-summary" class="font-bold text-white text-sm">Norisring — Nuremberg (72 Laps)</div>
         </div>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E10600] shadow-[0_0_12px_#E10600]"></span>
       </div>
-      <div class="flex justify-between">
-        <button data-goto="2" class="btn-outline">&larr; Back</button>
-        <button data-goto="4" class="btn-primary">Confirm Track &rarr;</button>
-      </div>
-    </section>
+    </div>
+
+    <!-- 9-Circuit Menu: 3 Per Row × Multiple Rows (Norisring FIRST) -->
+    <div id="track-cards-container" class="track-grid mb-10">
+      <!-- Injected immediately with instant visibility -->
+    </div>
+
+    <!-- FastF1 Telemetry Availability Banner -->
+    <div id="fastf1-status-bar" class="sub-box px-5 py-3.5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2 mono text-xs">
+      <span class="text-zinc-400">Calibration Profile: <strong id="fastf1-source-badge" class="text-white">Active</strong></span>
+      <span id="fastf1-source-note" class="text-zinc-400">Historical FastF1 2022 telemetry &amp; empirical Pirelli thermal degradation parameters.</span>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+      <button data-goto="2" class="btn-outline w-full sm:w-auto">
+        &larr; Briefing
+      </button>
+      <button id="btn-continue-tires" class="btn-primary w-full sm:w-auto px-8 py-3.5">
+        Continue to Tires &rarr;
+      </button>
+    </div>
+
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    (function () {
+      const container = document.getElementById('track-cards-container');
+      let state = getState();
+
+      // Ensure Norisring is default if not set
+      if (!state.track || !TrackLabSim.TRACKS[state.track]) {
+        state = saveState({ track: 'NORISRING', totalLaps: 72, pitLap: 28 });
+      }
+
+      const allTracks = Object.values(TrackLabSim.TRACKS);
+
+      // Render all 9 circuits (3 per row) with instant 100% opacity
+      container.innerHTML = allTracks.map((t) => {
+        const isSelected = t.id === state.track;
+        return `
+          <article data-track="${t.id}" data-laps="${t.laps}"
+                   class="track-card ${isSelected ? 'track-selected' : ''} flex flex-col justify-between"
+                   style="opacity: 1 !important; transform: none !important;">
+            <div>
+              <div class="flex justify-between items-start gap-2 mb-3">
+                <div>
+                  <span class="mono text-[10px] uppercase tracking-widest text-[#E10600] font-semibold">${t.country}</span>
+                  <h2 class="text-xl font-bold text-white tracking-tight mt-0.5">${t.shortName}</h2>
+                  <p class="text-xs text-zinc-500">${t.location}</p>
+                </div>
+                <span class="selected-badge ${isSelected ? '' : 'hidden'}">ACTIVE</span>
+              </div>
+
+              <!-- SVG Track Map Layout -->
+              <div class="h-32 rounded-xl bg-black/50 border border-white/10 flex items-center justify-center p-3 mb-4">
+                <svg viewBox="0 0 500 220" class="w-full h-full stroke-white fill-none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="${t.svgPath}"/>
+                </svg>
+              </div>
+
+              <p class="text-xs text-zinc-400 leading-relaxed mb-4">${t.characteristics}</p>
+            </div>
+
+            <!-- Key Track Metrics -->
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 mono text-xs">
+              <div>
+                <span class="text-[10px] text-zinc-500 block">LAPS</span>
+                <span class="text-white font-bold">${t.laps}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">PIT LOSS</span>
+                <span class="text-[#E10600] font-bold">${t.pitLoss}s</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">TIRE STRESS</span>
+                <span class="text-zinc-200 font-semibold">${t.tireStress}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      function selectTrack(trackId, laps) {
+        let curState = getState();
+        let pitLap = Number(curState.pitLap);
+        if (!pitLap || pitLap >= laps - 4 || pitLap <= 4) {
+          pitLap = Math.round(laps * 0.4);
+        }
+        state = saveState({ track: trackId, totalLaps: laps, pitLap: pitLap });
+        const trackObj = TrackLabSim.getTrack(trackId);
+        document.getElementById('selected-track-summary').textContent = `${trackObj.name} (${trackObj.laps} Laps)`;
+
+        container.querySelectorAll('.track-card').forEach(c => {
+          const match = c.dataset.track === trackId;
+          c.classList.toggle('track-selected', match);
+          const badge = c.querySelector('.selected-badge');
+          if (badge) badge.classList.toggle('hidden', !match);
+        });
+
+        // FastF1 check
+        TrackLabSim.fetchFastF1Context(trackId).then(ctx => {
+          const b = document.getElementById('fastf1-source-badge');
+          const n = document.getElementById('fastf1-source-note');
+          if (ctx.available) {
+            b.textContent = `FastF1 Telemetry Connected (${ctx.year} ${ctx.event})`;
+            b.className = 'text-[#22C55E]';
+            n.textContent = ctx.weather ? `Track Temp: ${ctx.weather.track_temp_c}°C • ${ctx.lapCount} Laps Analyzed` : ctx.note;
+          } else {
+            b.textContent = 'Empirical Physics Mode';
+            b.className = 'text-white';
+            n.textContent = ctx.note;
+          }
+        });
+      }
+
+      container.querySelectorAll('.track-card').forEach(card => {
+        card.addEventListener('click', () => {
+          selectTrack(card.dataset.track, Number(card.dataset.laps));
+        });
+      });
+
+      selectTrack(state.track, state.totalLaps);
+
+      document.getElementById('btn-continue-tires').addEventListener('click', () => {
+        const cur = getState();
+        goTo(cur.userMode === 'pro' ? 5 : 4);
+      });
+    })();
+  </script>
 </body>
 </html>

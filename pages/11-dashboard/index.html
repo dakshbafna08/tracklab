@@ -3,147 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 11. Dashboard</title>
+  <title>TrackLab — Driver Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn nav-btn-active">11. Dashboard</button>
-  </nav>
+<body class="no-dock min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
-      <button data-goto="11" class="header-link">Dashboard</button>
+    <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">F1 Guide</button>
+      <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">+ New Strategy</button>
+      <button data-goto="1" class="header-link">Switch Driver</button>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-11" class="screen w-full max-w-5xl space-y-6">
-      <div class="panel f1-border-top p-6 flex justify-between items-center">
-        <div>
-          <div class="mono text-xs muted-text uppercase">Driver Hub // Saved Telemetry</div>
-          <h1 class="text-2xl font-bold uppercase">Strategy Dashboard</h1>
-        </div>
-        <div class="flex gap-3">
-          <button data-goto="2" class="btn-outline">1. Replay Tutorial</button>
-          <button data-goto="5" class="btn-primary">2. + Create New Race Strategy</button>
-        </div>
-      </div>
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10">
 
-      <div class="panel p-6">
-        <div class="mono text-xs muted-text uppercase mb-4">3. Choose a Different Track</div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="sub-box flex justify-between items-center">
-            <div>
-              <div class="font-bold uppercase">Melbourne — Albert Park</div>
-              <div class="text-xs mono muted-text">58 Laps // Pit Loss: 21.2s</div>
-            </div>
-            <button data-quicktrack="MELBOURNE" data-quicklaps="58" class="btn-outline text-xs">Build Strategy</button>
-          </div>
-          <div class="sub-box flex justify-between items-center">
-            <div>
-              <div class="font-bold uppercase">Austin — Circuit of the Americas</div>
-              <div class="text-xs mono muted-text">56 Laps // Pit Loss: 20.4s</div>
-            </div>
-            <button data-quicktrack="AUSTIN (COTA)" data-quicklaps="56" class="btn-outline text-xs">Build Strategy</button>
-          </div>
-        </div>
+    <!-- Driver Header & Real Stats -->
+    <section class="flex flex-col md:flex-row justify-between md:items-end gap-6 animate-on-scroll">
+      <div>
+        <span class="section-tag">Driver Telemetry Hub</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+          <span id="dash-driver-name">Driver</span>’s Pit Wall
+        </h1>
+        <p id="dash-storage-note" class="mono text-xs text-zinc-500 mt-2">Checking race history archive...</p>
       </div>
-
-      <div class="panel p-6">
-        <div class="mono text-xs muted-text uppercase mb-4">4. Past Race Strategies</div>
-        <table class="w-full text-left border-collapse mono text-xs">
-          <thead>
-            <tr class="border-b border-[#38383F] muted-text uppercase">
-              <th class="py-3 px-4">Track</th>
-              <th class="py-3 px-4">Compound Stints</th>
-              <th class="py-3 px-4">Pit Stop Lap</th>
-              <th class="py-3 px-4">Your Time</th>
-              <th class="py-3 px-4">Vs. Optimal</th>
-              <th class="py-3 px-4 text-right">5. Replay</th>
-            </tr>
-          </thead>
-          <tbody id="history-tbody" class="divide-y divide-[#38383F]">
-            <!-- filled by JS -->
-          </tbody>
-        </table>
-        <div id="history-empty" class="hidden py-6 text-center muted-text mono text-xs">
-          No saved races yet — complete a race and hit "Save to Dashboard" on the Results screen.
-        </div>
+      <div class="flex gap-3">
+        <button data-goto="2" class="btn-outline text-xs">Guided Briefing</button>
+        <button data-goto="3" class="btn-primary text-xs px-6">Launch New Race &rarr;</button>
       </div>
     </section>
+
+    <!-- 4 Real Metric Cards (Computed strictly from saved runs) -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mono animate-on-scroll">
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Simulations Completed</span>
+        <div id="stat-races-count" class="text-3xl font-bold text-white mt-2">0</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Optimal / Near-Optimal</span>
+        <div id="stat-optimal-rate" class="text-3xl font-bold text-[#22C55E] mt-2">—</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Best Gap to Model</span>
+        <div id="stat-best-gap" class="text-3xl font-bold text-white mt-2">—</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Active Mode</span>
+        <div id="stat-active-mode" class="text-3xl font-bold text-[#E10600] mt-2 uppercase">GUIDED</div>
+      </div>
+    </section>
+
+    <!-- Real Saved Race History Table (Zero Fake Example Rows) -->
+    <section class="panel p-6 sm:p-8 animate-on-scroll">
+      <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+        <div>
+          <span class="section-tag mb-0">Archive</span>
+          <h2 class="text-xl font-bold text-white">Saved Strategy Runs</h2>
+        </div>
+        <span id="history-source-pill" class="mono text-[11px] px-3 py-1 rounded-full bg-white/5 text-zinc-400">SQLite / Local</span>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-history" class="hidden text-center py-14">
+        <p class="text-zinc-400 text-sm mb-4">No completed race simulations recorded yet for this driver.</p>
+        <button data-goto="3" class="btn-primary text-xs px-6 py-3">Configure Your First Race &rarr;</button>
+      </div>
+
+      <!-- Populated Table -->
+      <div id="history-table-wrap" class="overflow-x-auto hidden">
+        <table class="w-full text-left border-collapse mono text-xs">
+          <thead>
+            <tr class="border-b border-white/10 text-zinc-500 uppercase text-[10px]">
+              <th class="py-3 px-3">Circuit</th>
+              <th class="py-3 px-3">Strategy</th>
+              <th class="py-3 px-3">Your Time</th>
+              <th class="py-3 px-3">Gap vs Optimal</th>
+              <th class="py-3 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody" class="divide-y divide-white/10">
+            <!-- filled dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6-Circuit Quick Launcher -->
+    <section class="animate-on-scroll">
+      <div class="mb-5">
+        <span class="section-tag mb-0">Quick Launch</span>
+        <h2 class="text-xl font-bold text-white">Jump Straight to a Circuit</h2>
+      </div>
+      <div id="quick-tracks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
   </main>
 
   <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
-  (function () {
-    const history = JSON.parse(localStorage.getItem('tracklab_race_history') || '[]');
-    const tbody   = document.getElementById('history-tbody');
-    const empty   = document.getElementById('history-empty');
+    document.addEventListener('DOMContentLoaded', async () => {
+      const state = getState();
+      document.getElementById('dash-driver-name').textContent = state.username || 'Guest Driver';
+      document.getElementById('stat-active-mode').textContent = (state.userMode || 'guided').toUpperCase();
 
-    if (history.length === 0) {
-      empty.classList.remove('hidden');
-      return;
-    }
+      async function loadHistory() {
+        const res = await TrackLabDB.getRaces();
+        const races = res.races || [];
 
-    history.forEach(entry => {
-      const won    = entry.gapSec <= 0;
-      const gapStr = (entry.gapSec >= 0 ? '+' : '') + entry.gapSec.toFixed(1) + 's';
-      const result = won ? gapStr + ' (WIN 🏆)' : gapStr + ' (LOSS)';
-      const userTimeStr = TrackLabSim.formatTime(entry.userTime);
-      const tr = document.createElement('tr');
-      tr.className = 'bg-[#15151E]';
-      tr.innerHTML = `
-        <td class="py-3 px-4 font-bold">${entry.track}</td>
-        <td class="py-3 px-4">${entry.stint1} &rarr; ${entry.stint2}</td>
-        <td class="py-3 px-4">LAP ${entry.pitLap}</td>
-        <td class="py-3 px-4 text-white">${userTimeStr}</td>
-        <td class="py-3 px-4 ${won ? 'text-green-400 font-bold' : 'text-[#E10600]'}">${result}</td>
-        <td class="py-3 px-4 text-right">
-          <button class="replay-sim-btn" data-track="${entry.track}" data-s1="${entry.stint1}" data-s2="${entry.stint2}" data-pitlap="${entry.pitLap}">
-            Replay &rarr;
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+        document.getElementById('dash-storage-note').textContent =
+          res.source === 'sqlite'
+            ? `Connected to SQLite database • Showing real telemetry runs for ${state.username || 'all drivers'}`
+            : `Offline Local Storage • Showing runs saved in this browser`;
 
-    // Replay buttons: load strategy into state then go to sim
-    document.querySelectorAll('.replay-sim-btn[data-track]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        saveState({
-          track:   btn.dataset.track,
-          totalLaps: TrackLabSim.getTrack(btn.dataset.track)?.laps || 58,
-          stint1:  btn.dataset.s1,
-          stint2:  btn.dataset.s2,
-          pitLap:  Number(btn.dataset.pitlap),
-          simUserResult: null,
-          simOptResult:  null,
+        document.getElementById('history-source-pill').textContent =
+          res.source === 'sqlite' ? 'SQLite Database' : 'Browser Storage';
+
+        document.getElementById('stat-races-count').textContent = races.length;
+
+        if (races.length === 0) {
+          document.getElementById('empty-history').classList.remove('hidden');
+          document.getElementById('history-table-wrap').classList.add('hidden');
+          document.getElementById('stat-optimal-rate').textContent = '—';
+          document.getElementById('stat-best-gap').textContent = '—';
+          return;
+        }
+
+        document.getElementById('empty-history').classList.add('hidden');
+        document.getElementById('history-table-wrap').classList.remove('hidden');
+
+        const nearOpt = races.filter(r => Math.abs(r.gap) < 3.0).length;
+        document.getElementById('stat-optimal-rate').textContent = `${Math.round((nearOpt / races.length) * 100)}%`;
+
+        const minGap = Math.min(...races.map(r => r.gap));
+        document.getElementById('stat-best-gap').textContent = Math.abs(minGap) <= 0.15 ? 'OPTIMAL' : TrackLabSim.formatGap(minGap);
+
+        const tbody = document.getElementById('history-tbody');
+        tbody.innerHTML = races.map((r, idx) => {
+          const isOpt = Math.abs(r.gap) <= 0.15;
+          const gapCls = isOpt || r.gap < 0 ? 'text-[#22C55E]' : (r.gap < 6 ? 'text-amber-400' : 'text-[#E10600]');
+          return `
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-3.5 px-3 font-semibold text-white">${r.track_name || r.track}</td>
+              <td class="py-3.5 px-3 text-zinc-300">${r.stint1} → ${r.stint2} <span class="text-zinc-500">(L${r.pit_lap})</span></td>
+              <td class="py-3.5 px-3 text-white">${TrackLabSim.formatTime(r.total_time)}</td>
+              <td class="py-3.5 px-3 font-bold ${gapCls}">${isOpt ? 'OPTIMAL' : TrackLabSim.formatGap(r.gap)}</td>
+              <td class="py-3.5 px-3 text-right space-x-2">
+                <button type="button" data-replay-idx="${idx}" class="btn-outline py-1 px-3 text-[11px]">Replay</button>
+                <button type="button" data-del-id="${r.id || ''}" data-del-idx="${idx}" class="btn-ghost py-1 px-2 text-[11px] text-zinc-500 hover:text-red-400">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        tbody.querySelectorAll('[data-replay-idx]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const run = races[Number(btn.dataset.replayIdx)];
+            const trackObj = TrackLabSim.getTrack(run.track);
+            saveState({
+              track: run.track,
+              totalLaps: trackObj.laps,
+              stint1: run.stint1,
+              stint2: run.stint2,
+              pitLap: run.pit_lap
+            });
+            goTo(9);
+          });
         });
-        goTo(9);
+
+        tbody.querySelectorAll('[data-del-idx]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.delId ? Number(btn.dataset.delId) : null;
+            const idx = Number(btn.dataset.delIdx);
+            await TrackLabDB.clearOrDeleteRace(id, idx);
+            loadHistory();
+          });
+        });
+      }
+
+      await loadHistory();
+
+      // Quick launch circuit grid
+      const quickGrid = document.getElementById('quick-tracks-grid');
+      quickGrid.innerHTML = Object.values(TrackLabSim.TRACKS).map(t => `
+        <button type="button" data-qtrack="${t.id}" data-qlaps="${t.laps}"
+                class="panel p-5 text-left hover:border-white/30 transition-all flex justify-between items-center">
+          <div>
+            <div class="mono text-[10px] text-zinc-500 uppercase">${t.country}</div>
+            <div class="font-bold text-white text-base mt-0.5">${t.shortName}</div>
+            <div class="mono text-xs text-zinc-400 mt-1">${t.laps} Laps • ${t.pitLoss}s Pit Loss</div>
+          </div>
+          <span class="text-[#E10600] font-bold text-sm">&rarr;</span>
+        </button>
+      `).join('');
+
+      quickGrid.querySelectorAll('[data-qtrack]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          saveState({
+            track: btn.dataset.qtrack,
+            totalLaps: Number(btn.dataset.qlaps)
+          });
+          goTo(5);
+        });
       });
     });
-  })();
   </script>
 </body>
 </html>

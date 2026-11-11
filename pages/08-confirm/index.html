@@ -3,83 +3,238 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 8. Confirm</title>
+  <title>TrackLab — Grid Lock &amp; Launch</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    #start-lights-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: #050507;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #start-lights-overlay.active {
+      display: flex;
+      animation: pageFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn nav-btn-active">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <button data-goto="7" class="header-link">Edit Pit Lap</button>
       <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-8" class="screen w-full max-w-xl panel f1-border-top p-8">
-      <div class="section-tag">Part 3 // Pre-Race Confirmation</div>
-      <h2 class="text-2xl font-bold uppercase mb-6">Here Is Your Final Race Strategy</h2>
+  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col justify-center">
 
-      <div class="sub-box p-6 space-y-4 mono text-sm mb-6">
-        <div class="summary-row">
-          <span class="muted-text">CIRCUIT:</span>
-          <span id="summary-track" class="font-bold">MELBOURNE (58 LAPS)</span>
+    <section class="panel p-8 sm:p-12 animate-on-scroll">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-white/10 pb-6 mb-8">
+        <div>
+          <span class="section-tag">05 // Pre-Grid Final Sign-Off</span>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Strategy Briefing</h1>
         </div>
-        <div class="summary-row">
-          <span class="muted-text">STINT 01:</span>
-          <span id="summary-s1" class="font-bold">SOFT (LAPS 1 – 18)</span>
+        <span class="mono text-xs px-3.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 text-[#22C55E] font-semibold">
+          GRID TELEMETRY READY
+        </span>
+      </div>
+
+      <!-- Proportional Stint Architecture -->
+      <div class="sub-box p-6 mb-8">
+        <div class="flex justify-between mono text-[11px] text-zinc-400 uppercase mb-3">
+          <span>Planned Stint Architecture</span>
+          <span class="text-[#E10600] font-semibold">Box Window: Lap <span id="label-box-lap">18</span></span>
         </div>
-        <div class="summary-row">
-          <span class="muted-text">PIT STOP WINDOW:</span>
-          <span id="summary-pit" class="font-bold text-[#E10600]">END OF LAP 18 (+21.2s PIT LOSS)</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="muted-text">STINT 02:</span>
-          <span id="summary-s2" class="font-bold">HARD (LAPS 19 – 58)</span>
+        <div class="w-full h-12 flex rounded-xl overflow-hidden border border-white/15 mono text-xs font-bold">
+          <div id="vis-stint-1" style="width: 31%;" class="stint-bar-1 transition-all duration-300 px-2">SOFT (18L)</div>
+          <div id="vis-stint-2" style="width: 69%;" class="stint-bar-2 transition-all duration-300 px-2">HARD (40L)</div>
         </div>
       </div>
 
-      <div class="flex justify-between">
-        <button data-goto="7" class="btn-outline">&larr; Edit Strategy</button>
-        <button id="start-race-btn" class="btn-primary">Confirm &amp; Race Agent &rarr;</button>
+      <!-- Clean Telemetry Summary Table -->
+      <div class="sub-box p-6 mb-8 mono text-sm">
+        <div class="summary-row">
+          <span class="text-zinc-400">Grand Prix Circuit</span>
+          <span id="summary-track" class="text-white font-semibold">Norisring (72 Laps)</span>
+        </div>
+        <div class="summary-row">
+          <span class="text-zinc-400">Opening Stint</span>
+          <span id="summary-s1" class="text-white font-semibold">SOFT (Laps 1–28)</span>
+        </div>
+        <div class="summary-row">
+          <span class="text-zinc-400">Pit Stop &amp; Transit Delta</span>
+          <span id="summary-pit" class="text-[#E10600] font-semibold">End of Lap 28 (+18.4s)</span>
+        </div>
+        <div class="summary-row">
+          <span class="text-zinc-400">Closing Stint</span>
+          <span id="summary-s2" class="text-white font-semibold">HARD (Laps 29–72)</span>
+        </div>
+        <div class="flex justify-between items-center pt-3">
+          <span class="text-zinc-400">FIA Compound Regulation</span>
+          <span id="summary-fia" class="text-[#22C55E] font-semibold">Compliant (2 Compounds)</span>
+        </div>
+      </div>
+
+      <!-- Navigation & Launch Trigger -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <button data-goto="7" class="btn-outline w-full sm:w-auto">&larr; Adjust Pit Window</button>
+        <button id="btn-lights-launch" class="btn-primary w-full sm:w-auto px-10 py-4 text-base">
+          Initiate Race Sequence &rarr;
+        </button>
       </div>
     </section>
+
   </main>
+
+  <!-- =====================================================================
+       AUTHENTIC FIA 5-LIGHT STARTING GANTRY OVERLAY
+       ===================================================================== -->
+  <div id="start-lights-overlay">
+    <img src="../../assets/images/f1-lights-car.jpg" alt="Formula 1 Starting Grid — Mercedes Front View"
+         class="absolute inset-0 w-full h-full object-cover object-center opacity-45 pointer-events-none">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#050507] via-transparent to-[#050507]/90 pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col items-center px-6">
+      <span class="mono text-xs uppercase tracking-[0.25em] text-zinc-400 mb-3">Formation Lap Complete</span>
+      <h2 id="gantry-heading" class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-10 text-center">
+        Starting Grid Sequence
+      </h2>
+
+      <div class="gantry-container mb-10">
+        <div class="gantry-bar"></div>
+        <div class="gantry-clusters">
+          <div class="light-cluster">
+            <div class="light-bulb" id="l1-a"></div>
+            <div class="light-bulb" id="l1-b"></div>
+          </div>
+          <div class="light-cluster">
+            <div class="light-bulb" id="l2-a"></div>
+            <div class="light-bulb" id="l2-b"></div>
+          </div>
+          <div class="light-cluster">
+            <div class="light-bulb" id="l3-a"></div>
+            <div class="light-bulb" id="l3-b"></div>
+          </div>
+          <div class="light-cluster">
+            <div class="light-bulb" id="l4-a"></div>
+            <div class="light-bulb" id="l4-b"></div>
+          </div>
+          <div class="light-cluster">
+            <div class="light-bulb" id="l5-a"></div>
+            <div class="light-bulb" id="l5-b"></div>
+          </div>
+        </div>
+      </div>
+
+      <p id="gantry-caption" class="mono text-xs sm:text-sm tracking-[0.2em] uppercase text-zinc-300 text-center">
+        Hold clutch bite point...
+      </p>
+
+      <button id="btn-skip-lights" class="btn-ghost mt-8 text-xs text-zinc-500 hover:text-white">
+        Skip Sequence &rarr;
+      </button>
+    </div>
+  </div>
 
   <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
-  // Override the shared-state pit summary to use real track pit loss
-  document.addEventListener('DOMContentLoaded', () => {
-    const state = getState();
-    const track = TrackLabSim.getTrack(state.track);
-    const pitLoss = track ? track.pitLoss : 21.2;
-    const summaryPit = document.getElementById('summary-pit');
-    if (summaryPit) {
-      summaryPit.textContent = `END OF LAP ${state.pitLap} (+${pitLoss}s PIT LOSS)`;
-    }
-  });
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = getState();
+      const track = TrackLabSim.getTrack(state.track);
+      const totalLaps = track.laps;
+      const pitLap = Math.min(totalLaps - 3, Math.max(3, Number(state.pitLap) || 18));
+
+      document.getElementById('summary-track').textContent = `${track.name} (${totalLaps} Laps)`;
+      document.getElementById('summary-s1').textContent = `${state.stint1} (Laps 1–${pitLap})`;
+      document.getElementById('summary-pit').textContent = `End of Lap ${pitLap} (+${track.pitLoss}s Transit)`;
+      document.getElementById('summary-s2').textContent = `${state.stint2} (Laps ${pitLap + 1}–${totalLaps})`;
+      document.getElementById('label-box-lap').textContent = pitLap;
+
+      const fiaEl = document.getElementById('summary-fia');
+      if (state.stint1 === state.stint2) {
+        fiaEl.textContent = 'Non-Compliant (Single Compound)';
+        fiaEl.className = 'text-amber-400 font-semibold';
+      }
+
+      const pct1 = ((pitLap / totalLaps) * 100).toFixed(1);
+      const pct2 = (100 - pct1).toFixed(1);
+      const b1 = document.getElementById('vis-stint-1');
+      const b2 = document.getElementById('vis-stint-2');
+      b1.style.width = `${pct1}%`;
+      b1.textContent = `${state.stint1} (${pitLap}L)`;
+      b2.style.width = `${pct2}%`;
+      b2.textContent = `${state.stint2} (${totalLaps - pitLap}L)`;
+
+      // F1 Starting Lights Controller
+      const overlay = document.getElementById('start-lights-overlay');
+      const heading = document.getElementById('gantry-heading');
+      const caption = document.getElementById('gantry-caption');
+      const timers = [];
+
+      document.getElementById('btn-skip-lights').addEventListener('click', () => {
+        timers.forEach(clearTimeout);
+        goTo(9);
+      });
+
+      document.getElementById('btn-lights-launch').addEventListener('click', () => {
+        overlay.classList.add('active');
+        const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) {
+          goTo(9);
+          return;
+        }
+
+        const clusters = [
+          [document.getElementById('l1-a'), document.getElementById('l1-b')],
+          [document.getElementById('l2-a'), document.getElementById('l2-b')],
+          [document.getElementById('l3-a'), document.getElementById('l3-b')],
+          [document.getElementById('l4-a'), document.getElementById('l4-b')],
+          [document.getElementById('l5-a'), document.getElementById('l5-b')]
+        ];
+
+        clusters.forEach((pair, i) => {
+          timers.push(setTimeout(() => {
+            pair[0].classList.add('red-lit');
+            pair[1].classList.add('red-lit');
+            TrackLabAudio.playLightBeep(false);
+            caption.textContent = `Red light ${i + 1} of 5 illuminated`;
+          }, 550 + i * 750));
+        });
+
+        const allRedAt = 550 + 4 * 750;
+        const holdMs = 1100 + Math.round(Math.random() * 800);
+
+        timers.push(setTimeout(() => {
+          caption.textContent = 'All 5 lights set — stand by...';
+        }, allRedAt + 200));
+
+        timers.push(setTimeout(() => {
+          clusters.forEach(pair => {
+            pair[0].classList.remove('red-lit');
+            pair[1].classList.remove('red-lit');
+            pair[0].classList.add('green-lit');
+            pair[1].classList.add('green-lit');
+          });
+          TrackLabAudio.playLightBeep(true);
+          heading.textContent = 'LIGHTS OUT AND AWAY WE GO!';
+          heading.className = 'text-3xl sm:text-5xl font-extrabold tracking-tight text-[#22C55E] mb-10 text-center';
+          caption.textContent = 'Green flag — Telemetry active';
+
+          timers.push(setTimeout(() => goTo(9), 750));
+        }, allRedAt + holdMs));
+      });
+    });
   </script>
 </body>
 </html>

@@ -3,102 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 4. Tire Lesson</title>
+  <title>TrackLab — Tire Physics</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn nav-btn-active">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <button data-goto="5" class="btn-ghost text-xs">Skip Lesson &rarr;</button>
       <button data-goto="11" class="header-link">Dashboard</button>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-4" class="screen w-full max-w-2xl panel f1-border-top p-8">
-      <div class="section-tag">Part 1 // Educational Briefing</div>
-      <h2 class="text-2xl font-bold uppercase mb-4">Understanding Tyre Compounds</h2>
-      <p class="body-copy mb-6">
-        Teams choose between 3 dry slick compounds. Softer rubber heats up quickly and provides more grip in corners, but wears down rapidly over consecutive laps.
-      </p>
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col justify-between">
 
-      <div class="space-y-3 mb-6">
-        <div class="sub-box flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="tire-ring tire-soft"></div>
-            <div>
-              <div class="font-bold uppercase">Soft Compound (C3)</div>
-              <div class="text-xs muted-text">Fastest initial pace. High thermal degradation.</div>
-            </div>
-          </div>
-          <div class="mono text-xs text-right">
-            <div>PACE: <span class="text-white font-semibold">BASE (0.0s)</span></div>
-            <div class="muted-text">LIFE: ~14–18 LAPS</div>
-          </div>
-        </div>
-
-        <div class="sub-box flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="tire-ring tire-medium"></div>
-            <div>
-              <div class="font-bold uppercase">Medium Compound (C2)</div>
-              <div class="text-xs muted-text">Balanced pace and durability across medium stints.</div>
-            </div>
-          </div>
-          <div class="mono text-xs text-right">
-            <div>PACE: <span class="text-white font-semibold">+0.45s / LAP</span></div>
-            <div class="muted-text">LIFE: ~22–30 LAPS</div>
-          </div>
-        </div>
-
-        <div class="sub-box flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="tire-ring tire-hard"></div>
-            <div>
-              <div class="font-bold uppercase">Hard Compound (C1)</div>
-              <div class="text-xs muted-text">Slowest warm-up and peak grip, lowest wear rate.</div>
-            </div>
-          </div>
-          <div class="mono text-xs text-right">
-            <div>PACE: <span class="text-white font-semibold">+0.85s / LAP</span></div>
-            <div class="muted-text">LIFE: ~32–45 LAPS</div>
-          </div>
-        </div>
+    <!-- Apple Hardware-Style Hero Banner -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 animate-on-scroll">
+      <div>
+        <span class="section-tag">02 // Tire Thermodynamics</span>
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mt-2">
+          Grip is temporary.<br>Strategy is everything.
+        </h1>
+        <p class="body-copy text-lg mt-5">
+          Every dry Grand Prix weekend supplies three slick compounds. Faster compounds burn out rapidly; harder compounds trade peak grip for long-stint consistency.
+        </p>
       </div>
-
-      <div class="callout-box mb-6">
-        <strong class="uppercase text-white">FIA Sporting Regulation:</strong> Every driver must use at least 2 different dry compounds during a dry race.
-      </div>
-
-      <div class="flex justify-between">
-        <button data-goto="3" class="btn-outline">&larr; Back</button>
-        <button data-goto="5" class="btn-primary">Select Your Compounds &rarr;</button>
+      <div class="rounded-2xl overflow-hidden border border-white/10">
+        <img src="../../assets/images/f1-pit-tires.jpg" alt="Soft Medium and Hard Formula 1 Pirelli slick tires"
+             class="w-full h-[300px] sm:h-[340px] object-cover">
       </div>
     </section>
+
+    <!-- 3 Minimalist Compound Spec Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <article class="panel p-8 animate-on-scroll delay-1">
+        <div class="flex items-center justify-between mb-6">
+          <span class="tire-ring tire-soft w-10 h-10 border-[6px]"></span>
+          <span class="mono text-xs text-[#E10600] font-semibold">C4 / C5</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white">Soft</h2>
+        <p class="text-sm text-zinc-400 mt-2 mb-6">
+          Maximum mechanical grip for qualifying sprints and undercut laps, followed by a steep thermal cliff.
+        </p>
+        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
+          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">0.00s (Baseline)</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~13 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-[#E10600] font-semibold">~Lap 18</span></div>
+        </div>
+      </article>
+
+      <article class="panel p-8 animate-on-scroll delay-2">
+        <div class="flex items-center justify-between mb-6">
+          <span class="tire-ring tire-medium w-10 h-10 border-[6px]"></span>
+          <span class="mono text-xs text-yellow-400 font-semibold">C3</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white">Medium</h2>
+        <p class="text-sm text-zinc-400 mt-2 mb-6">
+          The strategic workhorse of modern Formula 1. Balances predictable linear wear with competitive race pace.
+        </p>
+        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
+          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.48s / lap</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~22 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-yellow-400 font-semibold">~Lap 30</span></div>
+        </div>
+      </article>
+
+      <article class="panel p-8 animate-on-scroll delay-3">
+        <div class="flex items-center justify-between mb-6">
+          <span class="tire-ring tire-hard w-10 h-10 border-[6px]"></span>
+          <span class="mono text-xs text-zinc-300 font-semibold">C1 / C2</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white">Hard</h2>
+        <p class="text-sm text-zinc-400 mt-2 mb-6">
+          Built for extended one-stop stints. Takes extra laps to reach temperature window, then resists fading.
+        </p>
+        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
+          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.92s / lap</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~34 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-zinc-300 font-semibold">~Lap 46</span></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- FIA Sporting Mandate Callout -->
+    <div class="callout-box mb-12 animate-on-scroll">
+      <strong class="text-white">FIA Mandatory Two-Compound Rule:</strong> In dry conditions, every car must use at least two different slick specifications during the Grand Prix, forcing at least one pit stop.
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+      <button data-goto="3" class="btn-outline w-full sm:w-auto">&larr; Back to Circuits</button>
+      <button data-goto="5" class="btn-primary w-full sm:w-auto px-8 py-3.5">Select Your Compounds &rarr;</button>
+    </div>
+
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
 </body>
 </html>

@@ -3,70 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 2. Intro</title>
+  <title>TrackLab — Briefing</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn nav-btn-active">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">F1 Guide</button>
       <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-2" class="screen w-full max-w-2xl panel f1-border-top p-8">
-      <div class="section-tag">Onboarding // Briefing</div>
-      <h1 class="text-3xl font-bold uppercase mb-4">F1 Race Strategy Walkthrough</h1>
-      <p class="body-copy mb-6">
-        Winning a Grand Prix isn't just about raw car speed—it comes down to calling the right tyres on the right lap. We will build a baseline race strategy together in 3 parts and test it against our reinforcement learning model.
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-16 flex flex-col justify-center">
+
+    <!-- Dramatic Apple Greeting -->
+    <section class="text-center max-w-3xl mx-auto mb-16 animate-on-scroll">
+      <span class="section-tag">Pre-Race Briefing</span>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mt-2">
+        Welcome, <span id="welcome-driver" class="text-[#E10600]">Driver</span>.
+      </h1>
+      <p class="body-copy text-lg mt-5">
+        Choose your pit wall experience. Walk through tire and strategy fundamentals step-by-step, or skip directly to circuit telemetry.
       </p>
-      <div class="grid grid-cols-3 gap-4 mb-8">
-        <div class="sub-box">
-          <div class="mono text-xs muted-text">PART 01</div>
-          <div class="font-bold uppercase mt-1">Circuit Selection</div>
-          <p class="text-xs muted-text mt-1">Select the track layout and baseline lap count.</p>
+    </section>
+
+    <!-- Two Distinct Experience Modes -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-14">
+
+      <!-- Guided Experience -->
+      <div id="mode-guided" class="panel p-8 sm:p-10 cursor-pointer hover:border-white/30 flex flex-col justify-between animate-on-scroll slide-left">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <span class="mono text-xs uppercase tracking-widest text-zinc-400">01 // Academy</span>
+            <span class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Learn &amp; Race</h2>
+          <p class="body-copy text-sm mt-3">
+            Guided briefings on Pirelli compounds, degradation cliffs, and pit window undercuts before launching your simulation.
+          </p>
         </div>
-        <div class="sub-box">
-          <div class="mono text-xs muted-text">PART 02</div>
-          <div class="font-bold uppercase mt-1">Tyre Compounds</div>
-          <p class="text-xs muted-text mt-1">Balance peak grip against tyre degradation rules.</p>
-        </div>
-        <div class="sub-box">
-          <div class="mono text-xs muted-text">PART 03</div>
-          <div class="font-bold uppercase mt-1">Pit Stop Window</div>
-          <p class="text-xs muted-text mt-1">Choose the exact lap to box before hitting the wear cliff.</p>
+        <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+          <span class="mono text-xs text-zinc-400">Recommended for new strategists</span>
+          <span class="btn-outline py-2 px-5 text-xs">Select Guided &rarr;</span>
         </div>
       </div>
-      <div class="flex justify-between items-center">
-        <button data-goto="11" class="btn-outline">Skip to Dashboard</button>
-        <button data-goto="3" class="btn-primary">Let's Build One Together &rarr;</button>
+
+      <!-- Pro Direct Experience -->
+      <div id="mode-pro" class="panel p-8 sm:p-10 cursor-pointer border-[#E10600]/40 bg-gradient-to-br from-[#E10600]/10 to-[#111114] flex flex-col justify-between animate-on-scroll slide-right">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <span class="mono text-xs uppercase tracking-widest text-[#E10600] font-semibold">02 // Pro Pit Wall</span>
+            <span class="w-9 h-9 rounded-full bg-[#E10600]/20 border border-[#E10600]/40 flex items-center justify-center text-[#E10600]">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Direct Telemetry</h2>
+          <p class="body-copy text-sm mt-3">
+            Bypass all tutorials and jump straight into circuit selection, tire allocation, pit timing, and race execution.
+          </p>
+        </div>
+        <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+          <span class="mono text-xs text-zinc-400">Fast-track workflow</span>
+          <span class="btn-primary py-2 px-5 text-xs">Launch Pro &rarr;</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Minimal 3-Step Architecture Strip -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 animate-on-scroll delay-2">
+      <div class="sub-box p-6">
+        <div class="mono text-xs text-[#E10600] mb-2">STEP 01</div>
+        <h3 class="font-semibold text-white">Select Circuit</h3>
+        <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">Pick from 9 championship circuits with calibrated pit loss &amp; tire stress.</p>
+      </div>
+      <div class="sub-box p-6">
+        <div class="mono text-xs text-[#E10600] mb-2">STEP 02</div>
+        <h3 class="font-semibold text-white">Configure Stints</h3>
+        <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">Allocate starting rubber, replacement compound, and exact pit lap.</p>
+      </div>
+      <div class="sub-box p-6">
+        <div class="mono text-xs text-[#E10600] mb-2">STEP 03</div>
+        <h3 class="font-semibold text-white">Race &amp; Debrief</h3>
+        <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">Watch live gaps against the mathematical optimum and save to your history.</p>
       </div>
     </section>
+
+    <div class="mt-10 flex justify-between items-center">
+      <button data-goto="1" class="btn-ghost">&larr; Switch Profile</button>
+      <button data-goto="11" class="btn-ghost">Open Driver Dashboard &rarr;</button>
+    </div>
+
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = getState();
+      if (state.username) {
+        document.getElementById('welcome-driver').textContent = state.username;
+      }
+
+      document.getElementById('mode-guided').addEventListener('click', () => {
+        saveState({ userMode: 'guided' });
+        goTo(3);
+      });
+
+      document.getElementById('mode-pro').addEventListener('click', () => {
+        saveState({ userMode: 'pro' });
+        goTo(3);
+      });
+    });
+  </script>
 </body>
 </html>

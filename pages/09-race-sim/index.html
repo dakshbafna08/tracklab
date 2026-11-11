@@ -3,419 +3,483 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 9. Race Sim</title>
+  <title>TrackLab — Live Race Telemetry</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
-    /* Lap-time sparkline bars */
-    .spark-bar {
-      display: inline-block;
-      width: 3px;
-      border-radius: 1px;
-      transition: height 0.1s;
+    .cockpit-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr 330px;
+      gap: 1.25rem;
+      min-height: calc(100vh - 165px);
     }
-    /* Car dot animation along track path */
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
+    @media (max-width: 1100px) {
+      .cockpit-grid {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
     }
-    .car-dot { animation: pulse-dot 1s ease-in-out infinite; }
-
-    /* Live event flash */
-    @keyframes flash-red {
-      0%   { background-color: #E10600; color: #fff; }
-      100% { background-color: transparent; color: inherit; }
-    }
-    .pit-flash { animation: flash-red 1.2s ease-out forwards; border-radius: 2px; padding: 0 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn nav-btn-active">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
+  <!-- Top Telemetry Header -->
   <header class="app-header">
     <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+      <span class="f1-badge">F1</span>
+      <div>
+        <span class="header-title block leading-none">LIVE TELEMETRY</span>
+        <span id="sim-circuit-subtitle" class="mono text-[11px] text-zinc-400">Loading circuit...</span>
+      </div>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
-      <button data-goto="11" class="header-link">Dashboard</button>
+
+    <div class="hidden md:flex items-center gap-3 mono text-xs">
+      <span id="sim-data-source-pill" class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300">
+        MODELED ESTIMATE
+      </span>
+      <span id="sim-flag-pill" class="px-3 py-1 rounded-full bg-green-500/15 border border-green-500/40 text-[#22C55E] font-semibold">
+        GREEN FLAG
+      </span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="btn-skip-finish" class="btn-outline py-1.5 px-4 text-xs">Skip to Finish</button>
+      <button id="btn-go-results" class="btn-primary py-1.5 px-4 text-xs">Results &rarr;</button>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-6">
-    <section id="screen-9" class="screen w-full max-w-4xl panel f1-border-top p-6">
+  <!-- Full-Viewport Telemetry Cockpit -->
+  <main class="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-5 flex flex-col gap-4">
 
-      <!-- Header row -->
-      <div class="flex justify-between items-start mb-5">
+    <div class="cockpit-grid">
+
+      <!-- LEFT: LIVE TIMING TOWER & GAP MATRIX -->
+      <section class="panel p-5 flex flex-col justify-between">
         <div>
-          <div class="section-tag">Live Telemetry Simulation</div>
-          <h2 class="text-2xl font-bold uppercase">Your Strategy vs. Optimal</h2>
-          <div id="sim-track-label" class="mono text-xs muted-text mt-1">— / —</div>
-        </div>
-        <div class="mono text-right">
-          <div class="text-xs muted-text">LAP COUNTER</div>
-          <div class="text-3xl font-bold">
-            <span id="sim-lap">1</span>
-            <span class="text-lg muted-text"> / </span>
-            <span class="total-laps-label text-lg">58</span>
-          </div>
-          <div id="sim-phase" class="text-xs text-[#E10600] font-bold uppercase mt-1">PRE-RACE</div>
-        </div>
-      </div>
-
-      <!-- Main grid: track map + timing tower -->
-      <div class="grid grid-cols-3 gap-5 mb-5">
-
-        <!-- Track map (col-span-2) -->
-        <div class="col-span-2 sub-box relative overflow-hidden" style="height:200px;">
-          <!-- Melbourne SVG -->
-          <svg id="track-svg-mel" viewBox="0 0 300 140" class="w-full h-full stroke-[#38383F] fill-none" stroke-width="6">
-            <path id="track-path" d="M 40 100 L 140 100 L 180 75 L 250 85 L 270 45 L 200 20 L 90 30 L 45 55 Z"/>
-            <!-- User car -->
-            <circle id="car-user" cx="40" cy="100" r="5" fill="#FFFFFF" class="car-dot" stroke="none"/>
-            <!-- Optimal car -->
-            <circle id="car-opt" cx="40" cy="100" r="5" fill="#E10600" class="car-dot" stroke="none" style="animation-delay:0.5s"/>
-          </svg>
-          <!-- Austin SVG (hidden by default) -->
-          <svg id="track-svg-aus" viewBox="0 0 300 140" class="w-full h-full stroke-[#38383F] fill-none hidden absolute inset-0" stroke-width="6">
-            <path d="M 20 70 L 70 20 L 120 35 L 175 20 L 160 65 L 110 55 L 90 75 Z"/>
-            <circle id="car-user-aus" cx="20" cy="70" r="5" fill="#FFFFFF" class="car-dot" stroke="none"/>
-            <circle id="car-opt-aus"  cx="20" cy="70" r="5" fill="#E10600" class="car-dot" stroke="none" style="animation-delay:0.5s"/>
-          </svg>
-
-          <!-- Legend -->
-          <div class="absolute bottom-2 left-3 mono text-xs flex gap-4">
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-white inline-block rounded-full"></span> YOU</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#E10600] inline-block rounded-full"></span> OPTIMAL</span>
+          <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+            <span class="section-tag mb-0">Timing Tower</span>
+            <span class="mono text-[10px] text-zinc-500 uppercase">Interval</span>
           </div>
 
-          <!-- Current tire indicator -->
-          <div class="absolute top-2 right-3 mono text-xs flex flex-col items-end gap-1">
-            <div class="flex items-center gap-1.5">
-              <span class="muted-text">YOU:</span>
-              <span id="sim-user-tire" class="font-bold text-white">SOFT</span>
-              <span id="sim-user-tire-ring" class="w-3 h-3 rounded-full border-4 border-[#E10600]"></span>
+          <!-- Your Car Row -->
+          <div id="tower-user" class="sub-box p-4 mb-3 border-l-4 border-l-white transition-all">
+            <div class="flex justify-between items-center mb-1.5">
+              <span id="tower-user-name" class="font-semibold text-sm text-white">YOU</span>
+              <span id="tower-user-pos" class="mono text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white">P1</span>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span class="muted-text">OPT:</span>
-              <span id="sim-opt-tire" class="font-bold text-[#E10600]">—</span>
-              <span id="sim-opt-tire-ring" class="w-3 h-3 rounded-full border-4 border-[#E10600]"></span>
+            <div class="flex justify-between items-center mono text-xs">
+              <span id="tower-user-comp" class="flex items-center gap-2 text-zinc-300">
+                <span class="tire-ring tire-soft w-3 h-3 border-2"></span> SOFT
+              </span>
+              <span id="tower-user-gap" class="font-bold text-white">LEADER</span>
+            </div>
+            <div class="flex justify-between mono text-[11px] text-zinc-500 mt-2">
+              <span>Last Lap</span>
+              <span id="tower-user-lap" class="text-zinc-200">—</span>
             </div>
           </div>
+
+          <!-- Optimal Strategy Model Row -->
+          <div id="tower-opt" class="sub-box p-4 mb-5 border-l-4 border-l-[#E10600] transition-all">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="font-semibold text-sm text-[#E10600]">OPTIMAL MODEL</span>
+              <span id="tower-opt-pos" class="mono text-xs font-bold px-2 py-0.5 rounded bg-[#E10600]/20 text-[#E10600]">P2</span>
+            </div>
+            <div class="flex justify-between items-center mono text-xs">
+              <span id="tower-opt-comp" class="flex items-center gap-2 text-zinc-300">
+                <span class="tire-ring tire-medium w-3 h-3 border-2"></span> MEDIUM
+              </span>
+              <span id="tower-opt-gap" class="font-bold text-[#E10600]">+0.00s</span>
+            </div>
+            <div class="flex justify-between mono text-[11px] text-zinc-500 mt-2">
+              <span>Last Lap</span>
+              <span id="tower-opt-lap" class="text-zinc-200">—</span>
+            </div>
+          </div>
+
+          <!-- Stint Strategy Summary -->
+          <div class="sub-box p-4 mono text-xs space-y-3">
+            <div>
+              <div class="flex justify-between text-[10px] text-zinc-500 mb-1">
+                <span>YOUR PLAN</span>
+                <span id="plan-user-label" class="text-white">BOX L18</span>
+              </div>
+              <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden flex">
+                <div id="sim-user-bar1" class="bg-[#E10600] h-full" style="width: 31%;"></div>
+                <div id="sim-user-bar2" class="bg-zinc-500 h-full" style="width: 69%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10px] text-zinc-500 mb-1">
+                <span>OPTIMAL TARGET</span>
+                <span id="plan-opt-label" class="text-[#E10600]">BOX L32</span>
+              </div>
+              <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden flex">
+                <div id="sim-opt-bar1" class="bg-yellow-500 h-full" style="width: 55%;"></div>
+                <div id="sim-opt-bar2" class="bg-zinc-300 h-full" style="width: 45%;"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Timing tower -->
-        <div class="sub-box p-4 mono text-xs flex flex-col gap-3">
-          <div class="muted-text border-b border-[#38383F] pb-2 uppercase">Timing Tower</div>
+        <!-- Speed Controls -->
+        <div class="pt-4 border-t border-white/10 mt-4">
+          <div class="mono text-[10px] text-zinc-500 uppercase mb-2">Playback Speed</div>
+          <div class="grid grid-cols-4 gap-1.5 mono text-xs">
+            <button data-speed="0" class="speed-btn btn-outline py-1.5 px-2 text-xs">Pause</button>
+            <button data-speed="1" class="speed-btn btn-primary py-1.5 px-2 text-xs">1x</button>
+            <button data-speed="2" class="speed-btn btn-outline py-1.5 px-2 text-xs">2x</button>
+            <button data-speed="5" class="speed-btn btn-outline py-1.5 px-2 text-xs">5x</button>
+          </div>
+        </div>
+      </section>
 
-          <!-- P1 -->
+      <!-- CENTER: CIRCUIT RADAR + LIVE CAR TELEMETRY HUD -->
+      <section class="panel p-5 flex flex-col justify-between gap-4">
+        <div class="flex justify-between items-center border-b border-white/10 pb-3">
           <div>
-            <div id="p1-label" class="text-[#E10600] font-bold">P1 // OPTIMAL</div>
-            <div id="p1-time" class="text-white font-bold text-sm">—</div>
-            <div id="p1-laptime" class="muted-text">Last lap: —</div>
+            <span class="section-tag mb-0">Track Radar</span>
+            <h1 id="radar-circuit-title" class="text-xl font-bold text-white">Albert Park Circuit</h1>
+          </div>
+          <div class="text-right mono">
+            <span class="text-xs text-zinc-500 uppercase mr-1">LAP</span>
+            <span class="text-3xl font-bold text-white" id="live-lap-num">1</span>
+            <span class="text-sm text-zinc-500">/<span class="total-laps-label">58</span></span>
+          </div>
+        </div>
+
+        <!-- Visual Track Representation with Moving Markers -->
+        <div class="relative flex-1 min-h-[250px] bg-black/40 border border-white/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden">
+          <svg id="radar-svg" viewBox="0 0 500 220" class="w-full h-full max-h-[300px]">
+            <path id="radar-path" d="M 70 155 Z" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle id="dot-opt" cx="70" cy="155" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
+            <circle id="dot-user" cx="70" cy="155" r="7" fill="#FFFFFF" stroke="#09090B" stroke-width="2"/>
+          </svg>
+
+          <!-- Pit Stop Notification Pill -->
+          <div id="pit-alert-pill" class="hidden absolute top-4 px-4 py-1.5 rounded-full bg-[#E10600] text-white mono text-xs font-bold tracking-wider shadow-lg">
+            BOXING THIS LAP — FRESH COMPOUND FIT
           </div>
 
-          <!-- P2 -->
-          <div>
-            <div id="p2-label" class="font-bold">P2 // YOU</div>
-            <div class="flex items-center gap-2">
-              <span id="sim-gap" class="text-base font-bold">+0.0s</span>
+          <div class="absolute bottom-3 left-4 flex items-center gap-4 mono text-[11px] bg-black/70 px-3 py-1.5 rounded-full border border-white/10">
+            <span class="flex items-center gap-1.5 text-white"><span class="w-2.5 h-2.5 rounded-full bg-white"></span> YOU</span>
+            <span class="flex items-center gap-1.5 text-zinc-300"><span class="w-2.5 h-2.5 rounded-full bg-[#E10600]"></span> OPTIMAL</span>
+          </div>
+        </div>
+
+        <!-- Live Cockpit HUD Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mono">
+          <div class="sub-box p-3.5 text-center">
+            <span class="text-[10px] text-zinc-500 uppercase">Speed</span>
+            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-speed">298</span> <span class="text-[10px] text-zinc-500 font-normal">km/h</span></div>
+          </div>
+          <div class="sub-box p-3.5 text-center">
+            <span class="text-[10px] text-zinc-500 uppercase">Gear / DRS</span>
+            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-gear">7</span> <span id="hud-drs" class="text-[10px] text-[#22C55E] align-middle">DRS</span></div>
+          </div>
+          <div class="sub-box p-3.5">
+            <div class="flex justify-between text-[10px] text-zinc-500">
+              <span>Tire Life</span>
+              <span id="hud-wear-pct" class="text-white font-semibold">100%</span>
             </div>
-            <div id="p2-laptime" class="muted-text">Last lap: —</div>
-          </div>
-
-          <div class="border-t border-[#38383F] pt-2 space-y-1">
-            <div class="flex justify-between">
-              <span class="muted-text">USER PIT LAP:</span>
-              <span id="tower-user-pit" class="text-white">—</span>
+            <div class="w-full h-2 bg-white/10 rounded-full mt-2 overflow-hidden">
+              <div id="hud-wear-bar" class="h-full bg-[#22C55E] transition-all duration-200" style="width: 100%;"></div>
             </div>
-            <div class="flex justify-between">
-              <span class="muted-text">OPT PIT LAP:</span>
-              <span id="tower-opt-pit" class="text-[#E10600]">—</span>
+            <div class="text-[10px] text-zinc-500 mt-1.5" id="hud-tire-age">Age: 1 Lap</div>
+          </div>
+          <div class="sub-box p-3.5 text-center">
+            <span class="text-[10px] text-zinc-500 uppercase">Race Gap</span>
+            <div id="hud-delta" class="text-2xl font-bold text-white mt-0.5">+0.00s</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: LAP TIME PROGRESSION & RACE ENGINEER FEED -->
+      <section class="panel p-5 flex flex-col justify-between gap-4">
+        <div>
+          <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+            <span class="section-tag mb-0">Lap Progression</span>
+            <span class="mono text-[10px] text-zinc-500">Pace Curve</span>
+          </div>
+
+          <!-- Real-Time Canvas Pace Progression Chart -->
+          <div class="sub-box p-3 mb-4 bg-black/40">
+            <canvas id="paceChart" width="290" height="145" class="w-full h-[145px]"></canvas>
+            <div class="flex justify-between mono text-[10px] text-zinc-500 mt-2">
+              <span class="text-white">— You</span>
+              <span class="text-[#E10600]">— Optimal Model</span>
             </div>
           </div>
 
-          <!-- Live event ticker -->
-          <div id="sim-event-ticker" class="border-t border-[#38383F] pt-2 muted-text text-[10px] leading-relaxed min-h-[2.5rem]">
-            Calculating strategies…
+          <!-- Pit Window Countdown -->
+          <div class="sub-box p-4 mb-4 mono text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-zinc-500">Pit Window</span>
+              <span id="pit-countdown" class="font-bold text-white">In 17 Laps</span>
+            </div>
+            <div class="text-[11px] text-zinc-400 mt-1.5">
+              Fuel weight gain: <span id="fuel-gain-stat" class="text-[#22C55E]">0.00s</span>
+            </div>
+          </div>
+
+          <!-- Engineer Radio Feed -->
+          <div class="sub-box p-3.5 mono text-xs">
+            <div class="text-[10px] text-zinc-500 uppercase mb-2 flex justify-between">
+              <span>Pit Wall Radio</span>
+              <span class="text-[#E10600]">LIVE</span>
+            </div>
+            <div id="radio-feed" class="space-y-2 text-[11px] text-zinc-300 max-h-28 overflow-y-auto">
+              <div><strong class="text-white">ENG:</strong> Clean launch. Bring tires up to window cleanly.</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Lap-time sparkline -->
-      <div class="sub-box p-3 mb-5">
-        <div class="mono text-xs muted-text uppercase mb-2">Lap Time Comparison (per lap)</div>
-        <div class="flex gap-1 items-end" id="spark-container" style="height:48px;">
-          <!-- filled by JS -->
-        </div>
-        <div class="flex gap-4 mono text-[10px] muted-text mt-2">
-          <span class="flex items-center gap-1"><span class="w-2 h-2 bg-white inline-block"></span> You</span>
-          <span class="flex items-center gap-1"><span class="w-2 h-2 bg-[#E10600] inline-block"></span> Optimal</span>
-          <span id="spark-lap-label" class="ml-auto"></span>
-        </div>
-      </div>
-
-      <!-- Bottom row: stint progress bar + CTA -->
-      <div class="flex gap-4 items-end">
-        <div class="flex-1">
-          <div class="mono text-xs muted-text mb-1">RACE PROGRESS</div>
-          <div class="w-full h-5 flex border border-[#38383F] mono text-[10px] font-bold">
-            <div id="prog-s1" class="bg-[#3A1414] border-r border-white flex items-center justify-center transition-all duration-200" style="width:31%">S1</div>
-            <div id="prog-s2" class="bg-[#25252E] flex items-center justify-center transition-all duration-200" style="width:69%">S2</div>
-          </div>
-        </div>
-        <button id="view-results-btn" data-goto="10" class="btn-primary opacity-50 cursor-not-allowed" disabled>
-          View Results →
+        <button id="btn-finish-debrief" class="btn-primary w-full py-3 text-xs">
+          Open Post-Race Debrief &rarr;
         </button>
-      </div>
+      </section>
 
-    </section>
+    </div>
+
   </main>
 
   <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
-  (function () {
-    // ── 1. Load state & run simulations ──────────────────────────
-    const state   = getState();
-    const trackKey = state.track || 'MELBOURNE';
-    const track   = TrackLabSim.getTrack(trackKey);
+    (async function () {
+      const state = getState();
+      const trackKey = state.track || 'MELBOURNE';
+      const track = TrackLabSim.getTrack(trackKey);
 
-    // User strategy from state
-    const userStrategy = {
-      trackKey,
-      stint1:  state.stint1  || 'SOFT',
-      stint2:  state.stint2  || 'HARD',
-      pitLap:  state.pitLap  || 18,
-    };
+      document.getElementById('sim-circuit-subtitle').textContent = `${track.name} • ${track.laps} Laps`;
+      document.getElementById('radar-circuit-title').textContent = track.name;
+      document.querySelectorAll('.total-laps-label').forEach(el => el.textContent = track.laps);
+      if (state.username) {
+        document.getElementById('tower-user-name').textContent = state.username.toUpperCase();
+      }
 
-    const userResult = TrackLabSim.simulate(userStrategy);
-    const optResult  = TrackLabSim.optimise(trackKey);
-
-    // Persist simulation results to localStorage for Screen 10
-    saveState({
-      simUserResult:  JSON.stringify(userResult),
-      simOptResult:   JSON.stringify(optResult),
-      simUserStrategy: JSON.stringify(userStrategy),
-      simOptStrategy:  JSON.stringify(optResult.strategy),
-    });
-
-    // ── 2. Set static labels ──────────────────────────────────────
-    document.getElementById('sim-track-label').textContent =
-      (track ? track.name : trackKey) + '  //  ' + (track ? track.laps : '—') + ' LAPS';
-
-    document.getElementById('tower-user-pit').textContent = 'LAP ' + userStrategy.pitLap;
-    document.getElementById('tower-opt-pit').textContent  = 'LAP ' + optResult.strategy.pitLap;
-
-    // Show correct track SVG
-    const isMel = trackKey === 'MELBOURNE';
-    document.getElementById('track-svg-mel').classList.toggle('hidden', !isMel);
-    document.getElementById('track-svg-aus').classList.toggle('hidden', isMel);
-    document.getElementById('track-svg-aus').classList.toggle('absolute', !isMel);
-
-    // ── 3. Build sparkline placeholders (all laps) ──────────────
-    const totalLaps  = track ? track.laps : 58;
-    const sparkCont  = document.getElementById('spark-container');
-    const userLaps   = userResult.laps;
-    const optLaps    = optResult.laps;
-
-    // Find min/max lap times across both for scaling
-    const allTimes = [...userLaps, ...optLaps].map(l => l.time);
-    const minT = Math.min(...allTimes);
-    const maxT = Math.max(...allTimes);
-    const range = maxT - minT || 1;
-
-    for (let i = 0; i < totalLaps; i++) {
-      const pair = document.createElement('div');
-      pair.className = 'flex gap-px items-end flex-shrink-0';
-
-      const uBar = document.createElement('div');
-      uBar.className = 'spark-bar bg-[#55555F]';
-      uBar.style.height = '4px';
-      uBar.id = `spark-u-${i + 1}`;
-
-      const oBar = document.createElement('div');
-      oBar.className = 'spark-bar bg-[#2A0A08]';
-      oBar.style.height = '4px';
-      oBar.id = `spark-o-${i + 1}`;
-
-      pair.appendChild(uBar);
-      pair.appendChild(oBar);
-      sparkCont.appendChild(pair);
-    }
-
-    // ── 4. Animation state ────────────────────────────────────────
-    const LAPS_PER_TICK = 1;          // advance 1 lap at a time
-    const TICK_MS       = 160;        // ms between updates (~9s for 58 laps)
-
-    let currentLap = 0;
-    let simDone    = false;
-
-    // Track-path waypoints for car-dot animation (simple polyline keyframes)
-    const MEL_WAYPOINTS = [
-      [40,100],[140,100],[180,75],[250,85],[270,45],[200,20],[90,30],[45,55],[40,100]
-    ];
-    const AUS_WAYPOINTS = [
-      [20,70],[70,20],[120,35],[175,20],[160,65],[110,55],[90,75],[20,70]
-    ];
-    const WAYPOINTS = isMel ? MEL_WAYPOINTS : AUS_WAYPOINTS;
-    const totalPathLen = WAYPOINTS.length - 1;
-
-    function getCarPos(progress /* 0–1 */) {
-      const scaled = progress * totalPathLen;
-      const seg    = Math.min(Math.floor(scaled), totalPathLen - 1);
-      const t      = scaled - seg;
-      const [x1, y1] = WAYPOINTS[seg];
-      const [x2, y2] = WAYPOINTS[seg + 1];
-      return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t];
-    }
-
-    const carUserEl = isMel
-      ? document.getElementById('car-user')
-      : document.getElementById('car-user-aus');
-    const carOptEl  = isMel
-      ? document.getElementById('car-opt')
-      : document.getElementById('car-opt-aus');
-
-    // Tire ring colour map
-    const TIRE_COLORS = { SOFT: '#E10600', MEDIUM: '#F5C518', HARD: '#FFFFFF' };
-
-    function tireRingStyle(compound) {
-      return `border-color: ${TIRE_COLORS[compound] || '#888'}`;
-    }
-
-    // ── 5. Tick function ─────────────────────────────────────────
-    function tick() {
-      currentLap = Math.min(currentLap + LAPS_PER_TICK, totalLaps);
-
-      const uLap = userLaps[currentLap - 1];
-      const oLap = optLaps[currentLap - 1];
-
-      // Update lap counter
-      document.getElementById('sim-lap').textContent = currentLap;
-
-      // Cumulative times and gap
-      const uCum   = uLap.cumTime;
-      const oCum   = oLap.cumTime;
-      const gapSec = uCum - oCum;
-      const gapEl  = document.getElementById('sim-gap');
-      gapEl.textContent = TrackLabSim.formatGap(gapSec);
-      gapEl.className = gapSec > 0 ? 'text-base font-bold text-[#E10600]' : 'text-base font-bold text-green-400';
-
-      // Position labels
-      const userAhead = gapSec <= 0;
-      document.getElementById('p1-label').textContent = userAhead ? 'P1 // YOU' : 'P1 // OPTIMAL';
-      document.getElementById('p1-label').className   = userAhead ? 'font-bold text-white' : 'font-bold text-[#E10600]';
-      document.getElementById('p2-label').textContent = userAhead ? 'P2 // OPTIMAL' : 'P2 // YOU';
-
-      // Timing display
-      document.getElementById('p1-time').textContent =
-        TrackLabSim.formatTime(userAhead ? uCum : oCum);
-      document.getElementById('p1-laptime').textContent =
-        'Last lap: ' + TrackLabSim.formatLapTime(userAhead ? uLap.time : oLap.time);
-      document.getElementById('p2-laptime').textContent =
-        'Last lap: ' + TrackLabSim.formatLapTime(userAhead ? oLap.time : uLap.time);
-
-      // Sim phase
-      const phaseEl = document.getElementById('sim-phase');
-      if (currentLap < userStrategy.pitLap) {
-        phaseEl.textContent = 'STINT 1 — ' + userStrategy.stint1;
-      } else if (currentLap === userStrategy.pitLap) {
-        phaseEl.textContent = '🔧 PIT STOP — BOXING';
-        phaseEl.classList.add('pit-flash');
-        setTimeout(() => phaseEl.classList.remove('pit-flash'), 1200);
+      // Check real FastF1 historical context if available
+      const f1Ctx = await TrackLabSim.fetchFastF1Context(trackKey);
+      const pill = document.getElementById('sim-data-source-pill');
+      if (f1Ctx.available) {
+        pill.textContent = `FASTF1 CALIBRATED (${f1Ctx.year})`;
+        pill.className = 'px-3 py-1 rounded-full bg-green-500/15 border border-green-500/40 text-[#22C55E]';
       } else {
-        phaseEl.textContent = 'STINT 2 — ' + userStrategy.stint2;
+        pill.textContent = 'MODELED ESTIMATE (PIRELLI PHYSICS)';
       }
 
-      // Tire indicators
-      document.getElementById('sim-user-tire').textContent = uLap.compound;
-      document.getElementById('sim-user-tire').style.color = TIRE_COLORS[uLap.compound] || '#fff';
-      document.getElementById('sim-user-tire-ring').style = tireRingStyle(uLap.compound);
+      const pitLap = Math.min(track.laps - 3, Math.max(3, Number(state.pitLap) || 18));
+      const userStrategy = { trackKey, stint1: state.stint1 || 'SOFT', stint2: state.stint2 || 'HARD', pitLap };
 
-      document.getElementById('sim-opt-tire').textContent = oLap.compound;
-      document.getElementById('sim-opt-tire').style.color = TIRE_COLORS[oLap.compound] || '#E10600';
-      document.getElementById('sim-opt-tire-ring').style = tireRingStyle(oLap.compound);
+      const userSim = TrackLabSim.simulate(userStrategy, f1Ctx.weather);
+      const optResult = TrackLabSim.optimise(trackKey, f1Ctx.weather);
+      const optStrategy = optResult.strategy;
 
-      // Event ticker
-      const events = [];
-      if (uLap.event === 'PIT') events.push('🔧 YOU pitted — switching to ' + userStrategy.stint2);
-      if (oLap.event === 'PIT') events.push('🔧 OPTIMAL pitted — switching to ' + optResult.strategy.stint2);
-      if (events.length) {
-        const ticker = document.getElementById('sim-event-ticker');
-        ticker.innerHTML = events.join('<br>');
-        ticker.classList.add('text-white');
-        setTimeout(() => { ticker.classList.remove('text-white'); }, 2000);
-      } else if (currentLap === 1) {
-        document.getElementById('sim-event-ticker').textContent = 'Lights out! Race started.';
+      // Update Stint Plan Bars
+      const uPct1 = ((pitLap / track.laps) * 100).toFixed(1);
+      document.getElementById('plan-user-label').textContent = `BOX L${pitLap}`;
+      document.getElementById('sim-user-bar1').style.width = `${uPct1}%`;
+      document.getElementById('sim-user-bar2').style.width = `${100 - uPct1}%`;
+
+      const oPct1 = ((optStrategy.pitLap / track.laps) * 100).toFixed(1);
+      document.getElementById('plan-opt-label').textContent = `${optStrategy.stint1}→${optStrategy.stint2} @ L${optStrategy.pitLap}`;
+      document.getElementById('sim-opt-bar1').style.width = `${oPct1}%`;
+      document.getElementById('sim-opt-bar2').style.width = `${100 - oPct1}%`;
+
+      // Persist simulation outputs immediately for Results screen
+      saveState({
+        simUserResult: JSON.stringify(userSim),
+        simOptResult: JSON.stringify(optResult),
+        simUserStrategy: JSON.stringify(userStrategy),
+        simOptStrategy: JSON.stringify(optStrategy),
+        simDataSource: f1Ctx.available ? 'FASTF1_CALIBRATED' : 'MODELED_ESTIMATE'
+      });
+
+      // Track SVG geometry setup
+      const pathEl = document.getElementById('radar-path');
+      pathEl.setAttribute('d', track.svgPath);
+      const pathLen = pathEl.getTotalLength ? pathEl.getTotalLength() : 900;
+      const dotUser = document.getElementById('dot-user');
+      const dotOpt = document.getElementById('dot-opt');
+
+      // Pace chart canvas
+      const canvas = document.getElementById('paceChart');
+      const ctx = canvas.getContext('2d');
+
+      function drawPaceChart(upToIdx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (upToIdx < 1) return;
+
+        const sliceU = userSim.laps.slice(0, upToIdx + 1);
+        const sliceO = optResult.laps.slice(0, upToIdx + 1);
+        const allTimes = sliceU.map(l => l.time).concat(sliceO.map(l => l.time));
+        const minT = Math.min(...allTimes) - 0.3;
+        const maxT = Math.max(...allTimes) + 0.3;
+        const range = Math.max(0.5, maxT - minT);
+
+        const plotLine = (arr, color) => {
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          arr.forEach((lapObj, idx) => {
+            const x = (idx / Math.max(1, track.laps - 1)) * (canvas.width - 16) + 8;
+            const y = canvas.height - 10 - ((lapObj.time - minT) / range) * (canvas.height - 20);
+            if (idx === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        };
+
+        plotLine(sliceO, '#E10600');
+        plotLine(sliceU, '#FFFFFF');
       }
 
-      // Sparkline update
-      const uH = Math.round(4 + ((uLap.time - minT) / range) * 44);
-      const oH = Math.round(4 + ((oLap.time - minT) / range) * 44);
-      const uBar = document.getElementById(`spark-u-${currentLap}`);
-      const oBar = document.getElementById(`spark-o-${currentLap}`);
-      if (uBar) { uBar.style.height = uH + 'px'; uBar.style.backgroundColor = '#FFFFFF'; }
-      if (oBar) { oBar.style.height = oH + 'px'; oBar.style.backgroundColor = '#E10600'; }
-
-      document.getElementById('spark-lap-label').textContent =
-        'LAP ' + currentLap + ' / ' + totalLaps;
-
-      // Progress stint bar
-      const pct1 = Math.min(currentLap, userStrategy.pitLap) / totalLaps * 100;
-      const pct2 = 100 - pct1;
-      document.getElementById('prog-s1').style.width = pct1 + '%';
-      document.getElementById('prog-s1').textContent = currentLap <= userStrategy.pitLap
-        ? userStrategy.stint1 + ' (' + currentLap + 'L)' : userStrategy.stint1;
-      document.getElementById('prog-s2').style.width = pct2 + '%';
-
-      // Car dot positions (progress = laps completed / total)
-      const userProgress = userResult.laps[currentLap - 1].cumTime / userResult.totalTime;
-      const optProgress  = optResult.laps[currentLap - 1].cumTime / optResult.totalTime;
-
-      // Invert: ahead means smaller cumTime ratio → further along track visually
-      const [ux, uy] = getCarPos((currentLap - 0.5) / totalLaps % 1);
-      const [ox, oy] = getCarPos((currentLap - 0.5 + (gapSec < 0 ? 0.5 : 0)) / totalLaps % 1);
-      if (carUserEl) { carUserEl.setAttribute('cx', ux); carUserEl.setAttribute('cy', uy); }
-      if (carOptEl)  { carOptEl.setAttribute('cx', ox);  carOptEl.setAttribute('cy', oy); }
-
-      // Done?
-      if (currentLap >= totalLaps) {
-        simDone = true;
-        phaseEl.textContent = 'RACE FINISHED — CHEQUERED FLAG 🏁';
-        document.getElementById('sim-event-ticker').innerHTML =
-          'Race complete!<br>Your time: ' + TrackLabSim.formatTime(userResult.totalTime) +
-          '&nbsp;&nbsp;Optimal: ' + TrackLabSim.formatTime(optResult.totalTime);
-
-        const btn = document.getElementById('view-results-btn');
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        return;
+      // Radio helper
+      const radioFeed = document.getElementById('radio-feed');
+      function logRadio(speaker, msg, playBeep = false) {
+        const div = document.createElement('div');
+        div.innerHTML = `<strong class="text-white">${speaker}:</strong> ${msg}`;
+        radioFeed.prepend(div);
+        if (playBeep) TrackLabAudio.playRadioChime();
       }
 
-      setTimeout(tick, TICK_MS);
-    }
+      // Live race animation loop
+      let lapIdx = 0;
+      let speedMult = 1;
+      let tickCounter = 0;
+      let timer = null;
 
-    // ── 6. Kick off ───────────────────────────────────────────────
-    setTimeout(tick, 400);
+      function updateLapUI(idx) {
+        const uLap = userSim.laps[idx];
+        const oLap = optResult.laps[idx];
+        const lapNumber = uLap.lap;
 
-  })();
+        document.getElementById('live-lap-num').textContent = lapNumber;
+        document.getElementById('tower-user-lap').textContent = TrackLabSim.formatLapTime(uLap.time);
+        document.getElementById('tower-opt-lap').textContent = TrackLabSim.formatLapTime(oLap.time);
+
+        const gap = uLap.cumTime - oLap.cumTime;
+        const gapStr = TrackLabSim.formatGap(gap);
+        const hudDelta = document.getElementById('hud-delta');
+        hudDelta.textContent = gapStr;
+        hudDelta.className = gap <= 0 ? 'text-2xl font-bold text-[#22C55E] mt-0.5' : 'text-2xl font-bold text-[#E10600] mt-0.5';
+
+        // Timing Tower order
+        if (gap <= 0) {
+          document.getElementById('tower-user-pos').textContent = 'P1';
+          document.getElementById('tower-user-gap').textContent = 'LEADER';
+          document.getElementById('tower-opt-pos').textContent = 'P2';
+          document.getElementById('tower-opt-gap').textContent = TrackLabSim.formatGap(Math.abs(gap));
+        } else {
+          document.getElementById('tower-opt-pos').textContent = 'P1';
+          document.getElementById('tower-opt-gap').textContent = 'LEADER';
+          document.getElementById('tower-user-pos').textContent = 'P2';
+          document.getElementById('tower-user-gap').textContent = TrackLabSim.formatGap(gap);
+        }
+
+        // Compound indicators
+        const ringClass = (c) => c === 'SOFT' ? 'tire-soft' : (c === 'MEDIUM' ? 'tire-medium' : 'tire-hard');
+        document.getElementById('tower-user-comp').innerHTML = `<span class="tire-ring ${ringClass(uLap.compound)} w-3 h-3 border-2"></span> ${uLap.compound}`;
+        document.getElementById('tower-opt-comp').innerHTML = `<span class="tire-ring ${ringClass(oLap.compound)} w-3 h-3 border-2"></span> ${oLap.compound}`;
+
+        // Tire wear & age
+        const wearBar = document.getElementById('hud-wear-bar');
+        document.getElementById('hud-wear-pct').textContent = `${uLap.wearPct}%`;
+        wearBar.style.width = `${uLap.wearPct}%`;
+        wearBar.className = `h-full transition-all duration-200 ${uLap.wearPct > 55 ? 'bg-[#22C55E]' : (uLap.wearPct > 30 ? 'bg-amber-400' : 'bg-[#E10600]')}`;
+        document.getElementById('hud-tire-age').textContent = `Age: ${uLap.tireAge} Laps`;
+        document.getElementById('fuel-gain-stat').textContent = `-${uLap.fuelSaving.toFixed(2)}s`;
+
+        // Dynamic Speed / Gear simulation aligned with circuit top speed
+        const speedBase = track.topSpeedKmh - 28 + Math.round(Math.sin(lapNumber * 1.4) * 18);
+        document.getElementById('hud-speed').textContent = uLap.event === 'PIT' ? 80 : speedBase;
+        document.getElementById('hud-gear').textContent = uLap.event === 'PIT' ? '2' : (speedBase > 315 ? '8' : '7');
+        document.getElementById('hud-drs').textContent = uLap.event === 'PIT' ? 'PIT' : 'DRS';
+
+        // Pit alert & countdown
+        const lapsLeftToPit = pitLap - lapNumber;
+        const pitCountEl = document.getElementById('pit-countdown');
+        const pitAlert = document.getElementById('pit-alert-pill');
+        if (lapsLeftToPit > 0) {
+          pitCountEl.textContent = `In ${lapsLeftToPit} Laps`;
+          pitAlert.classList.add('hidden');
+        } else if (lapsLeftToPit === 0) {
+          pitCountEl.textContent = 'BOX THIS LAP';
+          pitAlert.classList.remove('hidden');
+          logRadio('ENG', `Box, box at the end of Lap ${lapNumber}. Switching to ${userStrategy.stint2}.`, true);
+        } else {
+          pitCountEl.textContent = 'Completed';
+          pitAlert.classList.add('hidden');
+        }
+
+        if (uLap.pastCliff && uLap.tireAge === TrackLabSim.getCompound(uLap.compound).cliffStart + 1) {
+          logRadio('DATA', `${uLap.compound} tires entering thermal cliff zone.`, false);
+        }
+
+        if (lapNumber === track.laps) {
+          document.getElementById('sim-flag-pill').textContent = 'CHECKERED FLAG';
+          logRadio('ENG', 'Checkered flag! Saving telemetry for post-race debrief.', true);
+        }
+
+        drawPaceChart(idx);
+      }
+
+      // Smooth radar marker movement
+      function stepFrame() {
+        tickCounter++;
+        const fracU = ((lapIdx + (tickCounter % 8) / 8) * pathLen) % pathLen;
+        const fracO = (((lapIdx + 0.04) + (tickCounter % 8) / 8) * pathLen) % pathLen;
+
+        if (pathEl.getPointAtLength) {
+          const pU = pathEl.getPointAtLength(fracU);
+          const pO = pathEl.getPointAtLength(fracO);
+          dotUser.setAttribute('cx', pU.x);
+          dotUser.setAttribute('cy', pU.y);
+          dotOpt.setAttribute('cx', pO.x);
+          dotOpt.setAttribute('cy', pO.y);
+        }
+
+        if (tickCounter % 4 === 0 && lapIdx < track.laps - 1) {
+          lapIdx++;
+          updateLapUI(lapIdx);
+          if (lapIdx === track.laps - 1) {
+            clearInterval(timer);
+          }
+        }
+      }
+
+      function startLoop(mult) {
+        if (timer) clearInterval(timer);
+        speedMult = mult;
+        if (mult === 0) return;
+        const interval = Math.max(40, Math.round(140 / mult));
+        timer = setInterval(stepFrame, interval);
+      }
+
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.speed-btn').forEach(b => {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline');
+          });
+          btn.classList.remove('btn-outline');
+          btn.classList.add('btn-primary');
+          startLoop(Number(btn.dataset.speed));
+        });
+      });
+
+      document.getElementById('btn-skip-finish').addEventListener('click', () => {
+        if (timer) clearInterval(timer);
+        lapIdx = track.laps - 1;
+        updateLapUI(lapIdx);
+      });
+
+      document.getElementById('btn-go-results').addEventListener('click', () => goTo(10));
+      document.getElementById('btn-finish-debrief').addEventListener('click', () => goTo(10));
+
+      updateLapUI(0);
+      startLoop(1);
+    })();
   </script>
 </body>
 </html>

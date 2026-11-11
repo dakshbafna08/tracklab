@@ -3,71 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab // 7. Pick Pit Lap</title>
+  <title>TrackLab — Pit Window Timing</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <nav class="dev-nav">
-    <span class="dev-nav-label">Screen Switcher:</span>
-    <button data-target="1" class="nav-btn">1. Login</button>
-    <button data-target="2" class="nav-btn">2. Intro</button>
-    <button data-target="3" class="nav-btn">3. Track Select</button>
-    <button data-target="4" class="nav-btn">4. Tire Lesson</button>
-    <button data-target="5" class="nav-btn">5. Pick Tires</button>
-    <button data-target="6" class="nav-btn">6. Pit Lesson</button>
-    <button data-target="7" class="nav-btn nav-btn-active">7. Pick Pit Lap</button>
-    <button data-target="8" class="nav-btn">8. Confirm</button>
-    <button data-target="9" class="nav-btn">9. Race Sim</button>
-    <button data-target="10" class="nav-btn">10. Results</button>
-    <button data-target="11" class="nav-btn">11. Dashboard</button>
-  </nav>
+<body class="min-h-screen flex flex-col f1-grid-bg">
 
   <header class="app-header">
-    <div class="flex items-center gap-4">
-      <div class="f1-badge">F1</div>
-      <span class="header-title">TrackLab // Strategy Telemetry</span>
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
     </div>
-    <div class="flex items-center gap-4 text-sm">
-      <button data-goto="2" class="header-link">Replay Tutorial</button>
-      <span class="divider">|</span>
+    <div class="flex items-center gap-5">
+      <button data-goto="5" class="header-link">Change Tires</button>
       <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 flex items-center justify-center p-8">
-    <section id="screen-7" class="screen w-full max-w-2xl panel f1-border-top p-8">
-      <div class="mono text-xs muted-text uppercase mb-1">Part 2 // Strategy Builder</div>
-      <h2 class="text-2xl font-bold uppercase mb-2">When Do You Want to Pit Stop?</h2>
-      <p class="text-sm muted-text mb-6">Drag the pit window slider to choose the exact lap to box for your second compound.</p>
+  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col justify-center">
 
-      <div class="sub-box p-6 mb-6">
-        <div class="flex justify-between items-center mono text-sm mb-2">
-          <span>START (LAP 1)</span>
-          <span class="text-[#E10600] font-bold text-base">BOX ON LAP <span id="pit-lap-val">18</span></span>
-          <span>FINISH (LAP <span class="total-laps-label">58</span>)</span>
+    <section class="panel p-8 sm:p-12 animate-on-scroll">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-white/10 pb-6 mb-8">
+        <div>
+          <span class="section-tag">04 // Pit Timing Calibration</span>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">When Do You Box?</h1>
         </div>
-
-        <input type="range" id="pit-slider" min="5" max="52" value="18" class="w-full my-4">
-
-        <div class="w-full h-10 flex border border-[#38383F] mono text-xs font-bold mt-2">
-          <div id="bar-s1" style="width: 31%;" class="stint-bar-1">SOFT (18L)</div>
-          <div id="bar-s2" style="width: 69%;" class="stint-bar-2">HARD (40L)</div>
-        </div>
-
-        <div id="wear-warning" class="mt-4 mono text-xs muted-text">
-          STATUS: Optimal window for Soft compound (14-20 laps). Low cliff risk.
+        <div class="sub-box px-4 py-2.5 mono text-xs">
+          <span class="text-zinc-500 block text-[10px]">CIRCUIT</span>
+          <span id="slider-track-name" class="text-white font-semibold">Norisring (72 Laps)</span>
         </div>
       </div>
 
-      <div class="flex justify-between">
-        <button data-goto="6" class="btn-outline">&larr; Back to Lesson</button>
-        <button data-goto="8" class="btn-primary">Review Final Strategy &rarr;</button>
+      <!-- Interactive Slider Console -->
+      <div class="sub-box p-6 sm:p-8 mb-8">
+        <div class="flex flex-wrap justify-between items-baseline gap-4 mb-6 mono">
+          <span class="text-xs text-zinc-500">LAP 1</span>
+          <div class="text-2xl sm:text-3xl font-bold text-white">
+            BOX TARGET: <span class="text-[#E10600]">LAP <span id="pit-lap-val">28</span></span>
+          </div>
+          <span class="text-xs text-zinc-500">LAP <span class="total-laps-label">72</span></span>
+        </div>
+
+        <input type="range" id="pit-slider" min="5" max="67" value="28" class="my-6">
+
+        <!-- Proportional Compound Timeline -->
+        <div class="w-full h-14 flex rounded-xl overflow-hidden border border-white/15 mono text-xs font-bold mt-4">
+          <div id="bar-s1" style="width: 31%;" class="transition-all duration-150 flex items-center justify-center border-r-2 border-white px-2">
+            SOFT (18L)
+          </div>
+          <div id="bar-s2" style="width: 69%;" class="transition-all duration-150 flex items-center justify-center px-2">
+            HARD (40L)
+          </div>
+        </div>
+
+        <div id="wear-warning" class="mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]">
+          <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+          <span>Pit window inside safe thermal operating window.</span>
+        </div>
+      </div>
+
+      <!-- Clean Metrics Summary -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 mono">
+        <div class="sub-box p-5 text-center">
+          <span class="text-[10px] text-zinc-500 uppercase">Stint 1 Length</span>
+          <div id="stint1-length-display" class="text-2xl font-bold text-white mt-1">18 Laps</div>
+        </div>
+        <div class="sub-box p-5 text-center">
+          <span class="text-[10px] text-zinc-500 uppercase">Pit Lane Loss</span>
+          <div id="pit-loss-display" class="text-2xl font-bold text-[#E10600] mt-1">21.2s</div>
+        </div>
+        <div class="sub-box p-5 text-center">
+          <span class="text-[10px] text-zinc-500 uppercase">Stint 2 Length</span>
+          <div id="stint2-length-display" class="text-2xl font-bold text-white mt-1">40 Laps</div>
+        </div>
+      </div>
+
+      <!-- Progressive Details Toggle -->
+      <details class="sub-box p-4 mb-8 mono text-xs">
+        <summary class="cursor-pointer font-semibold text-zinc-300 hover:text-white select-none flex justify-between items-center">
+          <span>Tire Cliff Thresholds &amp; Fuel Dissipation Details</span>
+          <span class="text-zinc-500">Expand</span>
+        </summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10 text-zinc-400">
+          <div>
+            <span class="text-white font-semibold block mb-1" id="detail-s1-title">Stint 1 Profile</span>
+            <span id="detail-s1-info">Optimal grip up to ~13L</span>
+          </div>
+          <div>
+            <span class="text-white font-semibold block mb-1" id="detail-s2-title">Stint 2 Profile</span>
+            <span id="detail-s2-info">Optimal grip up to ~34L</span>
+          </div>
+        </div>
+      </details>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+        <button data-goto="5" class="btn-outline w-full sm:w-auto">&larr; Change Compounds</button>
+        <button id="btn-confirm-pit" class="btn-primary w-full sm:w-auto px-8 py-3.5">
+          Confirm Strategy &rarr;
+        </button>
       </div>
     </section>
+
   </main>
 
+  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = getState();
+      const track = TrackLabSim.getTrack(state.track);
+      const s1Spec = TrackLabSim.getCompound(state.stint1);
+      const s2Spec = TrackLabSim.getCompound(state.stint2);
+
+      document.getElementById('slider-track-name').textContent = `${track.name} (${track.laps} Laps)`;
+      document.getElementById('pit-loss-display').textContent = `${track.pitLoss}s`;
+      document.querySelectorAll('.total-laps-label').forEach(el => el.textContent = track.laps);
+
+      const slider = document.getElementById('pit-slider');
+      slider.min = 5;
+      slider.max = track.laps - 5;
+      let initialPit = Number(state.pitLap) || Math.round(track.laps * 0.35);
+      initialPit = Math.max(5, Math.min(track.laps - 5, initialPit));
+      slider.value = initialPit;
+
+      function compoundGradient(name) {
+        if (name === 'SOFT') return { bg: 'linear-gradient(90deg, #7F1D1D, #E10600)', color: '#FFFFFF' };
+        if (name === 'MEDIUM') return { bg: 'linear-gradient(90deg, #713F12, #EAB308)', color: '#09090B' };
+        return { bg: 'linear-gradient(90deg, #3F3F46, #E4E4E7)', color: '#09090B' };
+      }
+
+      function render(val) {
+        const pitLap = parseInt(val, 10);
+        const s2Laps = track.laps - pitLap;
+        const pct1 = ((pitLap / track.laps) * 100).toFixed(1);
+        const pct2 = (100 - pct1).toFixed(1);
+
+        document.getElementById('pit-lap-val').textContent = pitLap;
+        document.getElementById('stint1-length-display').textContent = `${pitLap} Laps`;
+        document.getElementById('stint2-length-display').textContent = `${s2Laps} Laps`;
+
+        const bar1 = document.getElementById('bar-s1');
+        const bar2 = document.getElementById('bar-s2');
+        const g1 = compoundGradient(state.stint1);
+        const g2 = compoundGradient(state.stint2);
+
+        bar1.style.width = `${pct1}%`;
+        bar1.style.background = g1.bg;
+        bar1.style.color = g1.color;
+        bar1.textContent = `${state.stint1} (${pitLap}L)`;
+
+        bar2.style.width = `${pct2}%`;
+        bar2.style.background = g2.bg;
+        bar2.style.color = g2.color;
+        bar2.textContent = `${state.stint2} (${s2Laps}L)`;
+
+        const s1Cliff = Math.round(s1Spec.cliffStart / track.degradationMult);
+        const s2Cliff = Math.round(s2Spec.cliffStart / track.degradationMult);
+        const warn = document.getElementById('wear-warning');
+
+        if (pitLap > s1Cliff) {
+          warn.className = 'mt-6 p-4 rounded-xl bg-red-950/50 border border-[#E10600]/60 mono text-xs flex items-center gap-2.5 text-red-300';
+          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#E10600]"></span>
+            <span>THERMAL CLIFF WARNING: Stint 1 (${state.stint1}) pushed past ~${s1Cliff}L cliff on ${track.shortName}.</span>`;
+        } else if (s2Laps > s2Cliff) {
+          warn.className = 'mt-6 p-4 rounded-xl bg-amber-950/50 border border-amber-500/50 mono text-xs flex items-center gap-2.5 text-amber-300';
+          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>STINT 2 STRETCH: ${state.stint2} expected to reach thermal drop-off near ${s2Cliff}L.</span>`;
+        } else {
+          warn.className = 'mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]';
+          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+            <span>Pit window inside safe thermal operating window for both compounds.</span>`;
+        }
+
+        document.getElementById('detail-s1-title').textContent = `Stint 1 — ${state.stint1}`;
+        document.getElementById('detail-s1-info').textContent = `Cliff around ${s1Cliff} laps • Wear rate ${(s1Spec.linearDeg * track.degradationMult).toFixed(3)}s/lap`;
+        document.getElementById('detail-s2-title').textContent = `Stint 2 — ${state.stint2}`;
+        document.getElementById('detail-s2-info').textContent = `Cliff around ${s2Cliff} laps • Fuel burn saving -${track.fuelEffect}s/lap`;
+      }
+
+      render(slider.value);
+      slider.addEventListener('input', e => render(e.target.value));
+      slider.addEventListener('change', e => saveState({ pitLap: parseInt(e.target.value, 10) }));
+
+      document.getElementById('btn-confirm-pit').addEventListener('click', () => {
+        saveState({ pitLap: parseInt(slider.value, 10) });
+        goTo(8);
+      });
+    });
+  </script>
 </body>
 </html>
