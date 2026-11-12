@@ -2,6 +2,11 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+*.egg-info/
+
+src/racecar/training/models/
+src/racecar/training/checkpoints/
+src/racecar/training/runs/
 
 # Local Claude teaching files
 tutorials/

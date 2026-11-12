@@ -35,7 +35,9 @@ class RaceCarEnv(gym.Env):
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
 
         # observation in world coords
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32)
+        self.lookahead = np.array([10, 25, 50, 100, 150.0])
+        self.observation_space = spaces.Box(low=-np.inf, high=np.inf,
+                                            shape=(4 + 2 * len(self.lookahead),), dtype=np.float32)
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
@@ -49,7 +51,25 @@ class RaceCarEnv(gym.Env):
         return self._get_obs(), self._get_info()
 
     def _get_obs(self):
-        return np.concatenate([self.position, self.velocity], dtype=np.float32)
+        progress, lateral, i = self._locate(self.position)
+        speed = np.linalg.norm(self.velocity)
+        forward = self.velocity / speed
+        left = np.array([-forward[1], forward[0]])
+        track_dir = self.seg_vec[i] / self.seg_len[i]
+        width = self.width_left[i] if lateral > 0 else self.width_right[i]
+
+        ahead = []
+        for d in self.lookahead:
+            rel = self._point_at(progress + d) - self.position
+            ahead += [rel @ forward / d, rel @ left / d]
+
+        return np.array([lateral / width, track_dir @ forward, track_dir @ left, speed / 50] + ahead,
+                        dtype=np.float32)
+
+    def _point_at(self, s):
+        s = s % self.track_length
+        j = np.searchsorted(self.seg_start_s, s, side="right") - 1
+        return self.seg_start[j] + (s - self.seg_start_s[j]) / self.seg_len[j] * self.seg_vec[j]
 
     def _get_info(self):
         return {}
@@ -119,15 +139,3 @@ class RaceCarEnv(gym.Env):
         truncated = self.steps >= self.max_steps
 
         return self._get_obs(), reward, terminated, truncated, self._get_info()
-
-
-
-
-
-
-
-
-
-
-
-
