@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Race Debrief</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col f1-grid-bg">
@@ -18,8 +19,9 @@
       </div>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="9" class="header-link">Replay Sim</button>
-      <button data-goto="3" class="header-link">New Track</button>
+      <button data-goto="3" class="header-link">New Race</button>
       <button data-goto="11" class="btn-primary py-1.5 px-4 text-xs">Dashboard</button>
     </div>
   </header>
@@ -30,17 +32,17 @@
     <section class="panel p-8 sm:p-10 animate-on-scroll">
       <div class="flex flex-col md:flex-row justify-between md:items-center gap-8">
         <div>
-          <span class="section-tag">Post-Race Classification</span>
+          <span class="section-tag">Race Debrief</span>
           <h1 id="verdict-title" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-1">
             Strategy Analysis
           </h1>
           <p id="verdict-desc" class="body-copy text-base mt-3 max-w-2xl">
-            Comparing your strategy against the mathematical optimum across full Grand Prix distance.
+            Here is how your pit stop and tire plan stacked up against the computer's optimal strategy.
           </p>
         </div>
 
         <div class="sub-box p-6 mono text-right min-w-[240px]">
-          <span class="text-[10px] uppercase text-zinc-500 font-semibold block">Total Time Delta</span>
+          <span class="text-[10px] uppercase text-zinc-400 font-semibold block">Time vs. Optimal</span>
           <div id="big-delta-value" class="text-4xl font-bold text-white mt-1">+0.00s</div>
           <span id="verdict-badge" class="inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 text-zinc-200">
             ANALYZING
@@ -170,18 +172,22 @@
 
       const badge = document.getElementById('verdict-badge');
       const title = document.getElementById('verdict-title');
+      const vDesc = document.getElementById('verdict-desc');
       if (isMatch) {
-        title.textContent = 'Mathematical Optimum Matched';
+        title.textContent = 'Perfect Strategy! Optimal Matched';
         badge.textContent = 'P1 // OPTIMAL STRATEGY';
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-green-500/15 text-[#22C55E]';
+        vDesc.textContent = 'Incredible race craft! You chose the exact fastest tire pairing and pitted at the perfect lap before your tires lost grip.';
       } else if (gap < 6) {
-        title.textContent = 'Competitive Pit Strategy';
+        title.textContent = 'Solid Strategy — Very Close!';
         badge.textContent = `WITHIN ${gap.toFixed(2)}s OF OPTIMAL`;
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-300';
+        vDesc.textContent = `Great race! You finished within ${gap.toFixed(1)} seconds of the computer. The optimal plan boxed on Lap ${optStrat.pitLap} using ${optStrat.stint1} → ${optStrat.stint2}.`;
       } else {
-        title.textContent = 'Time Left on the Table';
-        badge.textContent = `+${gap.toFixed(2)}s DEFICIT`;
+        title.textContent = 'Room for Improvement';
+        badge.textContent = `+${gap.toFixed(2)}s BEHIND OPTIMAL`;
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E10600]/20 text-[#E10600]';
+        vDesc.textContent = `The computer gained ${gap.toFixed(1)}s by running ${optStrat.stint1} then ${optStrat.stint2} and pitting on Lap ${optStrat.pitLap}. Adjusting your pit stop lap keeps tires in their prime grip window.`;
       }
 
       // Render Stint Bars
@@ -216,10 +222,10 @@
       const fastestOptLap = Math.min(...optSim.laps.map(l => l.time));
       const rows = [
         ['Total Race Time', TrackLabSim.formatTime(userSim.totalTime), TrackLabSim.formatTime(optSim.totalTime)],
-        ['Pit Window Executed', `Lap ${userStrat.pitLap}`, `Lap ${optStrat.pitLap}`],
-        ['Pit Lane Transit Cost', `${track.pitLoss}s`, `${track.pitLoss}s`],
-        ['Best Race Lap', TrackLabSim.formatLapTime(fastestUserLap), TrackLabSim.formatLapTime(fastestOptLap)],
-        ['Compound Pair', `${userStrat.stint1} → ${userStrat.stint2}`, `${optStrat.stint1} → ${optStrat.stint2}`]
+        ['Pit Stop Made On', `Lap ${userStrat.pitLap}`, `Lap ${optStrat.pitLap}`],
+        ['Pit Lane Time Lost', `+${track.pitLoss}s`, `+${track.pitLoss}s`],
+        ['Fastest Single Lap', TrackLabSim.formatLapTime(fastestUserLap), TrackLabSim.formatLapTime(fastestOptLap)],
+        ['Tires Used', `${userStrat.stint1} → ${userStrat.stint2}`, `${optStrat.stint1} → ${optStrat.stint2}`]
       ];
       document.getElementById('metrics-rows').innerHTML = rows.map(r => `
         <div class="py-3 flex justify-between items-center gap-2">
@@ -279,7 +285,7 @@
       }
       document.getElementById('engineer-debrief').textContent = notes.join(' ');
 
-      // Auto-save real result to SQLite / LocalStorage (avoid duplicate save on page reload if already saved)
+      // Auto-save real result to Supabase Cloud (avoid duplicate save on page reload if already saved)
       const saveKey = `saved_${trackKey}_${userStrat.stint1}_${userStrat.stint2}_${userStrat.pitLap}_${Math.round(userSim.totalTime)}`;
       const badgeEl = document.getElementById('save-status-badge');
       if (!sessionStorage.getItem(saveKey)) {
@@ -298,10 +304,10 @@
           data_source: state.simDataSource || 'MODELED_ESTIMATE'
         });
         sessionStorage.setItem(saveKey, '1');
-        badgeEl.textContent = res.savedToDb ? '✓ Saved to SQLite DB' : '✓ Saved to Local History';
-        badgeEl.className = 'mono text-xs text-[#22C55E]';
+        badgeEl.textContent = res.savedToDb ? '✓ Synced to Supabase Cloud' : (res.error ? 'Supabase Required' : '✓ Telemetry Recorded');
+        badgeEl.className = 'mono text-xs ' + (res.savedToDb ? 'text-[#22C55E]' : 'text-zinc-400');
       } else {
-        badgeEl.textContent = '✓ Recorded in History';
+        badgeEl.textContent = '✓ Recorded in Telemetry';
       }
     })();
   </script>

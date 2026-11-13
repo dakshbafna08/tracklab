@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Compound Allocation</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col f1-grid-bg">
@@ -15,7 +16,8 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
-      <button data-goto="3" class="header-link">Change Track</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="3" class="header-link">Circuit</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
@@ -26,10 +28,10 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-10 animate-on-scroll">
       <div>
-        <span class="section-tag">03 // Stint Allocation</span>
-        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Select Compounds</h1>
+        <span class="section-tag">03 // Pick Your Tires</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Choose Your Tires</h1>
         <p class="body-copy text-base mt-2 max-w-2xl">
-          Choose your starting set for Lights Out and your replacement set for the pit window.
+          A "stint" is simply the segment of the race you drive on one set of tires. Pick your starting set for the race start, and the fresh set you will put on during your pit stop.
         </p>
       </div>
       <div class="glass-panel px-5 py-3 mono text-xs">
@@ -45,10 +47,10 @@
       <section class="panel p-7 animate-on-scroll slide-left">
         <div class="flex justify-between items-center mb-5">
           <div>
-            <div class="mono text-xs text-[#E10600] font-semibold uppercase">Stint 01 // Grid Start</div>
-            <h2 class="text-xl font-bold text-white mt-0.5">Opening Compound</h2>
+            <div class="mono text-xs text-[#E10600] font-semibold uppercase">Stint 01 // Start of Race</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Starting Tire</h2>
           </div>
-          <span class="mono text-[11px] text-zinc-500">Heavy Fuel (105kg)</span>
+          <span class="mono text-[11px] text-zinc-400">Full Fuel Tank (~105kg)</span>
         </div>
 
         <div class="space-y-3">
@@ -57,10 +59,10 @@
               <span class="tire-ring tire-soft"></span>
               <span>
                 <strong class="block text-sm text-white">Soft (Red)</strong>
-                <span class="text-xs text-zinc-500">High launch grip • Optimal ~13L</span>
+                <span class="text-xs text-zinc-400">Huge launch grip off the line • Lasts ~13 laps</span>
               </span>
             </span>
-            <span class="mono text-xs text-zinc-400">0.00s</span>
+            <span class="mono text-xs text-zinc-400">Fastest</span>
           </button>
 
           <button data-stint="1" data-compound="MEDIUM" id="s1-MEDIUM" class="compound-btn">
@@ -68,7 +70,7 @@
               <span class="tire-ring tire-medium"></span>
               <span>
                 <strong class="block text-sm text-white">Medium (Yellow)</strong>
-                <span class="text-xs text-zinc-500">Balanced pace • Optimal ~22L</span>
+                <span class="text-xs text-zinc-400">Balanced pace &amp; life • Lasts ~22 laps</span>
               </span>
             </span>
             <span class="mono text-xs text-zinc-400">+0.48s</span>
@@ -79,7 +81,7 @@
               <span class="tire-ring tire-hard"></span>
               <span>
                 <strong class="block text-sm text-white">Hard (White)</strong>
-                <span class="text-xs text-zinc-500">Deep overcut life • Optimal ~34L</span>
+                <span class="text-xs text-zinc-400">Toughest rubber • Lasts ~34 laps</span>
               </span>
             </span>
             <span class="mono text-xs text-zinc-400">+0.92s</span>
@@ -91,10 +93,10 @@
       <section class="panel p-7 animate-on-scroll slide-right">
         <div class="flex justify-between items-center mb-5">
           <div>
-            <div class="mono text-xs text-zinc-400 font-semibold uppercase">Stint 02 // Post Pit Stop</div>
-            <h2 class="text-xl font-bold text-white mt-0.5">Closing Compound</h2>
+            <div class="mono text-xs text-zinc-400 font-semibold uppercase">Stint 02 // After Pit Stop</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Finishing Tire</h2>
           </div>
-          <span class="mono text-[11px] text-zinc-500">Light Fuel Run-In</span>
+          <span class="mono text-[11px] text-zinc-400">Light Car (Fuel Burned)</span>
         </div>
 
         <div class="space-y-3">
@@ -103,10 +105,10 @@
               <span class="tire-ring tire-soft"></span>
               <span>
                 <strong class="block text-sm text-white">Soft (Red)</strong>
-                <span class="text-xs text-zinc-500">Late sprint attack • ~13–18L</span>
+                <span class="text-xs text-zinc-400">Fast finish sprint • Lasts ~13–18 laps</span>
               </span>
             </span>
-            <span class="mono text-xs text-zinc-400">0.00s</span>
+            <span class="mono text-xs text-zinc-400">Fastest</span>
           </button>
 
           <button data-stint="2" data-compound="MEDIUM" id="s2-MEDIUM" class="compound-btn">
@@ -114,7 +116,7 @@
               <span class="tire-ring tire-medium"></span>
               <span>
                 <strong class="block text-sm text-white">Medium (Yellow)</strong>
-                <span class="text-xs text-zinc-500">Versatile closer • ~22–30L</span>
+                <span class="text-xs text-zinc-400">Reliable balanced closer • Lasts ~22–30 laps</span>
               </span>
             </span>
             <span class="mono text-xs text-zinc-400">+0.48s</span>
@@ -125,7 +127,7 @@
               <span class="tire-ring tire-hard"></span>
               <span>
                 <strong class="block text-sm text-white">Hard (White)</strong>
-                <span class="text-xs text-zinc-500">Early undercut cover • ~34–46L</span>
+                <span class="text-xs text-zinc-400">Deep run to the checkered flag • Lasts ~34–46 laps</span>
               </span>
             </span>
             <span class="mono text-xs text-zinc-400">+0.92s</span>

@@ -19,6 +19,8 @@ except ImportError:
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "tracklab.db")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ejbrepdwafsjxyhoufut.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_g-qWZ-McCCBXz-l7lcEVkQ_xOezN_Jw")
 
 app = FastAPI(
     title="TrackLab Telemetry & Strategy API",
@@ -33,6 +35,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/api/supabase-config")
+def get_supabase_config():
+    return {
+        "url": SUPABASE_URL,
+        "key": SUPABASE_KEY,
+        "configured": True,
+    }
 
 
 def get_db() -> sqlite3.Connection:
@@ -58,11 +69,11 @@ def init_db() -> None:
         """
         CREATE TABLE IF NOT EXISTS user_strategy_state (
             username TEXT PRIMARY KEY COLLATE NOCASE,
-            track TEXT NOT NULL DEFAULT 'MELBOURNE',
-            total_laps INTEGER NOT NULL DEFAULT 58,
+            track TEXT NOT NULL DEFAULT 'NORISRING',
+            total_laps INTEGER NOT NULL DEFAULT 72,
             stint1 TEXT NOT NULL DEFAULT 'SOFT',
             stint2 TEXT NOT NULL DEFAULT 'HARD',
-            pit_lap INTEGER NOT NULL DEFAULT 18,
+            pit_lap INTEGER NOT NULL DEFAULT 28,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (username) REFERENCES users(username)
         )
@@ -118,11 +129,11 @@ class AuthRequest(BaseModel):
 
 class StrategyStateRequest(BaseModel):
     username: str
-    track: str = "MELBOURNE"
-    total_laps: int = 58
+    track: str = "NORISRING"
+    total_laps: int = 72
     stint1: str = "SOFT"
     stint2: str = "HARD"
-    pit_lap: int = 18
+    pit_lap: int = 28
     preferred_mode: Optional[str] = None
 
 
@@ -166,86 +177,6 @@ def get_circuits():
                 "length_km": 2.300,
                 "pit_loss": 18.4,
                 "tire_stress": "LOW"
-            },
-            {
-                "id": "MELBOURNE",
-                "name": "Melbourne — Albert Park",
-                "short_name": "Albert Park",
-                "country": "Australia",
-                "laps": 58,
-                "length_km": 5.278,
-                "pit_loss": 21.2,
-                "tire_stress": "MEDIUM"
-            },
-            {
-                "id": "AUSTIN (COTA)",
-                "name": "Austin — Circuit of the Americas",
-                "short_name": "COTA Austin",
-                "country": "United States",
-                "laps": 56,
-                "length_km": 5.513,
-                "pit_loss": 20.4,
-                "tire_stress": "HIGH"
-            },
-            {
-                "id": "SILVERSTONE",
-                "name": "Silverstone — Grand Prix Circuit",
-                "short_name": "Silverstone",
-                "country": "Great Britain",
-                "laps": 52,
-                "length_km": 5.891,
-                "pit_loss": 22.8,
-                "tire_stress": "VERY HIGH"
-            },
-            {
-                "id": "SPA",
-                "name": "Spa-Francorchamps",
-                "short_name": "Spa",
-                "country": "Belgium",
-                "laps": 44,
-                "length_km": 7.004,
-                "pit_loss": 23.5,
-                "tire_stress": "MEDIUM-HIGH"
-            },
-            {
-                "id": "MONZA",
-                "name": "Monza — Temple of Speed",
-                "short_name": "Monza",
-                "country": "Italy",
-                "laps": 53,
-                "length_km": 5.793,
-                "pit_loss": 24.1,
-                "tire_stress": "LOW"
-            },
-            {
-                "id": "MONACO",
-                "name": "Circuit de Monaco",
-                "short_name": "Monaco",
-                "country": "Monaco",
-                "laps": 78,
-                "length_km": 3.337,
-                "pit_loss": 19.5,
-                "tire_stress": "VERY LOW"
-            },
-            {
-                "id": "SUZUKA",
-                "name": "Suzuka International Racing Course",
-                "short_name": "Suzuka",
-                "country": "Japan",
-                "laps": 53,
-                "length_km": 5.807,
-                "pit_loss": 22.4,
-                "tire_stress": "VERY HIGH"
-            },
-            {
-                "id": "INTERLAGOS",
-                "name": "Autódromo José Carlos Pace — Interlagos",
-                "short_name": "Interlagos",
-                "country": "Brazil",
-                "laps": 71,
-                "length_km": 4.309,
-                "pit_loss": 21.6,
-                "tire_stress": "MEDIUM-HIGH"
             }
         ]
     }
@@ -277,7 +208,7 @@ def register(payload: AuthRequest):
         conn.execute(
             """
             INSERT OR IGNORE INTO user_strategy_state (username, track, total_laps, stint1, stint2, pit_lap)
-            VALUES (?, 'MELBOURNE', 58, 'SOFT', 'HARD', 18)
+            VALUES (?, 'NORISRING', 72, 'SOFT', 'HARD', 28)
             """,
             (username,),
         )

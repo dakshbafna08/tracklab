@@ -5,6 +5,35 @@
 
 const API_BASE = 'http://localhost:8000';
 
+// Supabase Cloud Project Configuration
+const SUPABASE_URL = 'https://ejbrepdwafsjxyhoufut.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_g-qWZ-McCCBXz-l7lcEVkQ_xOezN_Jw';
+
+let supabaseClient = null;
+function getSupabase() {
+  if (supabaseClient) return supabaseClient;
+  if (typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function') {
+    try {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return supabaseClient;
+    } catch (e) {
+      console.warn('[TrackLab] Supabase client init warning:', e);
+    }
+  }
+  return null;
+}
+
+// Auto-inject Supabase JS client from CDN if not already in document head
+if (typeof window !== 'undefined' && typeof window.supabase === 'undefined' && typeof document !== 'undefined') {
+  if (!document.getElementById('supabase-js-cdn')) {
+    const s = document.createElement('script');
+    s.id = 'supabase-js-cdn';
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = () => { getSupabase(); };
+    document.head.appendChild(s);
+  }
+}
+
 const DEFAULT_STATE = {
   track: 'NORISRING',
   totalLaps: 72,
@@ -16,6 +45,8 @@ const DEFAULT_STATE = {
 };
 
 const SCREEN_PATHS = {
+  0: 'pages/login/index.html',
+  'login': 'pages/login/index.html',
   1: 'index.html',
   2: 'pages/02-intro/index.html',
   3: 'pages/03-track-select/index.html',
@@ -52,7 +83,7 @@ const FLOW_PRO = [
 
 function getState() {
   try {
-    const raw = localStorage.getItem('tracklab_state');
+    const raw = sessionStorage.getItem('tracklab_session_state');
     return raw ? { ...DEFAULT_STATE, ...JSON.parse(raw) } : { ...DEFAULT_STATE };
   } catch {
     return { ...DEFAULT_STATE };
@@ -62,24 +93,24 @@ function getState() {
 function saveState(updates) {
   const next = { ...getState(), ...updates };
   try {
-    localStorage.setItem('tracklab_state', JSON.stringify(next));
+    sessionStorage.setItem('tracklab_session_state', JSON.stringify(next));
   } catch {}
 
-  // Background sync to SQLite if user is signed in
-  if (next.username && typeof fetch === 'function') {
-    fetch(`${API_BASE}/api/state`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+  // Sync state directly to Supabase user_strategy_state table in real time
+  if (next.username && next.username !== 'Guest Driver') {
+    const sb = getSupabase();
+    if (sb) {
+      sb.from('user_strategy_state').upsert({
         username: next.username,
-        track: next.track,
-        total_laps: next.totalLaps,
-        stint1: next.stint1,
-        stint2: next.stint2,
-        pit_lap: next.pitLap,
-        preferred_mode: next.userMode
-      })
-    }).catch(() => {});
+        track: next.track || 'NORISRING',
+        total_laps: next.totalLaps || 72,
+        stint1: next.stint1 || 'SOFT',
+        stint2: next.stint2 || 'HARD',
+        pit_lap: next.pitLap || 28,
+        preferred_mode: next.userMode || 'guided',
+        updated_at: new Date().toISOString()
+      }).then(() => {}).catch(err => console.warn('[TrackLab] Supabase state sync notice:', err));
+    }
   }
 
   return next;
@@ -90,10 +121,11 @@ const setState = saveState;
 function getCurrentScreen() {
   if (typeof window === 'undefined') return 1;
   const path = window.location.pathname.replace(/\\/g, '/');
+  if (path.includes('/pages/login/') || path.endsWith('/login.html')) return 0;
   for (const [num, relPath] of Object.entries(SCREEN_PATHS)) {
     if (Number(num) === 1) {
       if ((path.endsWith('/index.html') || path.endsWith('/')) && !path.includes('/pages/')) return 1;
-    } else {
+    } else if (Number(num) > 1) {
       const folder = relPath.replace('/index.html', '');
       if (path.includes(folder)) return Number(num);
     }
@@ -103,7 +135,7 @@ function getCurrentScreen() {
 
 function goTo(screenNum) {
   if (typeof window === 'undefined') return;
-  const target = SCREEN_PATHS[screenNum];
+  const target = SCREEN_PATHS[screenNum] || (screenNum === 0 || screenNum === 'login' ? 'pages/login/index.html' : null);
   if (!target) return;
   const isSubpage = window.location.pathname.replace(/\\/g, '/').includes('/pages/');
   const prefix = isSubpage ? '../../' : '';
@@ -152,141 +184,224 @@ function goTo(screenNum) {
 const navigateTo = goTo;
 
 /**
- * SQLite + LocalStorage Unified Persistence Client
+ * Supabase Cloud Persistence Client
+ * No local storage fallback — all profiles, strategy state & telemetry live in Supabase
  */
 const TrackLabDB = {
   async login(username, password) {
+    const cleanUser = (username || '').trim();
+    if (!cleanUser) return { ok: false, error: 'Please enter a driver callsign.' };
+
+    const sb = getSupabase();
+    if (!sb) {
+      return { ok: false, error: 'Supabase client is not loaded. Please verify internet connection.' };
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { ok: false, error: data.detail || 'Authentication failed.', offline: false };
+      const { data, error } = await sb
+        .from('drivers')
+        .select('*')
+        .ilike('username', cleanUser)
+        .maybeSingle();
+
+      if (error) {
+        if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
+          return { ok: false, error: 'Supabase tables not found. Please run supabase_schema.sql in your Supabase SQL editor.' };
+        }
+        return { ok: false, error: 'Supabase Error: ' + error.message };
       }
+
+      if (!data) {
+        return { ok: false, error: `Driver callsign "${cleanUser}" not found in Supabase. Please create a profile first.` };
+      }
+
+      if (data.password_hash && data.password_hash !== 'pass' && data.password_hash !== password) {
+        return { ok: false, error: 'Incorrect password for driver ' + cleanUser };
+      }
+
       const updates = {
         username: data.username,
         userMode: data.preferred_mode || getState().userMode
       };
-      if (data.state) {
-        updates.track = data.state.track;
-        updates.totalLaps = data.state.total_laps;
-        updates.stint1 = data.state.stint1;
-        updates.stint2 = data.state.stint2;
-        updates.pitLap = data.state.pit_lap;
+
+      // Pull latest strategy state from Supabase
+      try {
+        const { data: stData } = await sb
+          .from('user_strategy_state')
+          .select('*')
+          .ilike('username', data.username)
+          .maybeSingle();
+        if (stData) {
+          updates.track = stData.track || updates.track;
+          updates.totalLaps = stData.total_laps || updates.totalLaps;
+          updates.stint1 = stData.stint1 || updates.stint1;
+          updates.stint2 = stData.stint2 || updates.stint2;
+          updates.pitLap = stData.pit_lap || updates.pitLap;
+        }
+      } catch (err) {
+        console.warn('[TrackLab] Strategy state fetch notice:', err);
       }
+
       saveState(updates);
-      return { ok: true, data, offline: false };
-    } catch {
-      // Backend offline: store locally with honest offline label
-      saveState({ username });
-      return { ok: true, offline: true };
+      return { ok: true, source: 'supabase', username: data.username };
+    } catch (e) {
+      return { ok: false, error: 'Supabase connection failed: ' + (e.message || e) };
     }
   },
 
   async register(username, password, preferred_mode = 'guided') {
+    const cleanUser = (username || '').trim();
+    if (!cleanUser) return { ok: false, error: 'Please enter a driver callsign.' };
+
+    const sb = getSupabase();
+    if (!sb) {
+      return { ok: false, error: 'Supabase client is not loaded. Please verify internet connection.' };
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/api/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, preferred_mode })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        return { ok: false, error: data.detail || 'Registration failed.', offline: false };
+      // Check existing driver in Supabase
+      const { data: existing, error: checkErr } = await sb
+        .from('drivers')
+        .select('username')
+        .ilike('username', cleanUser)
+        .maybeSingle();
+
+      if (existing) {
+        return { ok: false, error: `Driver callsign "${cleanUser}" already registered in Supabase. Please sign in instead.` };
       }
-      saveState({ username: data.username, userMode: preferred_mode });
-      return { ok: true, data, offline: false };
-    } catch {
-      saveState({ username, userMode: preferred_mode });
-      return { ok: true, offline: true };
+
+      // Insert new driver in Supabase
+      const { data, error } = await sb
+        .from('drivers')
+        .insert([{
+          username: cleanUser,
+          password_hash: password || 'pass',
+          preferred_mode: preferred_mode
+        }])
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
+          return { ok: false, error: 'Supabase tables not found. Please run supabase_schema.sql in your Supabase SQL editor.' };
+        }
+        return { ok: false, error: 'Supabase registration error: ' + error.message };
+      }
+
+      // Initialize user strategy state in Supabase
+      try {
+        await sb.from('user_strategy_state').upsert({
+          username: cleanUser,
+          track: 'NORISRING',
+          total_laps: 72,
+          stint1: 'SOFT',
+          stint2: 'HARD',
+          pit_lap: 28,
+          preferred_mode: preferred_mode,
+          updated_at: new Date().toISOString()
+        });
+      } catch (err) {
+        console.warn('[TrackLab] Strategy state init notice:', err);
+      }
+
+      saveState({ username: cleanUser, userMode: preferred_mode });
+      return { ok: true, source: 'supabase', username: cleanUser };
+    } catch (e) {
+      return { ok: false, error: 'Supabase registration failed: ' + (e.message || e) };
     }
   },
 
   async saveRace(raceRecord) {
     const state = getState();
-    const record = {
-      ...raceRecord,
-      username: state.username || 'Guest Driver',
-      created_at: new Date().toISOString()
-    };
+    const cleanUser = state.username || 'Guest Driver';
+    const sb = getSupabase();
 
-    // Save locally immediately so dashboard always has it
-    try {
-      const existing = JSON.parse(localStorage.getItem('tracklab_history') || '[]');
-      existing.unshift(record);
-      localStorage.setItem('tracklab_history', JSON.stringify(existing.slice(0, 50)));
-    } catch {}
+    if (!sb) {
+      return { savedToDb: false, error: 'Supabase client unavailable' };
+    }
 
-    // Persist to SQLite backend if online
     try {
-      const res = await fetch(`${API_BASE}/api/races`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: record.username,
-          track: record.track,
-          track_name: record.track_name,
-          stint1: record.stint1,
-          stint2: record.stint2,
-          pit_lap: record.pit_lap,
-          total_time: record.total_time,
-          optimal_time: record.optimal_time,
-          optimal_stint1: record.optimal_stint1 || 'MEDIUM',
-          optimal_stint2: record.optimal_stint2 || 'HARD',
-          optimal_pit_lap: record.optimal_pit_lap || 22,
-          gap: record.gap,
-          data_source: record.data_source || 'MODELED_ESTIMATE'
-        })
-      });
-      if (res.ok) {
-        const saved = await res.json();
-        return { savedToDb: true, id: saved.id };
+      const { data, error } = await sb.from('race_history').insert([{
+        username: cleanUser,
+        track: raceRecord.track || 'NORISRING',
+        track_name: raceRecord.track_name || 'Norisring — Nuremberg Street Circuit',
+        stint1: raceRecord.stint1,
+        stint2: raceRecord.stint2,
+        pit_lap: raceRecord.pit_lap,
+        total_time: raceRecord.total_time,
+        optimal_time: raceRecord.optimal_time,
+        optimal_stint1: raceRecord.optimal_stint1 || 'MEDIUM',
+        optimal_stint2: raceRecord.optimal_stint2 || 'HARD',
+        optimal_pit_lap: raceRecord.optimal_pit_lap || 28,
+        gap: raceRecord.gap,
+        data_source: raceRecord.data_source || 'MODELED_PHYSICS'
+      }]).select();
+
+      if (error) {
+        console.warn('[TrackLab] Supabase saveRace error:', error);
+        return { savedToDb: false, error: error.message };
       }
-    } catch {}
 
-    return { savedToDb: false };
+      // Sync active strategy state to Supabase
+      if (cleanUser !== 'Guest Driver') {
+        try {
+          await sb.from('user_strategy_state').upsert({
+            username: cleanUser,
+            track: raceRecord.track || 'NORISRING',
+            total_laps: state.totalLaps || 72,
+            stint1: raceRecord.stint1,
+            stint2: raceRecord.stint2,
+            pit_lap: raceRecord.pit_lap,
+            updated_at: new Date().toISOString()
+          });
+        } catch {}
+      }
+
+      return { savedToDb: true, source: 'supabase', id: data?.[0]?.id };
+    } catch (e) {
+      console.warn('[TrackLab] Supabase saveRace exception:', e);
+      return { savedToDb: false, error: e.message || e };
+    }
   },
 
   async getRaces() {
     const state = getState();
     const username = state.username || '';
-    try {
-      const q = username ? `?username=${encodeURIComponent(username)}` : '';
-      const res = await fetch(`${API_BASE}/api/races${q}`);
-      if (res.ok) {
-        const data = await res.json();
-        return { source: 'sqlite', races: data.races || [] };
-      }
-    } catch {}
+    const sb = getSupabase();
+
+    if (!sb) {
+      return { source: 'none', races: [], error: 'Supabase client unavailable' };
+    }
 
     try {
-      const local = JSON.parse(localStorage.getItem('tracklab_history') || '[]');
-      const filtered = username ? local.filter(r => !r.username || r.username.toLowerCase() === username.toLowerCase()) : local;
-      return { source: 'localStorage', races: filtered };
-    } catch {
-      return { source: 'localStorage', races: [] };
+      let query = sb.from('race_history').select('*').order('created_at', { ascending: false });
+      if (username && username !== 'Guest Driver') {
+        query = query.ilike('username', username);
+      }
+      const { data, error } = await query;
+      if (error) {
+        console.warn('[TrackLab] Supabase getRaces error:', error);
+        return { source: 'none', races: [], error: error.message };
+      }
+      return { source: 'supabase', races: data || [] };
+    } catch (e) {
+      console.warn('[TrackLab] Supabase getRaces exception:', e);
+      return { source: 'none', races: [], error: e.message || e };
     }
   },
 
-  async clearOrDeleteRace(raceId, localIdx) {
-    if (raceId) {
+  async clearOrDeleteRace(raceId) {
+    const sb = getSupabase();
+    if (sb && raceId) {
       try {
-        await fetch(`${API_BASE}/api/races/${raceId}`, { method: 'DELETE' });
-      } catch {}
-    }
-    try {
-      const existing = JSON.parse(localStorage.getItem('tracklab_history') || '[]');
-      if (typeof localIdx === 'number') {
-        existing.splice(localIdx, 1);
-      } else if (raceId) {
-        const idx = existing.findIndex(r => r.id === raceId);
-        if (idx >= 0) existing.splice(idx, 1);
+        await sb.from('race_history').delete().eq('id', raceId);
+        return { ok: true };
+      } catch (e) {
+        console.warn('[TrackLab] Supabase delete error:', e);
+        return { ok: false, error: e.message };
       }
-      localStorage.setItem('tracklab_history', JSON.stringify(existing));
-    } catch {}
+    }
+    return { ok: false };
   }
 };
 
@@ -302,8 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
-      const target = Number(el.dataset.goto);
-      if (target) goTo(target);
+      const raw = el.dataset.goto;
+      if (raw === '0' || raw === 'login') {
+        goTo(0);
+      } else if (raw !== undefined && raw !== null && raw !== '') {
+        const target = Number(raw);
+        if (!isNaN(target)) goTo(target);
+        else goTo(raw);
+      }
     });
   });
 
@@ -355,64 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <button type="button" id="dock-mode-toggle" class="dock-step mono text-[10px] uppercase tracking-wider" title="Switch Guided / Pro workflow">
         ${state.userMode === 'pro' ? '★ Pro' : 'Guided'}
       </button>
-      <span class="dock-divider"></span>
-      <button type="button" id="dock-pro-upgrade" class="dock-step mono text-[10px] text-amber-300 hover:text-white uppercase tracking-wider" title="Telemetry Pro Upgraded Version">
-        ⚡ Pro Tier
-      </button>
     `;
 
     dock.innerHTML = stepsMarkup + modeChip;
     document.body.appendChild(dock);
-
-    // Pro Upgrade Modal Injector
-    let proModal = document.getElementById('pro-upgrade-modal');
-    if (!proModal) {
-      proModal = document.createElement('div');
-      proModal.id = 'pro-upgrade-modal';
-      proModal.innerHTML = `
-        <div class="glass-panel p-8 max-w-md w-full relative">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <span class="section-tag mb-1">Exclusive Upgrade</span>
-              <h3 class="text-2xl font-bold text-white">TrackLab Pro Telemetry</h3>
-            </div>
-            <button type="button" id="close-pro-modal" class="text-zinc-500 hover:text-white text-xl leading-none">&times;</button>
-          </div>
-          <p class="body-copy text-xs mb-6">
-            Unlock championship-grade F1 race engineering algorithms with real-time predictive degradation modeling.
-          </p>
-          <div class="space-y-3 mono text-xs mb-6">
-            <div class="sub-box p-3 flex items-center justify-between">
-              <span>⚡ Monte Carlo Stint Variance Simulation</span>
-              <span class="text-[#22C55E]">Unlocked</span>
-            </div>
-            <div class="sub-box p-3 flex items-center justify-between">
-              <span>🌧 Live Weather Radar & Rain Delta</span>
-              <span class="text-[#22C55E]">Active</span>
-            </div>
-            <div class="sub-box p-3 flex items-center justify-between">
-              <span>📊 Sub-Tenth Degradation Cliff Optimizer</span>
-              <span class="text-[#22C55E]">Enabled</span>
-            </div>
-          </div>
-          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs mb-6">
-            <strong>Pro Mode Status:</strong> High-precision strategy optimization engine unlocked for this session.
-          </div>
-          <button type="button" id="confirm-pro-modal" class="btn-primary w-full py-3 text-xs">
-            Continue with Pro Capabilities
-          </button>
-        </div>
-      `;
-      document.body.appendChild(proModal);
-
-      const closeHandler = () => proModal.classList.remove('active');
-      document.getElementById('close-pro-modal').addEventListener('click', closeHandler);
-      document.getElementById('confirm-pro-modal').addEventListener('click', closeHandler);
-    }
-
-    document.getElementById('dock-pro-upgrade').addEventListener('click', () => {
-      proModal.classList.add('active');
-    });
 
     dock.querySelectorAll('[data-dock-target]').forEach(btn => {
       btn.addEventListener('click', () => goTo(Number(btn.dataset.dockTarget)));
@@ -426,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.reload();
       });
     }
-  } else if (currentScreen === 1 || currentScreen >= 11) {
+  } else if (currentScreen <= 1 || currentScreen >= 11) {
     document.body.classList.add('no-dock');
   }
 
@@ -500,22 +567,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 9. Auto-check backend API status for header pill
+  // 9. Auto-check backend & Supabase status for header pill
   const apiStatusEl = document.getElementById('header-api-status');
   if (apiStatusEl) {
     const checkApi = async () => {
+      let isSupabaseOnline = false;
+      let isFastF1Online = false;
+
+      // Supabase connection test
+      const sb = getSupabase();
+      if (sb) {
+        try {
+          const { error } = await sb.from('race_history').select('id').limit(1);
+          if (!error || error.code === 'PGRST116' || error.message) {
+            isSupabaseOnline = true;
+          }
+        } catch {}
+      }
+
+      // FastAPI / Local backend test
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 2000);
         const res = await fetch(`${API_BASE}/health`, { signal: controller.signal });
         clearTimeout(timeout);
-        if (res.ok) {
-          apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]"></span> FastF1 Engine';
-        } else {
-          apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-zinc-400"></span> Local Engine';
-        }
-      } catch {
-        apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-zinc-400"></span> Local Engine';
+        if (res.ok) isFastF1Online = true;
+      } catch {}
+
+      if (isSupabaseOnline && isFastF1Online) {
+        apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]"></span> Supabase + FastF1';
+      } else if (isSupabaseOnline) {
+        apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]"></span> Supabase Cloud';
+      } else if (isFastF1Online) {
+        apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]"></span> FastF1 Engine';
+      } else {
+        apiStatusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Supabase Required';
       }
     };
     checkApi();

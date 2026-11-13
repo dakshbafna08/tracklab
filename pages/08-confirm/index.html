@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Grid Lock &amp; Launch</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
     #start-lights-overlay {
@@ -31,6 +32,7 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="7" class="header-link">Edit Pit Lap</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
@@ -42,23 +44,24 @@
     <section class="panel p-8 sm:p-12 animate-on-scroll">
       <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-white/10 pb-6 mb-8">
         <div>
-          <span class="section-tag">05 // Pre-Grid Final Sign-Off</span>
-          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Strategy Briefing</h1>
+          <span class="section-tag">05 // Strategy Review</span>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Ready to Race</h1>
+          <p class="body-copy text-sm text-zinc-300 mt-1">Review your race plan before heading to the starting grid.</p>
         </div>
         <span class="mono text-xs px-3.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 text-[#22C55E] font-semibold">
-          GRID TELEMETRY READY
+          STRATEGY READY
         </span>
       </div>
 
       <!-- Proportional Stint Architecture -->
       <div class="sub-box p-6 mb-8">
         <div class="flex justify-between mono text-[11px] text-zinc-400 uppercase mb-3">
-          <span>Planned Stint Architecture</span>
-          <span class="text-[#E10600] font-semibold">Box Window: Lap <span id="label-box-lap">18</span></span>
+          <span>Race Plan Timeline</span>
+          <span class="text-[#E10600] font-semibold">Pit Stop: Lap <span id="label-box-lap">28</span></span>
         </div>
         <div class="w-full h-12 flex rounded-xl overflow-hidden border border-white/15 mono text-xs font-bold">
-          <div id="vis-stint-1" style="width: 31%;" class="stint-bar-1 transition-all duration-300 px-2">SOFT (18L)</div>
-          <div id="vis-stint-2" style="width: 69%;" class="stint-bar-2 transition-all duration-300 px-2">HARD (40L)</div>
+          <div id="vis-stint-1" style="width: 31%;" class="stint-bar-1 transition-all duration-300 px-2">SOFT (28L)</div>
+          <div id="vis-stint-2" style="width: 69%;" class="stint-bar-2 transition-all duration-300 px-2">HARD (44L)</div>
         </div>
       </div>
 
@@ -69,28 +72,28 @@
           <span id="summary-track" class="text-white font-semibold">Norisring (72 Laps)</span>
         </div>
         <div class="summary-row">
-          <span class="text-zinc-400">Opening Stint</span>
+          <span class="text-zinc-400">Starting Tires (Stint 1)</span>
           <span id="summary-s1" class="text-white font-semibold">SOFT (Laps 1–28)</span>
         </div>
         <div class="summary-row">
-          <span class="text-zinc-400">Pit Stop &amp; Transit Delta</span>
-          <span id="summary-pit" class="text-[#E10600] font-semibold">End of Lap 28 (+18.4s)</span>
+          <span class="text-zinc-400">Pit Stop Time Lost</span>
+          <span id="summary-pit" class="text-[#E10600] font-semibold">End of Lap 28 (+18.4s in pit lane)</span>
         </div>
         <div class="summary-row">
-          <span class="text-zinc-400">Closing Stint</span>
+          <span class="text-zinc-400">Finishing Tires (Stint 2)</span>
           <span id="summary-s2" class="text-white font-semibold">HARD (Laps 29–72)</span>
         </div>
         <div class="flex justify-between items-center pt-3">
-          <span class="text-zinc-400">FIA Compound Regulation</span>
-          <span id="summary-fia" class="text-[#22C55E] font-semibold">Compliant (2 Compounds)</span>
+          <span class="text-zinc-400">F1 Two-Compound Rule</span>
+          <span id="summary-fia" class="text-[#22C55E] font-semibold">Compliant (2 different tire types used)</span>
         </div>
       </div>
 
       <!-- Navigation & Launch Trigger -->
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <button data-goto="7" class="btn-outline w-full sm:w-auto">&larr; Adjust Pit Window</button>
+        <button data-goto="7" class="btn-outline w-full sm:w-auto">&larr; Change Pit Lap</button>
         <button id="btn-lights-launch" class="btn-primary w-full sm:w-auto px-10 py-4 text-base">
-          Initiate Race Sequence &rarr;
+          Start Race &rarr;
         </button>
       </div>
     </section>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab — Driver Sign In &amp; Authentication</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .login-stage {
+      position: relative;
+      background: radial-gradient(circle at 50% 20%, rgba(225, 6, 0, 0.08), transparent 70%),
+                  radial-gradient(circle at 80% 80%, rgba(24, 24, 27, 0.9), #09090B);
+    }
+  </style>
+</head>
+<body class="no-dock min-h-screen flex flex-col f1-grid-bg login-stage">
+
+  <!-- Floating App Header -->
+  <header class="app-header">
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB // PIT LANE ACCESS</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <button data-goto="1" class="header-link">&larr; Home</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="11" class="header-link">Dashboard</button>
+    </div>
+  </header>
+
+  <!-- Main Login Screen -->
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex items-center justify-center">
+
+    <div class="w-full max-w-md animate-on-scroll scale-in">
+      <div class="glass-panel p-8 sm:p-10 shadow-[0_30px_90px_rgba(0,0,0,0.85)] border border-white/15">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+          <span class="f1-badge mb-3">DRIVER AUTHENTICATION</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">Enter the Pit Lane</h1>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-2">
+            Sign in to sync your race telemetry, custom stint strategies, and lap histories to the cloud.
+          </p>
+        </div>
+
+        <!-- Active Driver Session Banner -->
+        <div id="returning-banner" class="hidden mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="mono text-[10px] uppercase text-zinc-400">Active Driver Session</div>
+              <div id="returning-username" class="font-bold text-white text-sm">Driver</div>
+            </div>
+            <button id="btn-quick-resume" type="button" class="btn-primary py-2 px-4 text-xs">
+              Continue &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- Segmented Auth Tabs -->
+        <div class="grid grid-cols-2 p-1 rounded-xl bg-black/60 border border-white/10 mb-6 text-xs font-semibold">
+          <button type="button" id="tab-signin" class="py-2.5 rounded-lg bg-white/10 text-white transition-all">Sign In</button>
+          <button type="button" id="tab-register" class="py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all">Create Profile</button>
+        </div>
+
+        <!-- 1. Sign In Form -->
+        <form id="form-signin" class="space-y-4">
+          <div>
+            <label class="field-label" for="signin-username">Driver Callsign / Username</label>
+            <input id="signin-username" type="text" required placeholder="e.g. norris_04, leclerc_16" class="text-input" autocomplete="username">
+          </div>
+          <div>
+            <label class="field-label" for="signin-password">Password</label>
+            <input id="signin-password" type="password" required placeholder="••••••••" class="text-input" autocomplete="current-password">
+          </div>
+          <div id="signin-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
+          <button type="submit" id="btn-signin-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
+            Sign In to Pit Wall &rarr;
+          </button>
+        </form>
+
+        <!-- 2. Create Account Form -->
+        <form id="form-register" class="space-y-4 hidden">
+          <div>
+            <label class="field-label" for="reg-username">Choose Driver Callsign</label>
+            <input id="reg-username" type="text" required placeholder="e.g. piastri_81" class="text-input" autocomplete="username">
+          </div>
+          <div>
+            <label class="field-label" for="reg-password">Password</label>
+            <input id="reg-password" type="password" required placeholder="Min. 3 characters" class="text-input" autocomplete="new-password">
+          </div>
+          <div>
+            <label class="field-label" for="reg-confirm">Confirm Password</label>
+            <input id="reg-confirm" type="password" required placeholder="Repeat password" class="text-input" autocomplete="new-password">
+          </div>
+          <div>
+            <label class="field-label">Preferred Experience</label>
+            <div class="grid grid-cols-2 gap-2 mt-1">
+              <label class="sub-box p-3 cursor-pointer flex items-center gap-2 text-xs">
+                <input type="radio" name="reg-mode" value="guided" checked class="accent-[#E10600]">
+                <span class="text-white">Guided (Learn)</span>
+              </label>
+              <label class="sub-box p-3 cursor-pointer flex items-center gap-2 text-xs">
+                <input type="radio" name="reg-mode" value="pro" class="accent-[#E10600]">
+                <span class="text-white">Pro (Direct)</span>
+              </label>
+            </div>
+          </div>
+          <div id="reg-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
+          <button type="submit" id="btn-reg-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
+            Create Profile &amp; Launch &rarr;
+          </button>
+        </form>
+
+        <!-- Database Status & Guest Bypass -->
+        <div class="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+          <span id="db-status-label" class="mono text-[11px] flex items-center gap-1.5 text-zinc-400">
+            <span class="w-2 h-2 rounded-full bg-zinc-500" id="db-status-dot"></span>
+            Checking Cloud Sync...
+          </span>
+          <button type="button" id="btn-guest-enter" class="text-zinc-300 hover:text-white underline font-semibold">
+            Continue as Guest &rarr;
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Informative Sub-Callout -->
+      <div class="mt-6 text-center text-xs text-zinc-500 mono">
+        Norisring 72-Lap Championship • Nuremberg Street Circuit
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="../../assets/js/simulation-engine.js"></script>
+  <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const state = getState();
+
+      // Show returning driver resume banner if a username exists
+      if (state.username && state.username !== 'Guest Driver') {
+        const banner = document.getElementById('returning-banner');
+        document.getElementById('returning-username').textContent = state.username;
+        banner.classList.remove('hidden');
+        document.getElementById('btn-quick-resume').addEventListener('click', () => {
+          goTo(state.userMode === 'pro' ? 3 : 2);
+        });
+      }
+
+      // Check Database & Supabase Cloud Status
+      const dbLabel = document.getElementById('db-status-label');
+      const dbDot = document.getElementById('db-status-dot');
+
+      async function checkConnectionStatus() {
+        const sb = getSupabase();
+        let supabaseReachable = false;
+        let tablesReady = false;
+
+        if (sb) {
+          try {
+            const { data, error } = await sb.from('race_history').select('id').limit(1);
+            if (!error) {
+              supabaseReachable = true;
+              tablesReady = true;
+            } else if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
+              // Supabase project is active, tables just need to be run in SQL editor
+              supabaseReachable = true;
+              tablesReady = false;
+            }
+          } catch {
+            supabaseReachable = false;
+          }
+        }
+
+        if (tablesReady) {
+          dbDot.className = 'w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]';
+          dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> Supabase Cloud Connected';
+          return;
+        }
+
+        if (supabaseReachable) {
+          dbDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+          dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Supabase Connected (Run SQL)';
+          return;
+        }
+
+        // Check local backend
+        try {
+          const res = await fetch('http://localhost:8000/health');
+          if (res.ok) {
+            dbDot.className = 'w-2 h-2 rounded-full bg-[#22C55E]';
+            dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> SQLite DB Connected';
+            return;
+          }
+        } catch {}
+
+        dbDot.className = 'w-2 h-2 rounded-full bg-[#E10600]';
+        dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Supabase Cloud Required';
+      }
+
+      checkConnectionStatus();
+
+      // Tab Switching
+      const tabSignIn = document.getElementById('tab-signin');
+      const tabRegister = document.getElementById('tab-register');
+      const formSignIn = document.getElementById('form-signin');
+      const formRegister = document.getElementById('form-register');
+
+      tabSignIn.addEventListener('click', () => {
+        formSignIn.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        tabSignIn.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
+        tabRegister.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
+      });
+
+      tabRegister.addEventListener('click', () => {
+        formRegister.classList.remove('hidden');
+        formSignIn.classList.add('hidden');
+        tabRegister.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
+        tabSignIn.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
+      });
+
+      // Sign In Form Submission
+      formSignIn.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('signin-username').value.trim();
+        const password = document.getElementById('signin-password').value;
+        const fb = document.getElementById('signin-feedback');
+        fb.classList.add('hidden');
+
+        const btn = document.getElementById('btn-signin-submit');
+        btn.textContent = 'Authenticating with Supabase...';
+        btn.disabled = true;
+
+        try {
+          const result = await TrackLabDB.login(username, password);
+          if (!result.ok) {
+            fb.textContent = result.error || 'Invalid driver credentials in Supabase.';
+            fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
+            fb.classList.remove('hidden');
+            btn.textContent = 'Sign In to Pit Wall →';
+            btn.disabled = false;
+            return;
+          }
+          const curState = getState();
+          goTo(curState.userMode === 'pro' ? 3 : 2);
+        } catch (err) {
+          fb.textContent = 'Supabase authentication failed: ' + (err.message || 'Check database connection.');
+          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
+          fb.classList.remove('hidden');
+          btn.textContent = 'Sign In to Pit Wall →';
+          btn.disabled = false;
+        }
+      });
+
+      // Register Form Submission
+      formRegister.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('reg-username').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const confirm = document.getElementById('reg-confirm').value;
+        const preferredMode = document.querySelector('input[name="reg-mode"]:checked')?.value || 'guided';
+        const fb = document.getElementById('reg-feedback');
+        fb.classList.add('hidden');
+
+        if (password !== confirm) {
+          fb.textContent = 'Passwords do not match.';
+          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
+          fb.classList.remove('hidden');
+          return;
+        }
+
+        const btn = document.getElementById('btn-reg-submit');
+        btn.textContent = 'Registering with Supabase...';
+        btn.disabled = true;
+
+        try {
+          const result = await TrackLabDB.register(username, password, preferredMode);
+          if (!result.ok) {
+            fb.textContent = result.error || 'Could not register profile in Supabase.';
+            fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
+            fb.classList.remove('hidden');
+            btn.textContent = 'Create Profile & Launch →';
+            btn.disabled = false;
+            return;
+          }
+          saveState({ userMode: preferredMode });
+          goTo(preferredMode === 'pro' ? 3 : 2);
+        } catch (err) {
+          fb.textContent = 'Supabase registration error: ' + (err.message || 'Check database connection.');
+          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
+          fb.classList.remove('hidden');
+          btn.textContent = 'Create Profile & Launch →';
+          btn.disabled = false;
+        }
+      });
+
+      // Guest Flow
+      document.getElementById('btn-guest-enter').addEventListener('click', () => {
+        saveState({ username: 'Guest Driver' });
+        goTo(2);
+      });
+    });
+  </script>
+</body>
+</html>

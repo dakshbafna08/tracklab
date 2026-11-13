@@ -719,24 +719,3 @@ input[type="range"]::-webkit-slider-thumb:hover {
   height: auto;
   filter: drop-shadow(0 0 20px rgba(225, 6, 0, 0.65));
 }
-
-/* =========================================================================
-   PRO UPGRADE MODAL
-   ========================================================================= */
-#pro-upgrade-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: rgba(9, 9, 11, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
-
-#pro-upgrade-modal.active {
-  display: flex;
-  animation: pageFadeIn 0.3s var(--apple-ease) both;
-}

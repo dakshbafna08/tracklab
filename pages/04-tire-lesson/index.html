@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Tire Physics</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col f1-grid-bg">
@@ -15,6 +16,7 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="5" class="btn-ghost text-xs">Skip Lesson &rarr;</button>
       <button data-goto="11" class="header-link">Dashboard</button>
     </div>
@@ -22,77 +24,86 @@
 
   <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col justify-between">
 
-    <!-- Apple Hardware-Style Hero Banner -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 animate-on-scroll">
+    <!-- Friendly Hero Banner -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12 animate-on-scroll">
       <div>
-        <span class="section-tag">02 // Tire Thermodynamics</span>
+        <span class="section-tag">02 // Tires Explained Simply</span>
         <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mt-2">
-          Grip is temporary.<br>Strategy is everything.
+          Soft, Medium, or Hard.<br>Which wins the race?
         </h1>
         <p class="body-copy text-lg mt-5">
-          Every dry Grand Prix weekend supplies three slick compounds. Faster compounds burn out rapidly; harder compounds trade peak grip for long-stint consistency.
+          In Formula 1, tires are called <strong>compounds</strong> (the rubber recipe). Softer rubber gives huge grip but wears out quickly. Harder rubber lasts for dozens of laps but is slightly slower.
         </p>
+        <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300">
+          <strong class="text-white">What is a "Stint"?</strong>
+          A stint is simply the chunk of the race you drive on one set of tires. In a 1-stop race, you have two stints: Stint 1 before your pit stop, and Stint 2 after it.
+        </div>
       </div>
-      <div class="rounded-2xl overflow-hidden border border-white/10">
+      <div class="rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
         <img src="../../assets/images/f1-pit-tires.jpg" alt="Soft Medium and Hard Formula 1 Pirelli slick tires"
              class="w-full h-[300px] sm:h-[340px] object-cover">
       </div>
     </section>
 
-    <!-- 3 Minimalist Compound Spec Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <!-- 3 Simple Compound Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       <article class="panel p-8 animate-on-scroll delay-1">
         <div class="flex items-center justify-between mb-6">
           <span class="tire-ring tire-soft w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-[#E10600] font-semibold">C4 / C5</span>
+          <span class="mono text-xs text-[#E10600] font-semibold">Fastest Tire</span>
         </div>
-        <h2 class="text-2xl font-bold text-white">Soft</h2>
+        <h2 class="text-2xl font-bold text-white">Soft (Red)</h2>
         <p class="text-sm text-zinc-400 mt-2 mb-6">
-          Maximum mechanical grip for qualifying sprints and undercut laps, followed by a steep thermal cliff.
+          Maximum speed off the start line and for overtaking sprints, but the rubber wears out quickly.
         </p>
         <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">0.00s (Baseline)</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~13 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-[#E10600] font-semibold">~Lap 18</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-[#22C55E] font-semibold">Fastest (0.00s)</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~13 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-[#E10600] font-semibold">~Lap 18</span></div>
         </div>
       </article>
 
       <article class="panel p-8 animate-on-scroll delay-2">
         <div class="flex items-center justify-between mb-6">
           <span class="tire-ring tire-medium w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-yellow-400 font-semibold">C3</span>
+          <span class="mono text-xs text-yellow-400 font-semibold">Balanced Pick</span>
         </div>
-        <h2 class="text-2xl font-bold text-white">Medium</h2>
+        <h2 class="text-2xl font-bold text-white">Medium (Yellow)</h2>
         <p class="text-sm text-zinc-400 mt-2 mb-6">
-          The strategic workhorse of modern Formula 1. Balances predictable linear wear with competitive race pace.
+          The strategic workhorse. Balances great speed with strong durability—used in almost every winning race.
         </p>
         <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.48s / lap</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~22 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-yellow-400 font-semibold">~Lap 30</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-white font-semibold">+0.48s / lap</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~22 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-yellow-400 font-semibold">~Lap 30</span></div>
         </div>
       </article>
 
       <article class="panel p-8 animate-on-scroll delay-3">
         <div class="flex items-center justify-between mb-6">
           <span class="tire-ring tire-hard w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-zinc-300 font-semibold">C1 / C2</span>
+          <span class="mono text-xs text-zinc-300 font-semibold">Toughest Tire</span>
         </div>
-        <h2 class="text-2xl font-bold text-white">Hard</h2>
+        <h2 class="text-2xl font-bold text-white">Hard (White)</h2>
         <p class="text-sm text-zinc-400 mt-2 mb-6">
-          Built for extended one-stop stints. Takes extra laps to reach temperature window, then resists fading.
+          The marathon tire. Slightly slower single lap speed, but resists overheating and runs the longest.
         </p>
         <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.92s / lap</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Optimal Life</span><span class="text-white">~34 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Cliff Onset</span><span class="text-zinc-300 font-semibold">~Lap 46</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-white font-semibold">+0.92s / lap</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~34 Laps</span></div>
+          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-zinc-300 font-semibold">~Lap 46</span></div>
         </div>
       </article>
     </section>
 
-    <!-- FIA Sporting Mandate Callout -->
-    <div class="callout-box mb-12 animate-on-scroll">
-      <strong class="text-white">FIA Mandatory Two-Compound Rule:</strong> In dry conditions, every car must use at least two different slick specifications during the Grand Prix, forcing at least one pit stop.
+    <!-- Clear Callout Box -->
+    <div class="sub-box p-5 mb-8 animate-on-scroll space-y-2 text-xs">
+      <div class="flex items-center gap-2 text-amber-400 font-semibold uppercase tracking-wider text-[11px]">
+        <span>⚠</span> <span>F1 Two-Compound Rule</span>
+      </div>
+      <p class="text-zinc-300 leading-relaxed">
+        In a dry F1 race, the rules mandate that every driver must use <strong>at least two different tire types</strong> during the race (for example, Soft then Hard, or Medium then Soft). You cannot stay on the same tire type all race long.
+      </p>
     </div>
 
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Pit Window Timing</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col f1-grid-bg">
@@ -15,6 +16,7 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="5" class="header-link">Change Tires</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
@@ -26,8 +28,11 @@
     <section class="panel p-8 sm:p-12 animate-on-scroll">
       <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-white/10 pb-6 mb-8">
         <div>
-          <span class="section-tag">04 // Pit Timing Calibration</span>
-          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">When Do You Box?</h1>
+          <span class="section-tag">04 // Pit Stop Timing</span>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">When Do You Pit?</h1>
+          <p class="body-copy text-sm text-zinc-300 mt-2">
+            In F1, teams say "Box" for a pit stop. Slide below to pick which lap you want to enter the pit lane for fresh rubber.
+          </p>
         </div>
         <div class="sub-box px-4 py-2.5 mono text-xs">
           <span class="text-zinc-500 block text-[10px]">CIRCUIT</span>
@@ -38,11 +43,11 @@
       <!-- Interactive Slider Console -->
       <div class="sub-box p-6 sm:p-8 mb-8">
         <div class="flex flex-wrap justify-between items-baseline gap-4 mb-6 mono">
-          <span class="text-xs text-zinc-500">LAP 1</span>
+          <span class="text-xs text-zinc-500">START (LAP 1)</span>
           <div class="text-2xl sm:text-3xl font-bold text-white">
-            BOX TARGET: <span class="text-[#E10600]">LAP <span id="pit-lap-val">28</span></span>
+            PIT STOP: <span class="text-[#E10600]">LAP <span id="pit-lap-val">28</span></span> <span class="text-xs text-zinc-400 font-normal">("Box Lap")</span>
           </div>
-          <span class="text-xs text-zinc-500">LAP <span class="total-laps-label">72</span></span>
+          <span class="text-xs text-zinc-500">FINISH (LAP <span class="total-laps-label">72</span>)</span>
         </div>
 
         <input type="range" id="pit-slider" min="5" max="67" value="28" class="my-6">

@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab — F1 Race Strategy Telemetry</title>
+  <title>TrackLab — Learn F1 Strategy. Create Your Own.</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="assets/css/styles.css">
   <style>
     .hero-car-stage {
@@ -44,35 +45,47 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
-      <button data-goto="12" class="header-link">F1 Guide</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="11" class="header-link">Dashboard</button>
-      <a href="#login-section" class="btn-primary py-1.5 px-4 text-xs">Enter Pit Lane</a>
+      <a href="pages/login/index.html" class="btn-primary py-1.5 px-4 text-xs">Driver Sign In</a>
     </div>
   </header>
 
   <main>
 
     <!-- =====================================================================
-         SECTION 1: APPLE-STYLE FULL-VIEWPORT HERO + F1 CAR ENTRANCE
+         SECTION 1: APPLE-STYLE FULL-VIEWPORT HERO + PROJECT INTRODUCTION
          ===================================================================== -->
     <section class="min-h-[94vh] flex flex-col justify-between items-center text-center px-6 pt-16 pb-10 hero-car-stage">
       <div class="max-w-4xl mx-auto z-10">
-        <span class="section-tag">Formula 1 Strategy Telemetry</span>
-        <h1 class="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tight text-white leading-[0.98] mt-2">
-          Race Strategy.<br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-300 to-zinc-500">Engineered.</span>
+        <span class="section-tag">Formula 1 Strategy Simulator</span>
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.04] mt-2">
+          Learn F1 Strategy.<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#E10600]">Create Your Own to Master the Race.</span>
         </h1>
-        <p class="body-copy text-base sm:text-xl max-w-2xl mx-auto mt-6 font-normal">
-          Decide when to push, which compound unlocks the undercut, and down to the tenth of a second when to box.
+
+        <!-- Clear Project Introduction -->
+        <p class="body-copy text-base sm:text-lg max-w-3xl mx-auto mt-6 font-normal text-zinc-300">
+          Welcome to <strong class="text-white">TrackLab</strong> — an interactive Formula 1 strategy laboratory and educational simulator. Learn how tire compounds, degradation curves, and pit stop timing determine Grand Prix victories, then build and simulate your very own custom race strategy against computer-modeled telemetry on Germany's high-speed Norisring street circuit.
         </p>
 
+        <!-- Prominent "What does Boxing mean?" Callout Box -->
+        <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-white/[0.04] border border-white/10 max-w-2xl mx-auto text-left shadow-lg">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="f1-badge text-[10px]">F1 TERMINOLOGY</span>
+            <h3 class="font-bold text-white text-base">What does "Boxing" mean?</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            In Formula 1, when an engineer radios <strong class="text-white">"Box, box, box!"</strong>, they are instructing the driver to enter the pit lane immediately for a pit stop. The term comes from the German word <em class="text-zinc-200">Boxenstopp</em> and refers to the team's designated <em>"pit box"</em> area where 20 mechanics change all 4 wheels in under 2.5 seconds. In TrackLab, deciding which lap you box determines whether you win or lose.
+          </p>
+        </div>
+
         <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
-          <a href="#login-section" class="btn-primary px-8 py-3.5 text-sm">
-            Launch Simulator
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+          <a href="pages/login/index.html" class="btn-primary px-8 py-3.5 text-sm">
+            Launch Simulator &rarr;
           </a>
           <a href="#story-circuits" class="btn-outline px-7 py-3.5 text-sm">
-            Explore Telemetry
+            Explore Walkthrough
           </a>
         </div>
       </div>
@@ -94,44 +107,56 @@
     </section>
 
     <!-- =====================================================================
-         SECTION 2: CHOOSE YOUR CIRCUIT
+         SECTION 2: WALKTHROUGH & CIRCUIT GEOMETRY (NORISRING ONLY)
          ===================================================================== -->
-    <section id="story-circuits" class="min-h-[82vh] flex items-center px-6 py-24 max-w-6xl mx-auto">
+    <section id="story-circuits" class="min-h-[82vh] flex flex-col justify-center px-6 py-24 max-w-6xl mx-auto">
+      
+      <!-- Prominent Section Title Requested by User -->
+      <div class="text-center mb-14 animate-on-scroll">
+        <span class="section-tag">Step-by-Step Interactive Workflow</span>
+        <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
+          Let’s walk through it.
+        </h2>
+        <p class="body-copy text-base sm:text-lg max-w-2xl mx-auto mt-4 text-zinc-400">
+          Here is how you go from a complete beginner to building a winning Formula 1 Grand Prix race strategy on the Norisring street circuit.
+        </p>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
         <div class="animate-on-scroll slide-left">
           <span class="section-tag">01 // Track Geometry</span>
-          <h2 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mt-2">
-            Every millimeter<br>of asphalt matters.
-          </h2>
-          <p class="body-copy text-lg mt-6">
-            Select from nine iconic championship circuits—from the Norisring street bowl and Monza’s 356 km/h tow battles to Silverstone’s relentless lateral tire loads and Monaco’s millimeter barriers.
+          <h3 class="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight mt-2">
+            Norisring — Nuremberg Street Circuit
+          </h3>
+          <p class="body-copy text-lg mt-6 text-zinc-300">
+            A historic 2.300 km street circuit in Bavaria, Germany. With 72 rapid laps, heavy braking into the famous Grundig hairpin, and a 285 km/h blast along the Dutzendteich straight, tire management and pit stop timing decide the race.
           </p>
           <div class="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-white/10 mono">
             <div>
-              <div class="text-2xl font-bold text-white">9</div>
-              <div class="text-xs text-zinc-500 mt-1">GP Circuits</div>
+              <div class="text-2xl font-bold text-white">72</div>
+              <div class="text-xs text-zinc-500 mt-1">Race Laps</div>
             </div>
             <div>
-              <div class="text-2xl font-bold text-[#E10600]">19.5–24.1s</div>
-              <div class="text-xs text-zinc-500 mt-1">Pit Lane Loss</div>
+              <div class="text-2xl font-bold text-[#E10600]">18.4s</div>
+              <div class="text-xs text-zinc-500 mt-1">Pit Lane Transit</div>
             </div>
             <div>
-              <div class="text-2xl font-bold text-white">FastF1</div>
-              <div class="text-xs text-zinc-500 mt-1">Session Calibrated</div>
+              <div class="text-2xl font-bold text-white">2.30 km</div>
+              <div class="text-xs text-zinc-500 mt-1">Lap Distance</div>
             </div>
           </div>
         </div>
 
         <div class="animate-on-scroll slide-right flex justify-center">
           <div class="panel p-8 sm:p-12 w-full max-w-lg relative overflow-hidden">
-            <div class="mono text-[11px] text-zinc-500 uppercase tracking-widest mb-4">Circuit Vector Telemetry</div>
+            <div class="mono text-[11px] text-zinc-500 uppercase tracking-widest mb-4">Norisring Vector Telemetry</div>
             <svg viewBox="0 0 500 220" class="w-full h-auto stroke-white fill-none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <path class="svg-circuit-draw" d="M 60 165 L 95 65 C 102 48, 125 52, 132 70 L 145 110 C 152 125, 175 115, 185 95 C 195 75, 215 80, 225 100 L 250 130 L 385 125 C 415 125, 435 105, 430 85 C 425 65, 395 65, 385 88 L 365 135 C 355 162, 315 175, 270 168 L 120 172 C 85 174, 55 175, 60 165 Z"/>
-              <circle cx="60" cy="165" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
+              <path class="svg-circuit-draw" d="M 80 150 L 380 150 C 430 150, 440 120, 410 100 L 370 75 C 340 55, 300 70, 270 85 L 120 85 C 80 85, 60 110, 80 150 Z"/>
+              <circle cx="80" cy="150" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
             </svg>
             <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/10 mono text-xs text-zinc-400">
-              <span>COTA // 20 CORNERS</span>
-              <span class="text-[#E10600] font-semibold">HIGH TIRE STRESS</span>
+              <span>NORISRING // 8 CORNERS</span>
+              <span class="text-[#22C55E] font-semibold">LOW TIRE DEGRADATION</span>
             </div>
           </div>
         </div>
@@ -149,33 +174,37 @@
         </div>
 
         <div class="animate-on-scroll slide-right order-1 lg:order-2">
-          <span class="section-tag">02 // Pirelli Compounds</span>
+          <span class="section-tag">02 // Tires Explained Simply</span>
           <h2 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mt-2">
-            Raw grip vs.<br>pure endurance.
+            Speed vs. Durability.
           </h2>
           <p class="body-copy text-lg mt-6">
-            Model multi-phase rubber degradation: initial warm-up, stable linear wear, and the catastrophic thermal cliff where lap times bleed seconds.
+            In F1, tires are called <strong>compounds</strong>. Soft tires give you the fastest speed and cornering grip, but wear out quickly. Hard tires are slightly slower, but last for dozens of laps. Medium tires give you a balanced blend of both.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 mt-10">
+          <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300">
+            <strong class="text-white block mb-1">What is "The Cliff"?</strong>
+            As tires wear down, grip drops slowly at first. But when rubber overheats too much, you hit <em>the cliff</em>—where lap times suddenly become 2+ seconds slower and you are forced to make a pit stop.
+          </div>
+          <div class="flex flex-col sm:flex-row gap-4 mt-6">
             <div class="sub-box flex items-center gap-3 flex-1">
               <span class="tire-ring tire-soft"></span>
               <div>
-                <div class="font-semibold text-sm text-white">Soft</div>
-                <div class="mono text-xs text-zinc-500">0.00s Peak</div>
+                <div class="font-semibold text-sm text-white">Soft (Red)</div>
+                <div class="mono text-xs text-zinc-500">Fastest pace • ~13 laps</div>
               </div>
             </div>
             <div class="sub-box flex items-center gap-3 flex-1">
               <span class="tire-ring tire-medium"></span>
               <div>
-                <div class="font-semibold text-sm text-white">Medium</div>
-                <div class="mono text-xs text-zinc-500">+0.48s Balanced</div>
+                <div class="font-semibold text-sm text-white">Medium (Yellow)</div>
+                <div class="mono text-xs text-zinc-500">Balanced • ~22 laps</div>
               </div>
             </div>
             <div class="sub-box flex items-center gap-3 flex-1">
               <span class="tire-ring tire-hard"></span>
               <div>
-                <div class="font-semibold text-sm text-white">Hard</div>
-                <div class="mono text-xs text-zinc-500">+0.92s Long Stint</div>
+                <div class="font-semibold text-sm text-white">Hard (White)</div>
+                <div class="mono text-xs text-zinc-500">Long lasting • ~34 laps</div>
               </div>
             </div>
           </div>
@@ -184,21 +213,35 @@
     </section>
 
     <!-- =====================================================================
-         SECTION 4: PIT WALL OPTIMIZER & DEBRIEF
+         SECTION 4: PIT STOP STRATEGY & THE UNDERCUT
          ===================================================================== -->
     <section class="min-h-[82vh] flex items-center px-6 py-24 max-w-6xl mx-auto">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
         <div class="animate-on-scroll slide-left">
-          <span class="section-tag">03 // Real-Time Telemetry</span>
+          <span class="section-tag">03 // Pit Stop Tactics</span>
           <h2 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mt-2">
-            Box at the<br>exact lap.
+            The art of the pit stop.
           </h2>
-          <p class="body-copy text-lg mt-6">
-            Watch your strategy run lap-for-lap against an exhaustive mathematical optimizer evaluating fuel weight dissipation and every pit window permutation.
+          <p class="body-copy text-base mt-4 text-zinc-300">
+            A pit stop costs roughly 18.4 seconds at Norisring. Winning races is all about knowing the exact lap to come in:
           </p>
-          <div class="mt-8 flex items-center gap-6 mono text-xs text-zinc-400">
-            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> 1.75 kg/lap Fuel Burn</span>
-            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#E10600]"></span> 2-Compound FIA Mandate</span>
+          <div class="space-y-3 mt-6 text-xs mono">
+            <div class="sub-box p-3.5">
+              <strong class="text-white block text-sm mb-1">🛑 "Box, Box" = Pit Stop</strong>
+              <span class="text-zinc-400">The team radio instruction telling the driver to enter the pit lane to change tires right now.</span>
+            </div>
+            <div class="sub-box p-3.5">
+              <strong class="text-[#22C55E] block text-sm mb-1">⚡ The Undercut (Pit Early)</strong>
+              <span class="text-zinc-400">Pitting a lap or two <em>before</em> your rival. Fresh tires are so fast that when your rival pits later, you've already jumped ahead of them.</span>
+            </div>
+            <div class="sub-box p-3.5">
+              <strong class="text-amber-400 block text-sm mb-1">🔄 The Overcut (Pit Late)</strong>
+              <span class="text-zinc-400">Staying out on track while your rival pits. If your car is light and your old tires still have grip, you race in clean air to build a lead.</span>
+            </div>
+          </div>
+          <div class="mt-6 flex items-center gap-6 mono text-xs text-zinc-400">
+            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> Cars get faster as fuel burns</span>
+            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Must use 2 different tire types</span>
           </div>
         </div>
 
@@ -209,7 +252,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-transparent"></div>
             <div class="absolute bottom-5 left-5 right-5 glass-panel p-4 flex justify-between items-center">
               <div>
-                <div class="mono text-[10px] uppercase text-zinc-400">Pit Transit Window</div>
+                <div class="mono text-[10px] uppercase text-zinc-400">Norisring Pit Window</div>
                 <div class="text-sm font-semibold text-white">Optimal Undercut Detected</div>
               </div>
               <div class="mono text-lg font-bold text-[#22C55E]">-1.84s</div>
@@ -220,81 +263,27 @@
     </section>
 
     <!-- =====================================================================
-         SECTION 5: PIT LANE SIGN IN / ACCOUNT DATABASE
+         SECTION 5: CLOSING CALL-TO-ACTION (DIRECT ACCESS TO DEDICATED LOGIN)
          ===================================================================== -->
-    <section id="login-section" class="min-h-[85vh] flex items-center justify-center px-6 py-24">
-      <div class="w-full max-w-md animate-on-scroll scale-in">
-        <div class="glass-panel p-8 sm:p-10 shadow-2xl">
-          <div class="text-center mb-8">
-            <span class="f1-badge mb-3">F1</span>
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Enter the Pit Lane</h2>
-            <p class="text-sm text-zinc-400 mt-1">Sign in to sync your strategy configurations &amp; race telemetry.</p>
-          </div>
+    <section class="py-24 px-6 text-center border-t border-white/10 bg-gradient-to-b from-transparent to-[#111114]">
+      <div class="max-w-2xl mx-auto animate-on-scroll">
+        <span class="f1-badge mb-3">PIT WALL TELEMETRY</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Ready to Build Your Strategy?</h2>
+        <p class="text-sm sm:text-base text-zinc-400 mt-4 max-w-xl mx-auto">
+          Sign in to your driver profile, or jump right into the academy lessons to design your race plan for the Norisring street circuit.
+        </p>
 
-          <!-- Returning Driver Quick Resume Banner -->
-          <div id="returning-banner" class="hidden mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <div class="mono text-[10px] uppercase text-zinc-400">Active Driver Session</div>
-                <div id="returning-username" class="font-semibold text-white text-sm">Driver</div>
-              </div>
-              <button id="btn-quick-resume" type="button" class="btn-primary py-2 px-4 text-xs">
-                Continue &rarr;
-              </button>
-            </div>
-          </div>
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+          <a href="pages/login/index.html" class="btn-primary px-8 py-3.5 text-sm">
+            Driver Sign In &rarr;
+          </a>
+          <button data-goto="2" class="btn-outline px-7 py-3.5 text-sm">
+            Guided Briefing
+          </button>
+        </div>
 
-          <!-- Segmented Auth Tabs -->
-          <div class="grid grid-cols-2 p-1 rounded-xl bg-black/50 border border-white/10 mb-6 text-xs font-semibold">
-            <button type="button" id="tab-signin" class="py-2.5 rounded-lg bg-white/10 text-white transition-all">Sign In</button>
-            <button type="button" id="tab-register" class="py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all">Create Account</button>
-          </div>
-
-          <!-- Sign In Form -->
-          <form id="form-signin" class="space-y-4">
-            <div>
-              <label class="field-label" for="signin-username">Driver Callsign</label>
-              <input id="signin-username" type="text" required placeholder="e.g. leclerc_16" class="text-input">
-            </div>
-            <div>
-              <label class="field-label" for="signin-password">Password</label>
-              <input id="signin-password" type="password" required placeholder="••••••••" class="text-input">
-            </div>
-            <div id="signin-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
-            <button type="submit" id="btn-signin-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
-              Sign In to Pit Wall
-            </button>
-          </form>
-
-          <!-- Create Account Form -->
-          <form id="form-register" class="space-y-4 hidden">
-            <div>
-              <label class="field-label" for="reg-username">Choose Driver Callsign</label>
-              <input id="reg-username" type="text" required placeholder="e.g. norris_04" class="text-input">
-            </div>
-            <div>
-              <label class="field-label" for="reg-password">Password</label>
-              <input id="reg-password" type="password" required placeholder="Min. 3 characters" class="text-input">
-            </div>
-            <div>
-              <label class="field-label" for="reg-confirm">Confirm Password</label>
-              <input id="reg-confirm" type="password" required placeholder="Repeat password" class="text-input">
-            </div>
-            <div id="reg-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
-            <button type="submit" id="btn-reg-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
-              Create Driver Profile
-            </button>
-          </form>
-
-          <div class="mt-6 pt-5 border-t border-white/10 flex items-center justify-between text-xs text-zinc-500">
-            <span id="db-status-label" class="mono text-[11px] flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-zinc-500" id="db-status-dot"></span>
-              Checking DB...
-            </span>
-            <button type="button" id="btn-guest-enter" class="text-zinc-300 hover:text-white underline">
-              Continue as Guest
-            </button>
-          </div>
+        <div class="mt-8 text-xs text-zinc-500 mono">
+          Synced with Supabase Cloud Telemetry Database
         </div>
       </div>
     </section>
@@ -303,105 +292,5 @@
 
   <script src="assets/js/simulation-engine.js"></script>
   <script src="assets/js/shared-state.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const state = getState();
-
-      // Returning user quick resume
-      if (state.username) {
-        const banner = document.getElementById('returning-banner');
-        document.getElementById('returning-username').textContent = state.username;
-        banner.classList.remove('hidden');
-        document.getElementById('btn-quick-resume').addEventListener('click', () => {
-          goTo(state.userMode === 'pro' ? 3 : 2);
-        });
-      }
-
-      // Honest SQLite DB health check
-      const dbLabel = document.getElementById('db-status-label');
-      const dbDot = document.getElementById('db-status-dot');
-      try {
-        const res = await fetch('http://localhost:8000/health');
-        if (res.ok) {
-          dbDot.className = 'w-2 h-2 rounded-full bg-[#22C55E]';
-          dbLabel.lastChild.textContent = ' SQLite DB Connected';
-        } else {
-          dbLabel.lastChild.textContent = ' Local Storage Mode';
-        }
-      } catch {
-        dbLabel.lastChild.textContent = ' Local Storage Mode';
-      }
-
-      // Tab switching
-      const tabSignIn = document.getElementById('tab-signin');
-      const tabRegister = document.getElementById('tab-register');
-      const formSignIn = document.getElementById('form-signin');
-      const formRegister = document.getElementById('form-register');
-
-      tabSignIn.addEventListener('click', () => {
-        formSignIn.classList.remove('hidden');
-        formRegister.classList.add('hidden');
-        tabSignIn.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
-        tabRegister.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
-      });
-
-      tabRegister.addEventListener('click', () => {
-        formRegister.classList.remove('hidden');
-        formSignIn.classList.add('hidden');
-        tabRegister.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
-        tabSignIn.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
-      });
-
-      // Sign In submission
-      formSignIn.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('signin-username').value.trim();
-        const password = document.getElementById('signin-password').value;
-        const fb = document.getElementById('signin-feedback');
-        fb.classList.add('hidden');
-
-        const result = await TrackLabDB.login(username, password);
-        if (!result.ok) {
-          fb.textContent = result.error || 'Invalid credentials.';
-          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
-          fb.classList.remove('hidden');
-          return;
-        }
-        goTo(2);
-      });
-
-      // Register submission
-      formRegister.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('reg-username').value.trim();
-        const password = document.getElementById('reg-password').value;
-        const confirm = document.getElementById('reg-confirm').value;
-        const fb = document.getElementById('reg-feedback');
-        fb.classList.add('hidden');
-
-        if (password !== confirm) {
-          fb.textContent = 'Passwords do not match.';
-          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
-          fb.classList.remove('hidden');
-          return;
-        }
-
-        const result = await TrackLabDB.register(username, password, 'guided');
-        if (!result.ok) {
-          fb.textContent = result.error || 'Could not register profile.';
-          fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
-          fb.classList.remove('hidden');
-          return;
-        }
-        goTo(2);
-      });
-
-      // Guest flow
-      document.getElementById('btn-guest-enter').addEventListener('click', () => {
-        saveState({ username: 'Guest Driver' });
-        goTo(2);
-      });
-    });
-  </script>
 </body>
 </html>

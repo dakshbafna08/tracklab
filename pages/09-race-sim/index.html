@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Live Race Telemetry</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
     .cockpit-grid {
@@ -57,8 +58,8 @@
       <section class="panel p-5 flex flex-col justify-between">
         <div>
           <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
-            <span class="section-tag mb-0">Timing Tower</span>
-            <span class="mono text-[10px] text-zinc-500 uppercase">Interval</span>
+            <span class="section-tag mb-0">Leaderboard</span>
+            <span class="mono text-[10px] text-zinc-500 uppercase">Gap to Leader</span>
           </div>
 
           <!-- Your Car Row -->

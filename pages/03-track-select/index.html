@@ -5,22 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Circuit Selection</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
   <style>
     .track-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 640px));
       gap: 1.5rem;
-    }
-    @media (max-width: 1024px) {
-      .track-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 640px) {
-      .track-grid {
-        grid-template-columns: 1fr;
-      }
+      justify-content: center;
     }
   </style>
 </head>
@@ -35,7 +27,7 @@
       <span id="header-api-status" class="mono text-[10px] text-zinc-400 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
         <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> FastF1 Engine
       </span>
-      <button data-goto="12" class="header-link">F1 Guide</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
@@ -46,10 +38,10 @@
     <!-- Header Row -->
     <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-8">
       <div>
-        <span class="section-tag">01 // Grand Prix Venue Menu</span>
-        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Choose Your Circuit</h1>
+        <span class="section-tag">01 // Championship Circuit</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Select Your Circuit</h1>
         <p class="body-copy text-base mt-2 max-w-2xl">
-          Select from the calibrated championship circuit menu below. Track layout, pit loss, and surface abrasiveness determine the fastest tire window.
+          We are racing at the historic 2.300 km Norisring Bavarian street circuit. With 72 fast laps, low tire degradation, and intense braking into the Grundig hairpin, pit stop timing makes all the difference.
         </p>
       </div>
       <div class="glass-panel px-5 py-3.5 flex items-center gap-4">
@@ -128,15 +120,15 @@
             <!-- Key Track Metrics -->
             <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 mono text-xs">
               <div>
-                <span class="text-[10px] text-zinc-500 block">LAPS</span>
+                <span class="text-[10px] text-zinc-500 block">TOTAL LAPS</span>
                 <span class="text-white font-bold">${t.laps}</span>
               </div>
               <div>
                 <span class="text-[10px] text-zinc-500 block">PIT LOSS</span>
-                <span class="text-[#E10600] font-bold">${t.pitLoss}s</span>
+                <span class="text-[#E10600] font-bold">+${t.pitLoss}s</span>
               </div>
               <div>
-                <span class="text-[10px] text-zinc-500 block">TIRE STRESS</span>
+                <span class="text-[10px] text-zinc-500 block">TIRE WEAR</span>
                 <span class="text-zinc-200 font-semibold">${t.tireStress}</span>
               </div>
             </div>

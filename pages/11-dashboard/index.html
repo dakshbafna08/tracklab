@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Driver Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="no-dock min-h-screen flex flex-col f1-grid-bg">
@@ -15,9 +16,9 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
-      <button data-goto="12" class="header-link">F1 Guide</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">+ New Strategy</button>
-      <button data-goto="1" class="header-link">Switch Driver</button>
+      <button data-goto="login" class="header-link">Switch Driver</button>
     </div>
   </header>
 
@@ -119,12 +120,12 @@
         const races = res.races || [];
 
         document.getElementById('dash-storage-note').textContent =
-          res.source === 'sqlite'
-            ? `Connected to SQLite database • Showing real telemetry runs for ${state.username || 'all drivers'}`
-            : `Offline Local Storage • Showing runs saved in this browser`;
+          res.source === 'supabase'
+            ? `Connected to Supabase Cloud Database • Showing real synced runs for ${state.username || 'all drivers'}`
+            : (res.error ? `Supabase Sync: ${res.error}` : `Supabase Cloud Required • Connect your database to view saved runs`);
 
         document.getElementById('history-source-pill').textContent =
-          res.source === 'sqlite' ? 'SQLite Database' : 'Browser Storage';
+          res.source === 'supabase' ? 'Supabase Cloud' : 'Supabase Required';
 
         document.getElementById('stat-races-count').textContent = races.length;
 

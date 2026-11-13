@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrackLab — Briefing</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
 <body class="min-h-screen flex flex-col f1-grid-bg">
@@ -15,7 +16,7 @@
       <span class="header-title">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
-      <button data-goto="12" class="header-link">F1 Guide</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
@@ -46,14 +47,14 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             </span>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Learn &amp; Race</h2>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Learn &amp; Race (Beginner)</h2>
           <p class="body-copy text-sm mt-3">
-            Guided briefings on Pirelli compounds, degradation cliffs, and pit window undercuts before launching your simulation.
+            New to Formula 1? We will explain tire types, what "Box" and "Undercut" mean in plain English, and guide you through building your very first race strategy.
           </p>
         </div>
         <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
-          <span class="mono text-xs text-zinc-400">Recommended for new strategists</span>
-          <span class="btn-outline py-2 px-5 text-xs">Select Guided &rarr;</span>
+          <span class="mono text-xs text-zinc-400">Recommended for newcomers</span>
+          <span class="btn-outline py-2 px-5 text-xs">Start Lessons &rarr;</span>
         </div>
       </div>
 
@@ -61,19 +62,19 @@
       <div id="mode-pro" class="panel p-8 sm:p-10 cursor-pointer border-[#E10600]/40 bg-gradient-to-br from-[#E10600]/10 to-[#111114] flex flex-col justify-between animate-on-scroll slide-right">
         <div>
           <div class="flex items-center justify-between mb-6">
-            <span class="mono text-xs uppercase tracking-widest text-[#E10600] font-semibold">02 // Pro Pit Wall</span>
+            <span class="mono text-xs uppercase tracking-widest text-[#E10600] font-semibold">02 // Fast Track</span>
             <span class="w-9 h-9 rounded-full bg-[#E10600]/20 border border-[#E10600]/40 flex items-center justify-center text-[#E10600]">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </span>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Direct Telemetry</h2>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Direct Simulation (Pro)</h2>
           <p class="body-copy text-sm mt-3">
-            Bypass all tutorials and jump straight into circuit selection, tire allocation, pit timing, and race execution.
+            Already know the rules? Skip all the lessons and jump straight into circuit selection, picking your tires, and racing against the computer.
           </p>
         </div>
         <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
           <span class="mono text-xs text-zinc-400">Fast-track workflow</span>
-          <span class="btn-primary py-2 px-5 text-xs">Launch Pro &rarr;</span>
+          <span class="btn-primary py-2 px-5 text-xs">Jump to Circuit &rarr;</span>
         </div>
       </div>
 
@@ -83,8 +84,8 @@
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 animate-on-scroll delay-2">
       <div class="sub-box p-6">
         <div class="mono text-xs text-[#E10600] mb-2">STEP 01</div>
-        <h3 class="font-semibold text-white">Select Circuit</h3>
-        <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">Pick from 9 championship circuits with calibrated pit loss &amp; tire stress.</p>
+        <h3 class="font-semibold text-white">Norisring Circuit</h3>
+        <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">72 high-speed laps on Bavaria's Nuremberg street circuit with calibrated 18.4s pit loss.</p>
       </div>
       <div class="sub-box p-6">
         <div class="mono text-xs text-[#E10600] mb-2">STEP 02</div>
@@ -99,7 +100,7 @@
     </section>
 
     <div class="mt-10 flex justify-between items-center">
-      <button data-goto="1" class="btn-ghost">&larr; Switch Profile</button>
+      <button data-goto="login" class="btn-ghost">&larr; Switch Driver</button>
       <button data-goto="11" class="btn-ghost">Open Driver Dashboard &rarr;</button>
     </div>
 
