@@ -184,6 +184,25 @@ function goTo(screenNum) {
 const navigateTo = goTo;
 
 /**
+ * Cryptographic Password Hashing (Web Crypto API SHA-256 with Salt)
+ */
+async function hashPassword(plainText, salt = 'tracklab_f1_telemetry') {
+  if (!plainText) return '';
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    try {
+      const enc = new TextEncoder();
+      const data = enc.encode(`${salt}:${plainText}`);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      return plainText;
+    }
+  }
+  return plainText;
+}
+
+/**
  * Supabase Cloud Persistence Client
  * No local storage fallback — all profiles, strategy state & telemetry live in Supabase
  */
@@ -219,8 +238,16 @@ const TrackLabDB = {
         return { ok: false, error: `Driver callsign "${cleanUser}" not found in Supabase. Please create a profile first.` };
       }
 
-      if (data.password_hash && data.password_hash !== 'pass' && data.password_hash !== password) {
-        return { ok: false, error: 'Incorrect password for driver ' + cleanUser };
+      if (data.password_hash && data.password_hash !== 'pass') {
+        const hashedInput = await hashPassword(password);
+        const match = data.password_hash === hashedInput || data.password_hash === password;
+        if (!match) {
+          return { ok: false, error: 'Incorrect password for driver ' + cleanUser };
+        }
+        // Auto-upgrade any unhashed legacy password to SHA-256 in Supabase
+        if (data.password_hash === password && hashedInput !== password) {
+          sb.from('drivers').update({ password_hash: hashedInput }).eq('id', data.id).then(() => {}).catch(() => {});
+        }
       }
 
       const updates = {
@@ -274,12 +301,15 @@ const TrackLabDB = {
         return { ok: false, error: `Driver callsign "${cleanUser}" already registered in Supabase. Please sign in instead.` };
       }
 
+      // Hash password cryptographically before sending to Supabase
+      const hashedPw = await hashPassword(password);
+
       // Insert new driver in Supabase
       const { data, error } = await sb
         .from('drivers')
         .insert([{
           username: cleanUser,
-          password_hash: password || 'pass',
+          password_hash: hashedPw,
           preferred_mode: preferred_mode
         }])
         .select()
