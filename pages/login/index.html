@@ -124,6 +124,12 @@
           </button>
         </div>
 
+        <!-- 1-Click SQL Setup Guidance (appears only if tables need to be created) -->
+        <div id="sql-setup-notice" class="hidden mt-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
+          <strong class="block text-white mb-1">⚡ Tables Needed in Supabase:</strong>
+          Your Supabase instance is connected! Copy the SQL from <code class="mono bg-black/40 px-1 py-0.5 rounded text-white">supabase_schema.sql</code> and run it in your <a href="https://supabase.com/dashboard/project/ejbrepdwafsjxyhoufut/sql" target="_blank" rel="noopener" class="underline text-amber-300 font-semibold hover:text-white">Supabase SQL Editor &rarr;</a>
+        </div>
+
       </div>
 
       <!-- Informative Sub-Callout -->
@@ -166,8 +172,12 @@
             if (!error) {
               supabaseReachable = true;
               tablesReady = true;
-            } else if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
-              // Supabase project is active, tables just need to be run in SQL editor
+            } else if (
+              error.code === 'PGRST205' ||
+              error.code === '42P01' ||
+              (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist')))
+            ) {
+              // Supabase project is active and responding, tables just need to be created in SQL editor
               supabaseReachable = true;
               tablesReady = false;
             }
@@ -183,8 +193,10 @@
         }
 
         if (supabaseReachable) {
-          dbDot.className = 'w-2 h-2 rounded-full bg-amber-400';
-          dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Supabase Connected (Run SQL)';
+          dbDot.className = 'w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#F59E0B]';
+          dbLabel.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Supabase Connected (Run SQL in Dashboard)';
+          const sqlNotice = document.getElementById('sql-setup-notice');
+          if (sqlNotice) sqlNotice.classList.remove('hidden');
           return;
         }
 

@@ -205,8 +205,12 @@ const TrackLabDB = {
         .maybeSingle();
 
       if (error) {
-        if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
-          return { ok: false, error: 'Supabase tables not found. Please run supabase_schema.sql in your Supabase SQL editor.' };
+        if (
+          error.code === 'PGRST205' ||
+          error.code === '42P01' ||
+          (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist')))
+        ) {
+          return { ok: false, error: 'Supabase tables not found in schema cache. Please open your Supabase SQL Editor and run supabase_schema.sql to create them.' };
         }
         return { ok: false, error: 'Supabase Error: ' + error.message };
       }
@@ -282,8 +286,12 @@ const TrackLabDB = {
         .maybeSingle();
 
       if (error) {
-        if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
-          return { ok: false, error: 'Supabase tables not found. Please run supabase_schema.sql in your Supabase SQL editor.' };
+        if (
+          error.code === 'PGRST205' ||
+          error.code === '42P01' ||
+          (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist')))
+        ) {
+          return { ok: false, error: 'Supabase tables not found in schema cache. Please open your Supabase SQL Editor and run supabase_schema.sql to create them.' };
         }
         return { ok: false, error: 'Supabase registration error: ' + error.message };
       }

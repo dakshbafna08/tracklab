@@ -119,13 +119,19 @@
         const res = await TrackLabDB.getRaces();
         const races = res.races || [];
 
-        document.getElementById('dash-storage-note').textContent =
-          res.source === 'supabase'
-            ? `Connected to Supabase Cloud Database • Showing real synced runs for ${state.username || 'all drivers'}`
-            : (res.error ? `Supabase Sync: ${res.error}` : `Supabase Cloud Required • Connect your database to view saved runs`);
-
-        document.getElementById('history-source-pill').textContent =
-          res.source === 'supabase' ? 'Supabase Cloud' : 'Supabase Required';
+        if (res.source === 'supabase') {
+          document.getElementById('dash-storage-note').textContent =
+            `Connected to Supabase Cloud Database • Showing real synced runs for ${state.username || 'all drivers'}`;
+          document.getElementById('history-source-pill').textContent = 'Supabase Cloud';
+        } else if (res.error && (res.error.includes('schema cache') || res.error.includes('PGRST205') || res.error.includes('does not exist'))) {
+          document.getElementById('dash-storage-note').innerHTML =
+            `Supabase Connected • Tables needed. Run <code class="mono bg-white/10 px-1 rounded text-white">supabase_schema.sql</code> in your <a href="https://supabase.com/dashboard/project/ejbrepdwafsjxyhoufut/sql" target="_blank" rel="noopener" class="underline text-amber-300 font-semibold">Supabase SQL Editor &rarr;</a>`;
+          document.getElementById('history-source-pill').textContent = 'Tables Needed';
+        } else {
+          document.getElementById('dash-storage-note').textContent =
+            res.error ? `Supabase Sync: ${res.error}` : `Supabase Cloud Required • Connect your database to view saved runs`;
+          document.getElementById('history-source-pill').textContent = 'Supabase Required';
+        }
 
         document.getElementById('stat-races-count').textContent = races.length;
 
