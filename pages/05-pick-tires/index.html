@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab — Compound Allocation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col f1-grid-bg">
+
+  <header class="app-header">
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="3" class="header-link">Circuit</button>
+      <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col justify-between">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-10 animate-on-scroll">
+      <div>
+        <span class="section-tag">03 // Pick Your Tires</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Choose Your Tires</h1>
+        <p class="body-copy text-base mt-2 max-w-2xl">
+          A "stint" is simply the segment of the race you drive on one set of tires. Pick your starting set for the race start, and the fresh set you will put on during your pit stop.
+        </p>
+      </div>
+      <div class="glass-panel px-5 py-3 mono text-xs">
+        <span class="text-zinc-500 uppercase block text-[10px]">Active Circuit</span>
+        <span id="active-track-label" class="text-white font-semibold">Norisring (72 Laps)</span>
+      </div>
+    </div>
+
+    <!-- Dual Stint Selector Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+
+      <!-- Stint 1 -->
+      <section class="panel p-7 animate-on-scroll slide-left">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <div class="mono text-xs text-[#E10600] font-semibold uppercase">Stint 01 // Start of Race</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Starting Tire</h2>
+          </div>
+          <span class="mono text-[11px] text-zinc-400">Full Fuel Tank (~105kg)</span>
+        </div>
+
+        <div class="space-y-3">
+          <button data-stint="1" data-compound="SOFT" id="s1-SOFT" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-soft"></span>
+              <span>
+                <strong class="block text-sm text-white">Soft (Red)</strong>
+                <span class="text-xs text-zinc-400">Huge launch grip off the line • Lasts ~13 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">Fastest</span>
+          </button>
+
+          <button data-stint="1" data-compound="MEDIUM" id="s1-MEDIUM" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-medium"></span>
+              <span>
+                <strong class="block text-sm text-white">Medium (Yellow)</strong>
+                <span class="text-xs text-zinc-400">Balanced pace &amp; life • Lasts ~22 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.48s</span>
+          </button>
+
+          <button data-stint="1" data-compound="HARD" id="s1-HARD" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-hard"></span>
+              <span>
+                <strong class="block text-sm text-white">Hard (White)</strong>
+                <span class="text-xs text-zinc-400">Toughest rubber • Lasts ~34 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.92s</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Stint 2 -->
+      <section class="panel p-7 animate-on-scroll slide-right">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <div class="mono text-xs text-zinc-400 font-semibold uppercase">Stint 02 // After Pit Stop</div>
+            <h2 class="text-xl font-bold text-white mt-0.5">Finishing Tire</h2>
+          </div>
+          <span class="mono text-[11px] text-zinc-400">Light Car (Fuel Burned)</span>
+        </div>
+
+        <div class="space-y-3">
+          <button data-stint="2" data-compound="SOFT" id="s2-SOFT" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-soft"></span>
+              <span>
+                <strong class="block text-sm text-white">Soft (Red)</strong>
+                <span class="text-xs text-zinc-400">Fast finish sprint • Lasts ~13–18 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">Fastest</span>
+          </button>
+
+          <button data-stint="2" data-compound="MEDIUM" id="s2-MEDIUM" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-medium"></span>
+              <span>
+                <strong class="block text-sm text-white">Medium (Yellow)</strong>
+                <span class="text-xs text-zinc-400">Reliable balanced closer • Lasts ~22–30 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.48s</span>
+          </button>
+
+          <button data-stint="2" data-compound="HARD" id="s2-HARD" class="compound-btn">
+            <span class="flex items-center gap-3.5">
+              <span class="tire-ring tire-hard"></span>
+              <span>
+                <strong class="block text-sm text-white">Hard (White)</strong>
+                <span class="text-xs text-zinc-400">Deep run to the checkered flag • Lasts ~34–46 laps</span>
+              </span>
+            </span>
+            <span class="mono text-xs text-zinc-400">+0.92s</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Live Sequence Pipeline Bar -->
+    <div class="glass-panel p-5 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 animate-on-scroll">
+      <div>
+        <div class="mono text-xs text-zinc-400 uppercase">Selected Tire Architecture</div>
+        <div id="fia-compound-warning" class="hidden text-xs text-amber-400 mono mt-1">
+          ⚠ FIA Regulation Notice: Two distinct compounds are required in dry races.
+        </div>
+      </div>
+      <div class="flex items-center gap-3 mono text-xs sm:text-sm font-semibold">
+        <span id="preview-s1" class="px-4 py-2 rounded-full border border-[#E10600]/60 bg-[#E10600]/15 text-white">STINT 1: SOFT</span>
+        <span class="text-zinc-500">&rarr;</span>
+        <span id="preview-s2" class="px-4 py-2 rounded-full border border-white/20 bg-white/5 text-white">STINT 2: HARD</span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+      <button id="btn-back" class="btn-outline w-full sm:w-auto">&larr; Back</button>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button data-goto="6" class="btn-ghost hidden sm:inline-flex text-xs">Read Pit Window Guide</button>
+        <button id="btn-next-pit" class="btn-primary w-full sm:w-auto px-8 py-3.5">
+          Set Pit Timing &rarr;
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="../../assets/js/simulation-engine.js"></script>
+  <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const state = getState();
+      const track = TrackLabSim.getTrack(state.track);
+      document.getElementById('active-track-label').textContent = `${track.name} (${track.laps} Laps)`;
+
+      document.getElementById('btn-back').addEventListener('click', () => {
+        goTo(getState().userMode === 'pro' ? 3 : 4);
+      });
+
+      document.getElementById('btn-next-pit').addEventListener('click', () => {
+        goTo(7);
+      });
+    });
+  </script>
+</body>
+</html>

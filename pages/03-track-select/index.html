@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab — Circuit Selection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .track-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 640px));
+      gap: 1.5rem;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col f1-grid-bg">
+
+  <header class="app-header">
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <span id="header-api-status" class="mono text-[10px] text-zinc-400 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> FastF1 Engine
+      </span>
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="11" class="header-link">Dashboard</button>
+      <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 flex flex-col justify-between">
+
+    <!-- Header Row -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-8">
+      <div>
+        <span class="section-tag">01 // Championship Circuit</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">Select Your Circuit</h1>
+        <p class="body-copy text-base mt-2 max-w-2xl">
+          We are racing at the historic 2.300 km Norisring Bavarian street circuit. With 72 fast laps, low tire degradation, and intense braking into the Grundig hairpin, pit stop timing makes all the difference.
+        </p>
+      </div>
+      <div class="glass-panel px-5 py-3.5 flex items-center gap-4">
+        <div>
+          <div class="mono text-[10px] uppercase text-zinc-400">Active Circuit</div>
+          <div id="selected-track-summary" class="font-bold text-white text-sm">Norisring — Nuremberg (72 Laps)</div>
+        </div>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#E10600] shadow-[0_0_12px_#E10600]"></span>
+      </div>
+    </div>
+
+    <!-- 9-Circuit Menu: 3 Per Row × Multiple Rows (Norisring FIRST) -->
+    <div id="track-cards-container" class="track-grid mb-10">
+      <!-- Injected immediately with instant visibility -->
+    </div>
+
+    <!-- FastF1 Telemetry Availability Banner -->
+    <div id="fastf1-status-bar" class="sub-box px-5 py-3.5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2 mono text-xs">
+      <span class="text-zinc-400">Calibration Profile: <strong id="fastf1-source-badge" class="text-white">Active</strong></span>
+      <span id="fastf1-source-note" class="text-zinc-400">Historical FastF1 2022 telemetry &amp; empirical Pirelli thermal degradation parameters.</span>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+      <button data-goto="2" class="btn-outline w-full sm:w-auto">
+        &larr; Briefing
+      </button>
+      <button id="btn-continue-tires" class="btn-primary w-full sm:w-auto px-8 py-3.5">
+        Continue to Tires &rarr;
+      </button>
+    </div>
+
+  </main>
+
+  <script src="../../assets/js/simulation-engine.js"></script>
+  <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    (function () {
+      const container = document.getElementById('track-cards-container');
+      let state = getState();
+
+      // Ensure Norisring is default if not set
+      if (!state.track || !TrackLabSim.TRACKS[state.track]) {
+        state = saveState({ track: 'NORISRING', totalLaps: 72, pitLap: 28 });
+      }
+
+      const allTracks = Object.values(TrackLabSim.TRACKS);
+
+      // Render all 9 circuits (3 per row) with instant 100% opacity
+      container.innerHTML = allTracks.map((t) => {
+        const isSelected = t.id === state.track;
+        return `
+          <article data-track="${t.id}" data-laps="${t.laps}"
+                   class="track-card ${isSelected ? 'track-selected' : ''} flex flex-col justify-between"
+                   style="opacity: 1 !important; transform: none !important;">
+            <div>
+              <div class="flex justify-between items-start gap-2 mb-3">
+                <div>
+                  <span class="mono text-[10px] uppercase tracking-widest text-[#E10600] font-semibold">${t.country}</span>
+                  <h2 class="text-xl font-bold text-white tracking-tight mt-0.5">${t.shortName}</h2>
+                  <p class="text-xs text-zinc-500">${t.location}</p>
+                </div>
+                <span class="selected-badge ${isSelected ? '' : 'hidden'}">ACTIVE</span>
+              </div>
+
+              <!-- SVG Track Map Layout -->
+              <div class="h-32 rounded-xl bg-black/50 border border-white/10 flex items-center justify-center p-3 mb-4">
+                <svg viewBox="0 0 500 220" class="w-full h-full stroke-white fill-none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="${t.svgPath}"/>
+                </svg>
+              </div>
+
+              <p class="text-xs text-zinc-400 leading-relaxed mb-4">${t.characteristics}</p>
+            </div>
+
+            <!-- Key Track Metrics -->
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 mono text-xs">
+              <div>
+                <span class="text-[10px] text-zinc-500 block">TOTAL LAPS</span>
+                <span class="text-white font-bold">${t.laps}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">PIT LOSS</span>
+                <span class="text-[#E10600] font-bold">+${t.pitLoss}s</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">TIRE WEAR</span>
+                <span class="text-zinc-200 font-semibold">${t.tireStress}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      function selectTrack(trackId, laps) {
+        let curState = getState();
+        let pitLap = Number(curState.pitLap);
+        if (!pitLap || pitLap >= laps - 4 || pitLap <= 4) {
+          pitLap = Math.round(laps * 0.4);
+        }
+        state = saveState({ track: trackId, totalLaps: laps, pitLap: pitLap });
+        const trackObj = TrackLabSim.getTrack(trackId);
+        document.getElementById('selected-track-summary').textContent = `${trackObj.name} (${trackObj.laps} Laps)`;
+
+        container.querySelectorAll('.track-card').forEach(c => {
+          const match = c.dataset.track === trackId;
+          c.classList.toggle('track-selected', match);
+          const badge = c.querySelector('.selected-badge');
+          if (badge) badge.classList.toggle('hidden', !match);
+        });
+
+        // FastF1 check
+        TrackLabSim.fetchFastF1Context(trackId).then(ctx => {
+          const b = document.getElementById('fastf1-source-badge');
+          const n = document.getElementById('fastf1-source-note');
+          if (ctx.available) {
+            b.textContent = `FastF1 Telemetry Connected (${ctx.year} ${ctx.event})`;
+            b.className = 'text-[#22C55E]';
+            n.textContent = ctx.weather ? `Track Temp: ${ctx.weather.track_temp_c}°C • ${ctx.lapCount} Laps Analyzed` : ctx.note;
+          } else {
+            b.textContent = 'Empirical Physics Mode';
+            b.className = 'text-white';
+            n.textContent = ctx.note;
+          }
+        });
+      }
+
+      container.querySelectorAll('.track-card').forEach(card => {
+        card.addEventListener('click', () => {
+          selectTrack(card.dataset.track, Number(card.dataset.laps));
+        });
+      });
+
+      selectTrack(state.track, state.totalLaps);
+
+      document.getElementById('btn-continue-tires').addEventListener('click', () => {
+        const cur = getState();
+        goTo(cur.userMode === 'pro' ? 5 : 4);
+      });
+    })();
+  </script>
+</body>
+</html>

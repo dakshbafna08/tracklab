@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab — Driver Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+</head>
+<body class="no-dock min-h-screen flex flex-col f1-grid-bg">
+
+  <header class="app-header">
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">+ New Strategy</button>
+      <button data-goto="login" class="header-link">Switch Driver</button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10">
+
+    <!-- Driver Header & Real Stats -->
+    <section class="flex flex-col md:flex-row justify-between md:items-end gap-6 animate-on-scroll">
+      <div>
+        <span class="section-tag">Driver Telemetry Hub</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+          <span id="dash-driver-name">Driver</span>’s Pit Wall
+        </h1>
+        <p id="dash-storage-note" class="mono text-xs text-zinc-500 mt-2">Checking race history archive...</p>
+      </div>
+      <div class="flex gap-3">
+        <button data-goto="2" class="btn-outline text-xs">Guided Briefing</button>
+        <button data-goto="3" class="btn-primary text-xs px-6">Launch New Race &rarr;</button>
+      </div>
+    </section>
+
+    <!-- 4 Real Metric Cards (Computed strictly from saved runs) -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mono animate-on-scroll">
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Simulations Completed</span>
+        <div id="stat-races-count" class="text-3xl font-bold text-white mt-2">0</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Optimal / Near-Optimal</span>
+        <div id="stat-optimal-rate" class="text-3xl font-bold text-[#22C55E] mt-2">—</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Best Gap to Model</span>
+        <div id="stat-best-gap" class="text-3xl font-bold text-white mt-2">—</div>
+      </div>
+      <div class="panel p-6">
+        <span class="text-[10px] uppercase text-zinc-500 block">Active Mode</span>
+        <div id="stat-active-mode" class="text-3xl font-bold text-[#E10600] mt-2 uppercase">GUIDED</div>
+      </div>
+    </section>
+
+    <!-- Real Saved Race History Table (Zero Fake Example Rows) -->
+    <section class="panel p-6 sm:p-8 animate-on-scroll">
+      <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+        <div>
+          <span class="section-tag mb-0">Archive</span>
+          <h2 class="text-xl font-bold text-white">Saved Strategy Runs</h2>
+        </div>
+        <span id="history-source-pill" class="mono text-[11px] px-3 py-1 rounded-full bg-white/5 text-zinc-400">SQLite / Local</span>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-history" class="hidden text-center py-14">
+        <p class="text-zinc-400 text-sm mb-4">No completed race simulations recorded yet for this driver.</p>
+        <button data-goto="3" class="btn-primary text-xs px-6 py-3">Configure Your First Race &rarr;</button>
+      </div>
+
+      <!-- Populated Table -->
+      <div id="history-table-wrap" class="overflow-x-auto hidden">
+        <table class="w-full text-left border-collapse mono text-xs">
+          <thead>
+            <tr class="border-b border-white/10 text-zinc-500 uppercase text-[10px]">
+              <th class="py-3 px-3">Circuit</th>
+              <th class="py-3 px-3">Strategy</th>
+              <th class="py-3 px-3">Your Time</th>
+              <th class="py-3 px-3">Gap vs Optimal</th>
+              <th class="py-3 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody" class="divide-y divide-white/10">
+            <!-- filled dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6-Circuit Quick Launcher -->
+    <section class="animate-on-scroll">
+      <div class="mb-5">
+        <span class="section-tag mb-0">Quick Launch</span>
+        <h2 class="text-xl font-bold text-white">Jump Straight to a Circuit</h2>
+      </div>
+      <div id="quick-tracks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../../assets/js/simulation-engine.js"></script>
+  <script src="../../assets/js/shared-state.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const state = getState();
+      document.getElementById('dash-driver-name').textContent = state.username || 'Guest Driver';
+      document.getElementById('stat-active-mode').textContent = (state.userMode || 'guided').toUpperCase();
+
+      async function loadHistory() {
+        const res = await TrackLabDB.getRaces();
+        const races = res.races || [];
+
+        if (res.source === 'supabase') {
+          document.getElementById('dash-storage-note').textContent =
+            `Connected to Supabase Cloud Database • Showing real synced runs for ${state.username || 'all drivers'}`;
+          document.getElementById('history-source-pill').textContent = 'Supabase Cloud';
+        } else if (res.error && (res.error.includes('schema cache') || res.error.includes('PGRST205') || res.error.includes('does not exist'))) {
+          document.getElementById('dash-storage-note').innerHTML =
+            `Supabase Connected • Tables needed. Run <code class="mono bg-white/10 px-1 rounded text-white">supabase_schema.sql</code> in your <a href="https://supabase.com/dashboard/project/ejbrepdwafsjxyhoufut/sql" target="_blank" rel="noopener" class="underline text-amber-300 font-semibold">Supabase SQL Editor &rarr;</a>`;
+          document.getElementById('history-source-pill').textContent = 'Tables Needed';
+        } else {
+          document.getElementById('dash-storage-note').textContent =
+            res.error ? `Supabase Sync: ${res.error}` : `Supabase Cloud Required • Connect your database to view saved runs`;
+          document.getElementById('history-source-pill').textContent = 'Supabase Required';
+        }
+
+        document.getElementById('stat-races-count').textContent = races.length;
+
+        if (races.length === 0) {
+          document.getElementById('empty-history').classList.remove('hidden');
+          document.getElementById('history-table-wrap').classList.add('hidden');
+          document.getElementById('stat-optimal-rate').textContent = '—';
+          document.getElementById('stat-best-gap').textContent = '—';
+          return;
+        }
+
+        document.getElementById('empty-history').classList.add('hidden');
+        document.getElementById('history-table-wrap').classList.remove('hidden');
+
+        const nearOpt = races.filter(r => Math.abs(r.gap) < 3.0).length;
+        document.getElementById('stat-optimal-rate').textContent = `${Math.round((nearOpt / races.length) * 100)}%`;
+
+        const minGap = Math.min(...races.map(r => r.gap));
+        document.getElementById('stat-best-gap').textContent = Math.abs(minGap) <= 0.15 ? 'OPTIMAL' : TrackLabSim.formatGap(minGap);
+
+        const tbody = document.getElementById('history-tbody');
+        tbody.innerHTML = races.map((r, idx) => {
+          const isOpt = Math.abs(r.gap) <= 0.15;
+          const gapCls = isOpt || r.gap < 0 ? 'text-[#22C55E]' : (r.gap < 6 ? 'text-amber-400' : 'text-[#E10600]');
+          return `
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="py-3.5 px-3 font-semibold text-white">${r.track_name || r.track}</td>
+              <td class="py-3.5 px-3 text-zinc-300">${r.stint1} → ${r.stint2} <span class="text-zinc-500">(L${r.pit_lap})</span></td>
+              <td class="py-3.5 px-3 text-white">${TrackLabSim.formatTime(r.total_time)}</td>
+              <td class="py-3.5 px-3 font-bold ${gapCls}">${isOpt ? 'OPTIMAL' : TrackLabSim.formatGap(r.gap)}</td>
+              <td class="py-3.5 px-3 text-right space-x-2">
+                <button type="button" data-replay-idx="${idx}" class="btn-outline py-1 px-3 text-[11px]">Replay</button>
+                <button type="button" data-del-id="${r.id || ''}" data-del-idx="${idx}" class="btn-ghost py-1 px-2 text-[11px] text-zinc-500 hover:text-red-400">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        tbody.querySelectorAll('[data-replay-idx]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const run = races[Number(btn.dataset.replayIdx)];
+            const trackObj = TrackLabSim.getTrack(run.track);
+            saveState({
+              track: run.track,
+              totalLaps: trackObj.laps,
+              stint1: run.stint1,
+              stint2: run.stint2,
+              pitLap: run.pit_lap
+            });
+            goTo(9);
+          });
+        });
+
+        tbody.querySelectorAll('[data-del-idx]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.delId ? Number(btn.dataset.delId) : null;
+            const idx = Number(btn.dataset.delIdx);
+            await TrackLabDB.clearOrDeleteRace(id, idx);
+            loadHistory();
+          });
+        });
+      }
+
+      await loadHistory();
+
+      // Quick launch circuit grid
+      const quickGrid = document.getElementById('quick-tracks-grid');
+      quickGrid.innerHTML = Object.values(TrackLabSim.TRACKS).map(t => `
+        <button type="button" data-qtrack="${t.id}" data-qlaps="${t.laps}"
+                class="panel p-5 text-left hover:border-white/30 transition-all flex justify-between items-center">
+          <div>
+            <div class="mono text-[10px] text-zinc-500 uppercase">${t.country}</div>
+            <div class="font-bold text-white text-base mt-0.5">${t.shortName}</div>
+            <div class="mono text-xs text-zinc-400 mt-1">${t.laps} Laps • ${t.pitLoss}s Pit Loss</div>
+          </div>
+          <span class="text-[#E10600] font-bold text-sm">&rarr;</span>
+        </button>
+      `).join('');
+
+      quickGrid.querySelectorAll('[data-qtrack]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          saveState({
+            track: btn.dataset.qtrack,
+            totalLaps: Number(btn.dataset.qlaps)
+          });
+          goTo(5);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
