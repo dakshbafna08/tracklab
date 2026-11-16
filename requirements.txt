@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+supabase
+python-dotenv
+numpy
+fastf1==3.7.0
