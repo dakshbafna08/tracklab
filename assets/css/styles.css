@@ -420,6 +420,8 @@ body.no-dock {
 .tire-soft { border-color: #E10600; box-shadow: 0 0 12px rgba(225, 6, 0, 0.35); }
 .tire-medium { border-color: #EAB308; box-shadow: 0 0 12px rgba(234, 179, 8, 0.25); }
 .tire-hard { border-color: #F4F4F5; box-shadow: 0 0 12px rgba(255, 255, 255, 0.2); }
+.tire-intermediate { border-color: #22C55E; box-shadow: 0 0 12px rgba(34, 197, 94, 0.35); }
+.tire-wet { border-color: #3B82F6; box-shadow: 0 0 12px rgba(59, 130, 246, 0.35); }
 
 .compound-btn {
   width: 100%;

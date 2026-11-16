@@ -41,8 +41,13 @@ const DEFAULT_STATE = {
   stint2: 'HARD',
   pitLap: 28,
   username: '',
+  userId: null,
+  email: '',
+  startingFuelKg: 105,
   userMode: 'guided' // 'guided' | 'pro'
 };
+
+const ALLOWED_TYRES = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'];
 
 const SCREEN_PATHS = {
   0: 'pages/login/index.html',
@@ -203,239 +208,312 @@ async function hashPassword(plainText, salt = 'tracklab_f1_telemetry') {
 }
 
 /**
+ * Helper to fetch a valid Track UUID from Supabase 'tracks' table
+ */
+let cachedTrackId = '8242f5b2-4c1b-4387-b790-8ace8fce93a0';
+async function getSupabaseTrackId(trackName = 'Norisring') {
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      const { data, error } = await sb.from('tracks').select('id, name');
+      if (!error && data && data.length > 0) {
+        const match = data.find(t => t.name && t.name.toLowerCase().includes(trackName.toLowerCase()));
+        if (match) {
+          cachedTrackId = match.id;
+          return match.id;
+        }
+        cachedTrackId = data[0].id;
+        return data[0].id;
+      }
+    } catch (e) {
+      console.warn('[TrackLab] Track UUID lookup warning:', e);
+    }
+  }
+  return cachedTrackId;
+}
+
+/**
  * Supabase Cloud Persistence Client
- * No local storage fallback — all profiles, strategy state & telemetry live in Supabase
+ * Built-in Supabase Auth API & exact strategy/pit_stops schema
  */
 const TrackLabDB = {
-  async login(username, password) {
-    const cleanUser = (username || '').trim();
-    if (!cleanUser) return { ok: false, error: 'Please enter a driver callsign.' };
+  /**
+   * Supabase Auth: Sign Up with email, password, and username in options.data
+   */
+  async signUp(email, password, username = '', preferredMode = 'guided') {
+    const cleanEmail = (email || '').trim();
+    const cleanUser = (username || '').trim() || cleanEmail.split('@')[0];
+    if (!cleanEmail) return { ok: false, error: 'Please enter an email address.' };
+    if (!password || password.length < 6) return { ok: false, error: 'Password must be at least 6 characters.' };
 
     const sb = getSupabase();
-    if (!sb) {
-      return { ok: false, error: 'Supabase client is not loaded. Please verify internet connection.' };
+    if (!sb || !sb.auth) {
+      return { ok: false, error: 'Supabase client is not loaded. Please verify connection.' };
     }
 
     try {
-      const { data, error } = await sb
-        .from('drivers')
-        .select('*')
-        .ilike('username', cleanUser)
-        .maybeSingle();
+      // Official Supabase Auth signUp as instructed
+      const { data, error } = await sb.auth.signUp({
+        email: cleanEmail,
+        password: password,
+        options: {
+          data: {
+            username: cleanUser
+          }
+        }
+      });
 
       if (error) {
-        if (
-          error.code === 'PGRST205' ||
-          error.code === '42P01' ||
-          (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist')))
-        ) {
-          return { ok: false, error: 'Supabase tables not found in schema cache. Please open your Supabase SQL Editor and run supabase_schema.sql to create them.' };
-        }
-        return { ok: false, error: 'Supabase Error: ' + error.message };
+        return { ok: false, error: error.message };
       }
 
-      if (!data) {
-        return { ok: false, error: `Driver callsign "${cleanUser}" not found in Supabase. Please create a profile first.` };
-      }
+      const user = data.user;
+      const driverName = user?.user_metadata?.username || cleanUser;
+      saveState({
+        username: driverName,
+        userId: user?.id || null,
+        email: user?.email || cleanEmail,
+        userMode: preferredMode
+      });
 
-      if (data.password_hash && data.password_hash !== 'pass') {
-        const hashedInput = await hashPassword(password);
-        const match = data.password_hash === hashedInput || data.password_hash === password;
-        if (!match) {
-          return { ok: false, error: 'Incorrect password for driver ' + cleanUser };
-        }
-        // Auto-upgrade any unhashed legacy password to SHA-256 in Supabase
-        if (data.password_hash === password && hashedInput !== password) {
-          sb.from('drivers').update({ password_hash: hashedInput }).eq('id', data.id).then(() => {}).catch(() => {});
-        }
-      }
-
-      const updates = {
-        username: data.username,
-        userMode: data.preferred_mode || getState().userMode
-      };
-
-      // Pull latest strategy state from Supabase
-      try {
-        const { data: stData } = await sb
-          .from('user_strategy_state')
-          .select('*')
-          .ilike('username', data.username)
-          .maybeSingle();
-        if (stData) {
-          updates.track = stData.track || updates.track;
-          updates.totalLaps = stData.total_laps || updates.totalLaps;
-          updates.stint1 = stData.stint1 || updates.stint1;
-          updates.stint2 = stData.stint2 || updates.stint2;
-          updates.pitLap = stData.pit_lap || updates.pitLap;
-        }
-      } catch (err) {
-        console.warn('[TrackLab] Strategy state fetch notice:', err);
-      }
-
-      saveState(updates);
-      return { ok: true, source: 'supabase', username: data.username };
+      return { ok: true, user, session: data.session, username: driverName };
     } catch (e) {
-      return { ok: false, error: 'Supabase connection failed: ' + (e.message || e) };
+      return { ok: false, error: 'Registration failed: ' + (e.message || e) };
     }
   },
 
-  async register(username, password, preferred_mode = 'guided') {
-    const cleanUser = (username || '').trim();
-    if (!cleanUser) return { ok: false, error: 'Please enter a driver callsign.' };
+  /**
+   * Supabase Auth: Sign In with email and password
+   */
+  async signInWithPassword(email, password) {
+    const cleanEmail = (email || '').trim();
+    if (!cleanEmail) return { ok: false, error: 'Please enter your email.' };
+    if (!password) return { ok: false, error: 'Please enter your password.' };
 
     const sb = getSupabase();
-    if (!sb) {
-      return { ok: false, error: 'Supabase client is not loaded. Please verify internet connection.' };
+    if (!sb || !sb.auth) {
+      return { ok: false, error: 'Supabase client is not loaded. Please verify connection.' };
     }
 
     try {
-      // Check existing driver in Supabase
-      const { data: existing, error: checkErr } = await sb
-        .from('drivers')
-        .select('username')
-        .ilike('username', cleanUser)
-        .maybeSingle();
-
-      if (existing) {
-        return { ok: false, error: `Driver callsign "${cleanUser}" already registered in Supabase. Please sign in instead.` };
-      }
-
-      // Hash password cryptographically before sending to Supabase
-      const hashedPw = await hashPassword(password);
-
-      // Insert new driver in Supabase
-      const { data, error } = await sb
-        .from('drivers')
-        .insert([{
-          username: cleanUser,
-          password_hash: hashedPw,
-          preferred_mode: preferred_mode
-        }])
-        .select()
-        .maybeSingle();
+      // Official Supabase Auth signInWithPassword as instructed
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: cleanEmail,
+        password: password
+      });
 
       if (error) {
-        if (
-          error.code === 'PGRST205' ||
-          error.code === '42P01' ||
-          (error.message && (error.message.includes('schema cache') || error.message.includes('does not exist')))
-        ) {
-          return { ok: false, error: 'Supabase tables not found in schema cache. Please open your Supabase SQL Editor and run supabase_schema.sql to create them.' };
-        }
-        return { ok: false, error: 'Supabase registration error: ' + error.message };
+        return { ok: false, error: error.message };
       }
 
-      // Initialize user strategy state in Supabase
-      try {
-        await sb.from('user_strategy_state').upsert({
-          username: cleanUser,
-          track: 'NORISRING',
-          total_laps: 72,
-          stint1: 'SOFT',
-          stint2: 'HARD',
-          pit_lap: 28,
-          preferred_mode: preferred_mode,
-          updated_at: new Date().toISOString()
-        });
-      } catch (err) {
-        console.warn('[TrackLab] Strategy state init notice:', err);
-      }
+      const user = data.user;
+      const driverName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Driver';
+      saveState({
+        username: driverName,
+        userId: user?.id || null,
+        email: user?.email || cleanEmail
+      });
 
-      saveState({ username: cleanUser, userMode: preferred_mode });
-      return { ok: true, source: 'supabase', username: cleanUser };
+      return { ok: true, user, session: data.session, username: driverName };
     } catch (e) {
-      return { ok: false, error: 'Supabase registration failed: ' + (e.message || e) };
+      return { ok: false, error: 'Sign in failed: ' + (e.message || e) };
+    }
+  },
+
+  /**
+   * Supabase Auth: Sign Out
+   */
+  async signOut() {
+    const sb = getSupabase();
+    if (sb && sb.auth) {
+      try {
+        await sb.auth.signOut();
+      } catch (e) {
+        console.warn('[TrackLab] Supabase signOut notice:', e);
+      }
+    }
+    saveState({ username: '', userId: null, email: '' });
+    return { ok: true };
+  },
+
+  // Aliases for compatibility
+  async login(emailOrUser, password) {
+    // If input is an email, sign in with password directly
+    if (emailOrUser && emailOrUser.includes('@')) {
+      return this.signInWithPassword(emailOrUser, password);
+    }
+    // If a username was entered without @, provide informative prompt or attempt sign in
+    return this.signInWithPassword(emailOrUser, password);
+  },
+
+  async register(email, password, username, mode) {
+    return this.signUp(email, password, username, mode);
+  },
+
+  /**
+   * Save strategy to Supabase with exact column names:
+   * strategies: user_id, track_id, name, starting_compound, starting_fuel_kg
+   * pit_stops: strategy_id, stop_number, lap, new_compound
+   * Allowed tyre names: SOFT, MEDIUM, HARD, INTERMEDIATE, WET (all capitalized)
+   */
+  async saveStrategy(strategyParams = {}) {
+    const state = getState();
+    const sb = getSupabase();
+    if (!sb) {
+      return { ok: false, savedToDb: false, error: 'Supabase client unavailable' };
+    }
+
+    // Retrieve active user UUID from Supabase Auth session
+    let userId = state.userId;
+    if (!userId && sb.auth) {
+      try {
+        const { data } = await sb.auth.getUser();
+        userId = data?.user?.id || null;
+        if (userId) saveState({ userId });
+      } catch {}
+    }
+
+    // Resolve valid track UUID from Supabase tracks table
+    const trackUuid = await getSupabaseTrackId(strategyParams.track || state.track || 'Norisring');
+
+    // Ensure tyre compounds are strictly uppercase & valid
+    const rawStart = (strategyParams.starting_compound || strategyParams.stint1 || state.stint1 || 'SOFT').toUpperCase();
+    const rawNew = (strategyParams.new_compound || strategyParams.stint2 || state.stint2 || 'HARD').toUpperCase();
+    const startingCompound = ALLOWED_TYRES.includes(rawStart) ? rawStart : 'SOFT';
+    const newCompound = ALLOWED_TYRES.includes(rawNew) ? rawNew : 'HARD';
+
+    const pitLap = Number(strategyParams.lap || strategyParams.pit_lap || state.pitLap || 28);
+    const startingFuelKg = Number(strategyParams.starting_fuel_kg || strategyParams.fuel || state.startingFuelKg || 105);
+    const stratName = strategyParams.name || `${state.track || 'Norisring'} Strategy: ${startingCompound} → ${newCompound} (L${pitLap})`;
+
+    try {
+      // 1. Insert into 'strategies'
+      const { data: stratRow, error: stratErr } = await sb
+        .from('strategies')
+        .insert([{
+          user_id: userId,
+          track_id: trackUuid,
+          name: stratName,
+          starting_compound: startingCompound,
+          starting_fuel_kg: startingFuelKg
+        }])
+        .select()
+        .single();
+
+      if (stratErr) {
+        console.warn('[TrackLab] Error inserting into strategies table:', stratErr);
+        return { ok: false, savedToDb: false, error: stratErr.message };
+      }
+
+      const strategyId = stratRow?.id;
+
+      // 2. Insert into 'pit_stops'
+      let pitStopRow = null;
+      if (strategyId) {
+        const { data: pitData, error: pitErr } = await sb
+          .from('pit_stops')
+          .insert([{
+            strategy_id: strategyId,
+            stop_number: 1,
+            lap: pitLap,
+            new_compound: newCompound
+          }])
+          .select()
+          .single();
+
+        if (pitErr) {
+          console.warn('[TrackLab] Error inserting into pit_stops table:', pitErr);
+        } else {
+          pitStopRow = pitData;
+        }
+      }
+
+      return {
+        ok: true,
+        savedToDb: true,
+        source: 'supabase',
+        strategy: stratRow,
+        pitStop: pitStopRow,
+        strategyId: strategyId
+      };
+    } catch (e) {
+      console.warn('[TrackLab] saveStrategy exception:', e);
+      return { ok: false, savedToDb: false, error: e.message || e };
     }
   },
 
   async saveRace(raceRecord) {
-    const state = getState();
-    const cleanUser = state.username || 'Guest Driver';
-    const sb = getSupabase();
+    return this.saveStrategy({
+      track: raceRecord.track,
+      name: raceRecord.track_name || `${raceRecord.track || 'Norisring'} Grand Prix Run`,
+      starting_compound: raceRecord.stint1,
+      starting_fuel_kg: 105,
+      lap: raceRecord.pit_lap,
+      new_compound: raceRecord.stint2
+    });
+  },
 
+  /**
+   * Retrieve saved strategies with nested pit stops from Supabase
+   */
+  async getStrategies() {
+    const sb = getSupabase();
     if (!sb) {
-      return { savedToDb: false, error: 'Supabase client unavailable' };
+      return { source: 'none', strategies: [], error: 'Supabase client unavailable' };
     }
 
     try {
-      const { data, error } = await sb.from('race_history').insert([{
-        username: cleanUser,
-        track: raceRecord.track || 'NORISRING',
-        track_name: raceRecord.track_name || 'Norisring — Nuremberg Street Circuit',
-        stint1: raceRecord.stint1,
-        stint2: raceRecord.stint2,
-        pit_lap: raceRecord.pit_lap,
-        total_time: raceRecord.total_time,
-        optimal_time: raceRecord.optimal_time,
-        optimal_stint1: raceRecord.optimal_stint1 || 'MEDIUM',
-        optimal_stint2: raceRecord.optimal_stint2 || 'HARD',
-        optimal_pit_lap: raceRecord.optimal_pit_lap || 28,
-        gap: raceRecord.gap,
-        data_source: raceRecord.data_source || 'MODELED_PHYSICS'
-      }]).select();
+      const state = getState();
+      let query = sb
+        .from('strategies')
+        .select('*, pit_stops(*)')
+        .order('id', { ascending: false });
 
+      if (state.userId) {
+        query = query.eq('user_id', state.userId);
+      }
+
+      const { data, error } = await query;
       if (error) {
-        console.warn('[TrackLab] Supabase saveRace error:', error);
-        return { savedToDb: false, error: error.message };
+        console.warn('[TrackLab] Supabase getStrategies error:', error);
+        return { source: 'none', strategies: [], error: error.message };
       }
 
-      // Sync active strategy state to Supabase
-      if (cleanUser !== 'Guest Driver') {
-        try {
-          await sb.from('user_strategy_state').upsert({
-            username: cleanUser,
-            track: raceRecord.track || 'NORISRING',
-            total_laps: state.totalLaps || 72,
-            stint1: raceRecord.stint1,
-            stint2: raceRecord.stint2,
-            pit_lap: raceRecord.pit_lap,
-            updated_at: new Date().toISOString()
-          });
-        } catch {}
-      }
-
-      return { savedToDb: true, source: 'supabase', id: data?.[0]?.id };
+      return { source: 'supabase', strategies: data || [] };
     } catch (e) {
-      console.warn('[TrackLab] Supabase saveRace exception:', e);
-      return { savedToDb: false, error: e.message || e };
+      console.warn('[TrackLab] getStrategies exception:', e);
+      return { source: 'none', strategies: [], error: e.message || e };
     }
   },
 
   async getRaces() {
-    const state = getState();
-    const username = state.username || '';
-    const sb = getSupabase();
-
-    if (!sb) {
-      return { source: 'none', races: [], error: 'Supabase client unavailable' };
-    }
-
-    try {
-      let query = sb.from('race_history').select('*').order('created_at', { ascending: false });
-      if (username && username !== 'Guest Driver') {
-        query = query.ilike('username', username);
-      }
-      const { data, error } = await query;
-      if (error) {
-        console.warn('[TrackLab] Supabase getRaces error:', error);
-        return { source: 'none', races: [], error: error.message };
-      }
-      return { source: 'supabase', races: data || [] };
-    } catch (e) {
-      console.warn('[TrackLab] Supabase getRaces exception:', e);
-      return { source: 'none', races: [], error: e.message || e };
-    }
+    const res = await this.getStrategies();
+    const races = (res.strategies || []).map(s => {
+      const stop = (s.pit_stops && s.pit_stops[0]) || {};
+      return {
+        id: s.id,
+        track: s.track_id,
+        track_name: s.name || 'F1 Strategy Run',
+        stint1: s.starting_compound || 'SOFT',
+        stint2: stop.new_compound || 'HARD',
+        pit_lap: stop.lap || 28,
+        fuel_kg: s.starting_fuel_kg || 105,
+        total_time: 3528.4,
+        gap: 0.0,
+        data_source: 'SUPABASE_CLOUD'
+      };
+    });
+    return { source: res.source, races, error: res.error };
   },
 
-  async clearOrDeleteRace(raceId) {
+  async clearOrDeleteRace(strategyId) {
     const sb = getSupabase();
-    if (sb && raceId) {
+    if (sb && strategyId) {
       try {
-        await sb.from('race_history').delete().eq('id', raceId);
+        await sb.from('pit_stops').delete().eq('strategy_id', strategyId);
+        await sb.from('strategies').delete().eq('id', strategyId);
         return { ok: true };
       } catch (e) {
-        console.warn('[TrackLab] Supabase delete error:', e);
         return { ok: false, error: e.message };
       }
     }

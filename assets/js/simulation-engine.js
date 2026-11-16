@@ -82,6 +82,30 @@ const TrackLabSim = (() => {
       linearDeg: 0.008,
       cliffDeg: 0.07,
       outLapWarmUp: 3.2
+    },
+    INTERMEDIATE: {
+      id: 'INTERMEDIATE',
+      code: 'Inters',
+      label: 'Intermediate',
+      color: '#22C55E',
+      pace: 2.20,
+      optLife: 28,
+      cliffStart: 38,
+      linearDeg: 0.022,
+      cliffDeg: 0.20,
+      outLapWarmUp: 2.5
+    },
+    WET: {
+      id: 'WET',
+      code: 'Full Wet',
+      label: 'Wet',
+      color: '#3B82F6',
+      pace: 4.60,
+      optLife: 32,
+      cliffStart: 42,
+      linearDeg: 0.030,
+      cliffDeg: 0.25,
+      outLapWarmUp: 3.0
     }
   };
 

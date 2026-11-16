@@ -19,6 +19,7 @@
       <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">+ New Strategy</button>
       <button data-goto="login" class="header-link">Switch Driver</button>
+      <button id="btn-signout" class="header-link text-red-400 hover:text-red-300">Sign Out</button>
     </div>
   </header>
 
@@ -114,6 +115,11 @@
       const state = getState();
       document.getElementById('dash-driver-name').textContent = state.username || 'Guest Driver';
       document.getElementById('stat-active-mode').textContent = (state.userMode || 'guided').toUpperCase();
+
+      document.getElementById('btn-signout')?.addEventListener('click', async () => {
+        await TrackLabDB.signOut();
+        goTo('login');
+      });
 
       async function loadHistory() {
         const res = await TrackLabDB.getRaces();

@@ -67,8 +67,8 @@
         <!-- 1. Sign In Form -->
         <form id="form-signin" class="space-y-4">
           <div>
-            <label class="field-label" for="signin-username">Driver Callsign / Username</label>
-            <input id="signin-username" type="text" required placeholder="e.g. norris_04, leclerc_16" class="text-input" autocomplete="username">
+            <label class="field-label" for="signin-email">Email Address</label>
+            <input id="signin-email" type="email" required placeholder="driver@f1team.com" class="text-input" autocomplete="email">
           </div>
           <div>
             <label class="field-label" for="signin-password">Password</label>
@@ -83,16 +83,20 @@
         <!-- 2. Create Account Form -->
         <form id="form-register" class="space-y-4 hidden">
           <div>
-            <label class="field-label" for="reg-username">Choose Driver Callsign</label>
-            <input id="reg-username" type="text" required placeholder="e.g. piastri_81" class="text-input" autocomplete="username">
+            <label class="field-label" for="reg-username">Driver Callsign / Username</label>
+            <input id="reg-username" type="text" required placeholder="e.g. norris_04" class="text-input" autocomplete="username">
+          </div>
+          <div>
+            <label class="field-label" for="reg-email">Email Address</label>
+            <input id="reg-email" type="email" required placeholder="driver@f1team.com" class="text-input" autocomplete="email">
           </div>
           <div>
             <label class="field-label" for="reg-password">Password</label>
-            <input id="reg-password" type="password" required placeholder="Min. 3 characters" class="text-input" autocomplete="new-password">
+            <input id="reg-password" type="password" required minlength="6" placeholder="Min. 6 characters" class="text-input" autocomplete="new-password">
           </div>
           <div>
             <label class="field-label" for="reg-confirm">Confirm Password</label>
-            <input id="reg-confirm" type="password" required placeholder="Repeat password" class="text-input" autocomplete="new-password">
+            <input id="reg-confirm" type="password" required minlength="6" placeholder="Repeat password" class="text-input" autocomplete="new-password">
           </div>
           <div>
             <label class="field-label">Preferred Experience</label>
@@ -168,7 +172,7 @@
 
         if (sb) {
           try {
-            const { data, error } = await sb.from('race_history').select('id').limit(1);
+            const { data, error } = await sb.from('strategies').select('id').limit(1);
             if (!error) {
               supabaseReachable = true;
               tablesReady = true;
@@ -239,7 +243,7 @@
       // Sign In Form Submission
       formSignIn.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const username = document.getElementById('signin-username').value.trim();
+        const email = document.getElementById('signin-email').value.trim();
         const password = document.getElementById('signin-password').value;
         const fb = document.getElementById('signin-feedback');
         fb.classList.add('hidden');
@@ -249,7 +253,7 @@
         btn.disabled = true;
 
         try {
-          const result = await TrackLabDB.login(username, password);
+          const result = await TrackLabDB.signInWithPassword(email, password);
           if (!result.ok) {
             fb.textContent = result.error || 'Invalid driver credentials in Supabase.';
             fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
@@ -273,6 +277,7 @@
       formRegister.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('reg-username').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-password').value;
         const confirm = document.getElementById('reg-confirm').value;
         const preferredMode = document.querySelector('input[name="reg-mode"]:checked')?.value || 'guided';
@@ -291,7 +296,7 @@
         btn.disabled = true;
 
         try {
-          const result = await TrackLabDB.register(username, password, preferredMode);
+          const result = await TrackLabDB.signUp(email, password, username, preferredMode);
           if (!result.ok) {
             fb.textContent = result.error || 'Could not register profile in Supabase.';
             fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
