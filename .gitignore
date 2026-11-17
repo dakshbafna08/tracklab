@@ -3,7 +3,7 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
-
+data
 src/racecar/training/models/
 src/racecar/training/checkpoints/
 src/racecar/training/runs/
