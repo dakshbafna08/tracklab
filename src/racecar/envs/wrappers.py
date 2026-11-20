@@ -18,5 +18,5 @@ class ActionRepeat(gym.Wrapper):
         return obs, total_reward, terminated, truncated, info
 
 
-def make_env(track, repeat=10):
-    return ActionRepeat(RaceCarEnv(track), repeat=repeat)
+def make_env(track, car, repeat=10):
+    return ActionRepeat(RaceCarEnv(track, car), repeat=repeat)

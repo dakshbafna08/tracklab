@@ -12,19 +12,22 @@ from matplotlib.animation import FuncAnimation
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
+from racecar.config import load_car, load_track
 from racecar.envs.wrappers import make_env
 
 
 SIM_DIR = Path(__file__).resolve().parent
-TRACK_PATH = SIM_DIR.parent / "envs" / "Norisring.csv"
 CHECKPOINT_DIR = SIM_DIR.parent / "training" / "checkpoints"
 
+TRACK = "Melbourne"
 POLICY = "model"
 CHECKPOINT = None
 STRIDE = 2
+CONDITIONS = {"compound": "SOFT", "tyre_age": 0, "fuel_kg": 100.0}
 
-track = np.loadtxt(TRACK_PATH, delimiter=",")
-env = make_env(track)
+track = load_track(TRACK)
+car_config = load_car()
+env = make_env(track, car_config)
 car_env = env.unwrapped
 
 normal = np.stack([-car_env.seg_vec[:, 1], car_env.seg_vec[:, 0]], axis=1) / car_env.seg_len[:, None]
@@ -55,7 +58,7 @@ def load_model_policy(step=None):
 
     model = PPO.load(CHECKPOINT_DIR / f"ppo_{step}_steps")
     stats = VecNormalize.load(CHECKPOINT_DIR / f"ppo_vecnormalize_{step}_steps.pkl",
-                              DummyVecEnv([lambda: make_env(track)]))
+                              DummyVecEnv([lambda: make_env(track, car_config)]))
     stats.training = False
 
     def policy(obs):
@@ -67,7 +70,7 @@ def load_model_policy(step=None):
 policy = load_model_policy(CHECKPOINT) if POLICY == "model" else follow_track
 
 positions, speeds, times = [], [], []
-obs, info = env.reset(seed=0)
+obs, info = env.reset(seed=0, options=CONDITIONS)
 while True:
     obs, reward, terminated, truncated, info = env.step(policy(obs))
     positions.append(car_env.position.copy())
@@ -93,7 +96,8 @@ def update(frame):
     k = frame * STRIDE
     car.set_data([positions[k, 0]], [positions[k, 1]])
     trail.set_data(positions[:k + 1, 0], positions[:k + 1, 1])
-    label.set_text(f"t = {times[k]:.1f} s   {speeds[k]:.1f} m/s")
+    label.set_text(f"{info['compound']}, {info['tyre_age']} laps, {info['fuel_kg']:.0f} kg   "
+                   f"t = {times[k]:.1f} s   {speeds[k]:.1f} m/s")
     return car, trail, label
 
 

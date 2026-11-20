@@ -3,7 +3,7 @@ import gymnasium as gym
 from gymnasium import spaces
 
 class RaceCarEnv(gym.Env):
-    def __init__(self, track, mass=700,mu=1.5,drag=2,dt=0.01,max_steps=50000):
+    def __init__(self, track, car, dt=0.01, max_steps=80000):
         super().__init__()
 
         # constants
@@ -18,12 +18,14 @@ class RaceCarEnv(gym.Env):
         self.track_length = self.seg_len.sum()
         self.min_speed = 0.5
         self.crash_penalty = 50.0
-        self.mass = mass
-        self.mu = mu
-        self.drag = drag
+        self.car_mass = car["car_mass_kg"]
+        self.drag = car["drag_coeff"]
+        self.fuel_start = car["fuel_start_kg"]
+        self.power = car["power_w"]
+        self.max_tyre_age = car["max_tyre_age_laps"]
+        self.compounds = car["compounds"]
         self.dt = dt
         self.max_steps = max_steps
-        self.max_accel = self.mu * 9.81
 
         #start position
         self.start_position = self.centreline[0].copy()
@@ -37,10 +39,21 @@ class RaceCarEnv(gym.Env):
         # observation in world coords
         self.lookahead = np.array([10, 25, 50, 100, 150.0])
         self.observation_space = spaces.Box(low=-np.inf, high=np.inf,
-                                            shape=(4 + 2 * len(self.lookahead),), dtype=np.float32)
+                                            shape=(6 + 2 * len(self.lookahead),), dtype=np.float32)
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        options = options or {}
+
+        self.compound = options.get("compound", str(self.np_random.choice(list(self.compounds))))
+        self.tyre_age = options.get("tyre_age", int(self.np_random.integers(0, self.max_tyre_age + 1)))
+        self.fuel_kg = options.get("fuel_kg", float(self.np_random.uniform(0.0, self.fuel_start)))
+
+        tyre = self.compounds[self.compound]
+        self.mu = tyre["mu"] - tyre["wear_per_lap"] * self.tyre_age
+        self.mass = self.car_mass + self.fuel_kg
+        self.max_accel = self.mu * 9.81
+
 
         self.position = self.start_position.copy()
         self.velocity = self.start_direction * self.start_speed
@@ -63,8 +76,8 @@ class RaceCarEnv(gym.Env):
             rel = self._point_at(progress + d) - self.position
             ahead += [rel @ forward / d, rel @ left / d]
 
-        return np.array([lateral / width, track_dir @ forward, track_dir @ left, speed / 50] + ahead,
-                        dtype=np.float32)
+        return np.array([lateral / width, track_dir @ forward, track_dir @ left, speed / 50,
+                         self.mu, self.mass / 1000] + ahead, dtype=np.float32)
 
     def _point_at(self, s):
         s = s % self.track_length
@@ -72,7 +85,8 @@ class RaceCarEnv(gym.Env):
         return self.seg_start[j] + (s - self.seg_start_s[j]) / self.seg_len[j] * self.seg_vec[j]
 
     def _get_info(self):
-        return {}
+        return {"compound": self.compound, "tyre_age": self.tyre_age, "fuel_kg": self.fuel_kg,
+                "progress_m": self.total_progress, "time_s": self.steps * self.dt}
 
     def _locate(self, p):
         rel = p - self.seg_start
@@ -96,6 +110,8 @@ class RaceCarEnv(gym.Env):
 
         # this is the throttle, the acceleration along the vehicle
         accel_longitudinal = action[0] * self.max_accel
+        if accel_longitudinal > 0:
+            accel_longitudinal = min(accel_longitudinal, self.power / (self.mass * speed))
 
         # longitudinal and lateral acceleration are dictated by the grip of the tyre, as
         # it can be modeled by a circular relation, e.g. if 100% of grip is used for long accel, 0% is left for lateral accel

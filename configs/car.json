@@ -1,0 +1,13 @@
+{
+  "car_mass_kg": 600,
+  "power_w": 750000,
+  "drag_coeff": 0.9,
+  "fuel_start_kg": 100,
+  "fuel_burn_per_lap": 1.7,
+  "max_tyre_age_laps": 40,
+  "compounds": {
+    "SOFT": {"mu": 1.60, "wear_per_lap": 0.010},
+    "MEDIUM": {"mu": 1.50, "wear_per_lap": 0.006},
+    "HARD": {"mu": 1.40, "wear_per_lap": 0.004}
+  }
+}
