@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab — What is F1? Beginner's Guide to Formula 1</title>
+  <title>TrackLab — What is F1? Quick Visual Guide</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="no-dock min-h-screen flex flex-col f1-grid-bg">
+<body class="no-dock min-h-screen flex flex-col f1-grid-bg text-white">
 
   <!-- Header -->
   <header class="app-header">
@@ -18,138 +18,230 @@
     </div>
     <div class="flex items-center gap-5">
       <button data-goto="1" class="header-link">&larr; Home</button>
-      <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">Choose Circuit &rarr;</button>
+      <button data-goto="about" class="header-link">About</button>
+      <button data-goto="3" class="btn-primary py-1.5 px-4 text-xs">Strategy Lab &rarr;</button>
       <button data-goto="11" class="header-link">Dashboard</button>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-14 space-y-12">
+  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12 space-y-12">
 
-    <!-- Hero Introduction -->
-    <section class="animate-on-scroll">
-      <span class="section-tag">Beginner's Guide</span>
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mt-2">
-        What is Formula 1?
+    <!-- Hero Introduction (Crisp & Scannable) -->
+    <section class="text-center max-w-3xl mx-auto animate-on-scroll">
+      <span class="section-tag">60-Second Crash Course</span>
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white mt-2">
+        The Fastest Sport on Earth, <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#E10600]">Decoded.</span>
       </h1>
-      <p class="body-copy text-lg mt-4 max-w-3xl text-zinc-300">
-        Formula 1 is the highest class of global motorsport. Ten teams and twenty world-class drivers compete across 24 Grands Prix worldwide in custom 1,000-horsepower hybrid race cars pulling up to 5G in corners. But raw speed alone never wins a Grand Prix—strategy, pit stops, and tire physics determine the champion.
+      <p class="body-copy text-base sm:text-lg mt-4 text-zinc-300">
+        Formula 1 isn't just about driving fast—it's high-speed chess at 300 km/h. Races are won on the pit wall by engineers balancing tire degradation against fuel weight.
       </p>
+    </section>
 
-      <div class="mt-8 rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-        <img src="../../assets/images/f1-mclaren-speed.jpg" alt="Formula 1 Racing Telemetry" class="w-full h-[280px] sm:h-[340px] object-cover">
+    <!-- 1. F1 in 4 Quick Numbers (Fast Stat Cards) -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-on-scroll mono">
+      <div class="sub-box p-5 text-center">
+        <span class="text-3xl font-extrabold text-white">20</span>
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mt-1">Drivers • 10 Teams</span>
+        <p class="text-[11px] text-zinc-500 font-sans mt-2">The most exclusive grid in world sports.</p>
+      </div>
+
+      <div class="sub-box p-5 text-center">
+        <span class="text-3xl font-extrabold text-[#E10600]">1,000+</span>
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mt-1">Horsepower</span>
+        <p class="text-[11px] text-zinc-500 font-sans mt-2">Turbo-hybrid engines pulling up to 5G.</p>
+      </div>
+
+      <div class="sub-box p-5 text-center">
+        <span class="text-3xl font-extrabold text-[#22C55E]">~2.0s</span>
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mt-1">Pit Stop Time</span>
+        <p class="text-[11px] text-zinc-500 font-sans mt-2">20 mechanics swapping 4 tires in seconds.</p>
+      </div>
+
+      <div class="sub-box p-5 text-center">
+        <span class="text-3xl font-extrabold text-white">305 km</span>
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mt-1">Race Distance</span>
+        <p class="text-[11px] text-zinc-500 font-sans mt-2">72 laps at Norisring (~18.4s pit loss).</p>
       </div>
     </section>
 
-    <!-- Core Rules & Fundamentals -->
+    <!-- 2. Essential F1 Slang Decoded (Clean 3-Pillar Cards) -->
+    <section class="animate-on-scroll">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="f1-badge text-[10px]">PIT WALL TERMINOLOGY</span>
+        <h2 class="text-xl font-bold text-white">Three Words You Need to Know</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="panel p-6 border-l-4 border-l-[#E10600]">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-bold text-white">"Box, Box, Box!"</h3>
+            <span class="mono text-xs text-[#E10600] font-bold">Pit Stop Now</span>
+          </div>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Originating from the German <em>Boxenstopp</em>. When the engineer yells this over team radio, the driver must immediately enter the pit lane on this exact lap for fresh tires.
+          </p>
+        </div>
+
+        <div class="panel p-6 border-l-4 border-l-[#22C55E]">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-bold text-white">The Undercut</h3>
+            <span class="mono text-xs text-[#22C55E] font-bold">Pit 1 Lap Early</span>
+          </div>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Stuck behind a rival? Pit one lap before them. Your fresh rubber gives an instant 2-second speed advantage, putting you ahead when they pit on the next lap.
+          </p>
+        </div>
+
+        <div class="panel p-6 border-l-4 border-l-amber-400">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-bold text-white">The Tire "Cliff"</h3>
+            <span class="mono text-xs text-amber-400 font-bold">Sudden Drop</span>
+          </div>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Tires don't wear slowly. After 20–30 laps, the surface overheats and lap times plummet by 2 to 3 seconds in a single lap. Good engineers pit right before the cliff.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. The 5 Pirelli Compounds (Visual Swatch Grid) -->
+    <section class="panel p-8 animate-on-scroll">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-white/10">
+        <div>
+          <span class="section-tag mb-0">Pirelli Rubber Chemistry</span>
+          <h2 class="text-2xl font-bold text-white">The 5 Tire Compounds</h2>
+        </div>
+        <span class="mono text-xs px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+          ⚖️ Mandatory Rule: Must use at least 2 compounds
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+        <!-- Soft -->
+        <div class="sub-box p-4 border-[#E10600]/40 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-[#E10600] shadow-[0_0_8px_#E10600]"></span>
+              <strong class="text-sm text-white">SOFT</strong>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+              Maximum launch grip. Fastest single lap pace, but burns out quickly.
+            </p>
+          </div>
+          <div class="mt-4 pt-2 border-t border-white/10 mono text-[10px] text-zinc-400">
+            Life: ~13–18 Laps
+          </div>
+        </div>
+
+        <!-- Medium -->
+        <div class="sub-box p-4 border-yellow-500/40 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-[#EAB308] shadow-[0_0_8px_#EAB308]"></span>
+              <strong class="text-sm text-white">MEDIUM</strong>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+              The race favorite. Perfect balance of fast cornering pace and durability.
+            </p>
+          </div>
+          <div class="mt-4 pt-2 border-t border-white/10 mono text-[10px] text-zinc-400">
+            Life: ~22–30 Laps
+          </div>
+        </div>
+
+        <!-- Hard -->
+        <div class="sub-box p-4 border-zinc-400/40 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_8px_#FFFFFF]"></span>
+              <strong class="text-sm text-white">HARD</strong>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+              Toughest rubber. Takes longer to warm up, but lasts deepest into the race.
+            </p>
+          </div>
+          <div class="mt-4 pt-2 border-t border-white/10 mono text-[10px] text-zinc-400">
+            Life: ~34–46 Laps
+          </div>
+        </div>
+
+        <!-- Intermediate -->
+        <div class="sub-box p-4 border-emerald-500/40 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-[#22C55E] shadow-[0_0_8px_#22C55E]"></span>
+              <strong class="text-sm text-white">INTER</strong>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+              Grooved tread designed for clearing light drizzle and drying asphalt.
+            </p>
+          </div>
+          <div class="mt-4 pt-2 border-t border-white/10 mono text-[10px] text-zinc-400">
+            Wet Weather
+          </div>
+        </div>
+
+        <!-- Wet -->
+        <div class="sub-box p-4 border-blue-500/40 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3.5 h-3.5 rounded-full bg-[#3B82F6] shadow-[0_0_8px_#3B82F6]"></span>
+              <strong class="text-sm text-white">FULL WET</strong>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+              Evacuates 85 liters of water per second to prevent dangerous aquaplaning.
+            </p>
+          </div>
+          <div class="mt-4 pt-2 border-t border-white/10 mono text-[10px] text-zinc-400">
+            Heavy Rain
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. The Real Battle: Tires vs Fuel Weight -->
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-on-scroll">
-
-      <!-- 1. The Grand Prix -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-[#E10600] uppercase font-semibold">01 // The Race</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-white/10 text-white font-bold">~305 km</span>
+      <div class="sub-box p-6 flex flex-col justify-between">
+        <div>
+          <span class="mono text-xs text-[#E10600] uppercase font-bold block mb-1">Physics #1</span>
+          <h3 class="text-xl font-bold text-white mb-2">Fuel Weight Burn (~1.5 kg / lap)</h3>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            F1 cars start with ~105 kg of fuel. Every lap burned sheds weight, making the car naturally <strong class="text-white">+0.03 seconds faster</strong> each lap.
+          </p>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">How Does a Race Work?</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          A Grand Prix race covers roughly 305 kilometers (190 miles) or a maximum of 2 hours. Qualifying on Saturday sets the starting grid positions. On Sunday, five red lights illuminate one-by-one and extinguish together—and the race begins.
-        </p>
+        <div class="mt-4 text-xs mono text-[#22C55E] font-semibold">
+          Result: Car gets faster as the race progresses
+        </div>
       </div>
 
-      <!-- 2. The Mandatory Pit Stop Rule -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-[#22C55E] uppercase font-semibold">02 // Mandatory Rule</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-[#22C55E]/15 text-[#22C55E] font-bold">2 Compounds</span>
+      <div class="sub-box p-6 flex flex-col justify-between">
+        <div>
+          <span class="mono text-xs text-amber-400 uppercase font-bold block mb-1">Physics #2</span>
+          <h3 class="text-xl font-bold text-white mb-2">Thermal Tire Degradation</h3>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            While burning fuel makes the car lighter, tire rubber overheats and loses grip, making the car <strong class="text-white">-0.05 to -0.20 seconds slower</strong> each lap.
+          </p>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">The Two-Compound Rule</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          In a dry race, official FIA regulations require every driver to use at least <strong>two different tire compounds</strong>. This guarantees that no car can drive non-stop from flag to flag—everyone must make at least one pit stop.
-        </p>
-      </div>
-
-      <!-- 3. What is Boxing -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-[#E10600] uppercase font-semibold">03 // The Radio Call</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-white/10 text-white font-bold">"Box, Box!"</span>
+        <div class="mt-4 text-xs mono text-amber-400 font-semibold">
+          Result: The pit stop timing resolves this clash
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">What does "Boxing" mean?</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          <strong>"Box" is Formula 1 code for a pit stop.</strong> Originating from the German <em>Boxenstopp</em> and referring to the team's painted pit box, hearing <em>"Box, box, box!"</em> on the radio means the driver must enter the pit lane on that exact lap. A crew of twenty mechanics swaps all 4 wheels in roughly 2 to 2.5 seconds.
-        </p>
       </div>
-
-      <!-- 4. Fuel Mass Effect -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-amber-400 uppercase font-semibold">04 // Fuel Physics</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-amber-400/15 text-amber-400 font-bold">Weight Loss</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">Why Fuel Makes Cars Faster</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          F1 cars start the race heavy with up to 110 kg of fuel. As the laps count down, fuel burns away at ~1.5 kg per lap. As the car gets lighter, it gains approximately 0.03 seconds per lap in speed, fighting against tire degradation.
-        </p>
-      </div>
-
-      <!-- 5. Tire Compounds -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-zinc-400 uppercase font-semibold">05 // The Rubber</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-white/10 text-white font-bold">Soft / Med / Hard</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">The Three Tire Compounds</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          <strong class="text-[#E10600]">Soft (Red):</strong> Maximum cornering grip and fastest lap times, but wears out fast (~13 laps).<br>
-          <strong class="text-yellow-400">Medium (Yellow):</strong> The balanced sweet spot between high speed and durability (~22 laps).<br>
-          <strong class="text-zinc-200">Hard (White):</strong> Toughest rubber. Slightly slower per lap, but lasts the longest (~34 laps).
-        </p>
-      </div>
-
-      <!-- 6. The Cliff -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-[#E10600] uppercase font-semibold">06 // Tire Degradation</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-[#E10600]/20 text-[#E10600] font-bold">The Cliff</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">What is "The Cliff"?</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          Tires do not wear in a smooth line. For 15 to 20 laps, lap times remain relatively steady. But when the tire rubber overheats and blisters, the car suddenly falls off <strong>"the cliff"</strong>—losing 2 to 3 seconds per lap. A great strategist always pits right before this cliff hits.
-        </p>
-      </div>
-
-      <!-- 7. The Undercut -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-[#22C55E] uppercase font-semibold">07 // Passing in the Pits</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-[#22C55E]/15 text-[#22C55E] font-bold">Pit Earlier</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">What is an "Undercut"?</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          When stuck behind a rival you can't pass on track, you pit <strong>one lap earlier</strong> for fresh rubber. Because new tires grip immediately, your out-lap is significantly faster. When your rival pits on the following lap, you fly past them as they exit the pit lane!
-        </p>
-      </div>
-
-      <!-- 8. The Overcut -->
-      <div class="panel p-8">
-        <div class="flex items-center justify-between mb-2">
-          <span class="mono text-xs text-amber-400 uppercase font-semibold">08 // Counter-Move</span>
-          <span class="mono text-[10px] px-2 py-0.5 rounded bg-amber-400/15 text-amber-400 font-bold">Pit Later</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">What is an "Overcut"?</h2>
-        <p class="body-copy text-sm leading-relaxed text-zinc-300">
-          Your rival pits first. If your current tires still have life, you stay out on track in <em>"clean air"</em> (with no cars blocking your airflow). Because your car is light and unobstructed, you set flying lap times, building enough of a gap to stay ahead after your pit stop.
-        </p>
-      </div>
-
     </section>
 
     <!-- Bottom Actions -->
-    <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
       <button data-goto="1" class="btn-outline w-full sm:w-auto text-xs">&larr; Back to Home</button>
-      <button data-goto="3" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-sm">
-        Select Norisring Circuit &rarr;
-      </button>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button data-goto="about" class="btn-ghost text-xs">About TrackLab</button>
+        <button data-goto="3" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-sm">
+          Build Your Race Strategy &rarr;
+        </button>
+      </div>
     </div>
 
   </main>

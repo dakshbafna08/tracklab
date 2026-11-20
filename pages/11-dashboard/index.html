@@ -35,7 +35,7 @@
         <p id="dash-storage-note" class="mono text-xs text-zinc-500 mt-2">Checking race history archive...</p>
       </div>
       <div class="flex gap-3">
-        <button data-goto="2" class="btn-outline text-xs">Guided Briefing</button>
+        <button data-goto="2" class="btn-outline text-xs">📘 Show Guide</button>
         <button data-goto="3" class="btn-primary text-xs px-6">Launch New Race &rarr;</button>
       </div>
     </section>
@@ -55,8 +55,8 @@
         <div id="stat-best-gap" class="text-3xl font-bold text-white mt-2">—</div>
       </div>
       <div class="panel p-6">
-        <span class="text-[10px] uppercase text-zinc-500 block">Active Mode</span>
-        <div id="stat-active-mode" class="text-3xl font-bold text-[#E10600] mt-2 uppercase">GUIDED</div>
+        <span class="text-[10px] uppercase text-zinc-500 block">Strategy Guide</span>
+        <div id="stat-guide-status" class="text-2xl font-bold text-[#22C55E] mt-2">COMPLETED</div>
       </div>
     </section>
 
@@ -114,7 +114,12 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const state = getState();
       document.getElementById('dash-driver-name').textContent = state.username || 'Guest Driver';
-      document.getElementById('stat-active-mode').textContent = (state.userMode || 'guided').toUpperCase();
+      const guideCompleted = Boolean(state.hasCompletedGuide);
+      const guideStat = document.getElementById('stat-guide-status');
+      if (guideStat) {
+        guideStat.textContent = guideCompleted ? 'COMPLETED' : 'FIRST RUN';
+        guideStat.className = 'text-2xl font-bold mt-2 ' + (guideCompleted ? 'text-[#22C55E]' : 'text-amber-400');
+      }
 
       document.getElementById('btn-signout')?.addEventListener('click', async () => {
         await TrackLabDB.signOut();

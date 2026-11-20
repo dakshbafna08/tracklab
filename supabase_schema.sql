@@ -42,7 +42,20 @@ CREATE TABLE IF NOT EXISTS public.pit_stops (
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     username TEXT NOT NULL,
+    has_completed_guide BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. USER STRATEGY STATE TABLE (Active Stint Selections & Guide Progression)
+CREATE TABLE IF NOT EXISTS public.user_strategy_state (
+    username TEXT PRIMARY KEY,
+    track TEXT NOT NULL DEFAULT 'NORISRING',
+    total_laps INT NOT NULL DEFAULT 72,
+    stint1 TEXT NOT NULL DEFAULT 'SOFT',
+    stint2 TEXT NOT NULL DEFAULT 'HARD',
+    pit_lap INT NOT NULL DEFAULT 28,
+    has_completed_guide BOOLEAN NOT NULL DEFAULT FALSE,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- =========================================================================
@@ -52,6 +65,7 @@ ALTER TABLE public.tracks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.strategies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pit_stops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_strategy_state ENABLE ROW LEVEL SECURITY;
 
 -- Tracks (Public Read)
 CREATE POLICY "Allow public read on tracks" ON public.tracks FOR SELECT USING (true);
@@ -69,3 +83,8 @@ CREATE POLICY "Allow delete on pit_stops" ON public.pit_stops FOR DELETE USING (
 -- Profiles (Public Read & Self Update)
 CREATE POLICY "Allow read on profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Allow insert on profiles" ON public.profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow update on profiles" ON public.profiles FOR UPDATE USING (true);
+
+-- User Strategy State
+CREATE POLICY "Allow read on user_strategy_state" ON public.user_strategy_state FOR SELECT USING (true);
+CREATE POLICY "Allow write on user_strategy_state" ON public.user_strategy_state FOR ALL USING (true);

@@ -218,11 +218,11 @@
       document.getElementById('active-track-label').textContent = `${track.name} (${track.laps} Laps)`;
 
       document.getElementById('btn-back').addEventListener('click', () => {
-        goTo(getState().userMode === 'pro' ? 3 : 4);
+        goTo(getState().hasCompletedGuide ? 3 : 4);
       });
 
       document.getElementById('btn-next-pit').addEventListener('click', () => {
-        goTo(7);
+        goTo(getState().hasCompletedGuide ? 7 : 6);
       });
     });
   </script>

@@ -44,7 +44,7 @@ const DEFAULT_STATE = {
   userId: null,
   email: '',
   startingFuelKg: 105,
-  userMode: 'guided' // 'guided' | 'pro'
+  hasCompletedGuide: false
 };
 
 const ALLOWED_TYRES = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'];
@@ -63,21 +63,24 @@ const SCREEN_PATHS = {
   9: 'pages/09-race-sim/index.html',
   10: 'pages/10-results/index.html',
   11: 'pages/11-dashboard/index.html',
-  12: 'pages/12-f1-explained/index.html'
+  12: 'pages/12-f1-explained/index.html',
+  13: 'pages/about/index.html',
+  'about': 'pages/about/index.html'
 };
 
-const FLOW_GUIDED = [
+const FLOW_GUIDE = [
   { screen: 2, label: 'Briefing' },
   { screen: 3, label: 'Circuit' },
-  { screen: 4, label: 'Tire Physics' },
+  { screen: 4, label: 'Tire Guide' },
   { screen: 5, label: 'Compounds' },
+  { screen: 6, label: 'Pit Guide' },
   { screen: 7, label: 'Pit Window' },
   { screen: 8, label: 'Grid' },
   { screen: 9, label: 'Telemetry' },
   { screen: 10, label: 'Debrief' }
 ];
 
-const FLOW_PRO = [
+const FLOW_STANDARD = [
   { screen: 3, label: 'Circuit' },
   { screen: 5, label: 'Compounds' },
   { screen: 7, label: 'Pit Window' },
@@ -112,7 +115,7 @@ function saveState(updates) {
         stint1: next.stint1 || 'SOFT',
         stint2: next.stint2 || 'HARD',
         pit_lap: next.pitLap || 28,
-        preferred_mode: next.userMode || 'guided',
+        has_completed_guide: Boolean(next.hasCompletedGuide),
         updated_at: new Date().toISOString()
       }).then(() => {}).catch(err => console.warn('[TrackLab] Supabase state sync notice:', err));
     }
@@ -240,7 +243,7 @@ const TrackLabDB = {
   /**
    * Supabase Auth: Sign Up with email, password, and username in options.data
    */
-  async signUp(email, password, username = '', preferredMode = 'guided') {
+  async signUp(email, password, username = '') {
     const cleanEmail = (email || '').trim();
     const cleanUser = (username || '').trim() || cleanEmail.split('@')[0];
     if (!cleanEmail) return { ok: false, error: 'Please enter an email address.' };
@@ -273,10 +276,10 @@ const TrackLabDB = {
         username: driverName,
         userId: user?.id || null,
         email: user?.email || cleanEmail,
-        userMode: preferredMode
+        hasCompletedGuide: false
       });
 
-      return { ok: true, user, session: data.session, username: driverName };
+      return { ok: true, user, session: data.session, username: driverName, hasCompletedGuide: false };
     } catch (e) {
       return { ok: false, error: 'Registration failed: ' + (e.message || e) };
     }
@@ -308,13 +311,28 @@ const TrackLabDB = {
 
       const user = data.user;
       const driverName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'Driver';
+
+      // Check whether user has previously completed the guide in Supabase
+      let hasCompleted = false;
+      try {
+        const { data: stateData } = await sb
+          .from('user_strategy_state')
+          .select('has_completed_guide')
+          .eq('username', driverName)
+          .maybeSingle();
+        if (stateData && stateData.has_completed_guide) {
+          hasCompleted = true;
+        }
+      } catch {}
+
       saveState({
         username: driverName,
         userId: user?.id || null,
-        email: user?.email || cleanEmail
+        email: user?.email || cleanEmail,
+        hasCompletedGuide: hasCompleted
       });
 
-      return { ok: true, user, session: data.session, username: driverName };
+      return { ok: true, user, session: data.session, username: driverName, hasCompletedGuide: hasCompleted };
     } catch (e) {
       return { ok: false, error: 'Sign in failed: ' + (e.message || e) };
     }
@@ -332,7 +350,7 @@ const TrackLabDB = {
         console.warn('[TrackLab] Supabase signOut notice:', e);
       }
     }
-    saveState({ username: '', userId: null, email: '' });
+    saveState({ username: '', userId: null, email: '', hasCompletedGuide: false });
     return { ok: true };
   },
 
@@ -346,8 +364,8 @@ const TrackLabDB = {
     return this.signInWithPassword(emailOrUser, password);
   },
 
-  async register(email, password, username, mode) {
-    return this.signUp(email, password, username, mode);
+  async register(email, password, username) {
+    return this.signUp(email, password, username);
   },
 
   /**
@@ -568,7 +586,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 4. Inject Floating BOTTOM Progress Dock (Screens 2 to 10)
   if (currentScreen >= 2 && currentScreen <= 10 && !document.querySelector('.progress-dock')) {
-    const flow = state.userMode === 'pro' ? FLOW_PRO : FLOW_GUIDED;
+    const isGuideActive = !state.hasCompletedGuide || currentScreen === 2 || currentScreen === 4 || currentScreen === 6;
+    const flow = isGuideActive ? FLOW_GUIDE : FLOW_STANDARD;
     const activeIdx = flow.findIndex(s => s.screen === currentScreen);
 
     const dock = document.createElement('nav');
@@ -587,26 +606,24 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }).join('<span class="dock-divider"></span>');
 
-    const modeChip = `
+    const guideChip = `
       <span class="dock-divider"></span>
-      <button type="button" id="dock-mode-toggle" class="dock-step mono text-[10px] uppercase tracking-wider" title="Switch Guided / Pro workflow">
-        ${state.userMode === 'pro' ? '★ Pro' : 'Guided'}
+      <button type="button" id="dock-guide-toggle" class="dock-step mono text-[10px] uppercase tracking-wider ${currentScreen === 2 ? 'is-active' : ''}" title="View Strategy Guide & Lessons">
+        📘 Guide
       </button>
     `;
 
-    dock.innerHTML = stepsMarkup + modeChip;
+    dock.innerHTML = stepsMarkup + guideChip;
     document.body.appendChild(dock);
 
     dock.querySelectorAll('[data-dock-target]').forEach(btn => {
       btn.addEventListener('click', () => goTo(Number(btn.dataset.dockTarget)));
     });
 
-    const modeBtn = document.getElementById('dock-mode-toggle');
-    if (modeBtn) {
-      modeBtn.addEventListener('click', () => {
-        const nextMode = state.userMode === 'pro' ? 'guided' : 'pro';
-        saveState({ userMode: nextMode });
-        window.location.reload();
+    const guideBtn = document.getElementById('dock-guide-toggle');
+    if (guideBtn) {
+      guideBtn.addEventListener('click', () => {
+        goTo(2);
       });
     }
   } else if (currentScreen <= 1 || currentScreen >= 11) {

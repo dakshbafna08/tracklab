@@ -179,7 +179,7 @@
 
       document.getElementById('btn-continue-tires').addEventListener('click', () => {
         const cur = getState();
-        goTo(cur.userMode === 'pro' ? 5 : 4);
+        goTo(cur.hasCompletedGuide ? 5 : 4);
       });
     })();
   </script>

@@ -310,9 +310,11 @@
           data_source: state.simDataSource || 'MODELED_ESTIMATE'
         });
         sessionStorage.setItem(saveKey, '1');
+        saveState({ hasCompletedGuide: true });
         badgeEl.textContent = res.savedToDb ? '✓ Synced to Supabase Cloud' : (res.error ? 'Supabase Required' : '✓ Telemetry Recorded');
         badgeEl.className = 'mono text-xs ' + (res.savedToDb ? 'text-[#22C55E]' : 'text-zinc-400');
       } else {
+        saveState({ hasCompletedGuide: true });
         badgeEl.textContent = '✓ Recorded in Telemetry';
       }
     })();

@@ -25,6 +25,7 @@
     </div>
     <div class="flex items-center gap-5">
       <button data-goto="1" class="header-link">&larr; Home</button>
+      <button data-goto="about" class="header-link">About</button>
       <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="11" class="header-link">Dashboard</button>
     </div>
@@ -58,30 +59,14 @@
           </div>
         </div>
 
-        <!-- Segmented Auth Tabs -->
+        <!-- Segmented Auth Tabs (Default: Create Profile) -->
         <div class="grid grid-cols-2 p-1 rounded-xl bg-black/60 border border-white/10 mb-6 text-xs font-semibold">
-          <button type="button" id="tab-signin" class="py-2.5 rounded-lg bg-white/10 text-white transition-all">Sign In</button>
-          <button type="button" id="tab-register" class="py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all">Create Profile</button>
+          <button type="button" id="tab-register" class="py-2.5 rounded-lg bg-white/10 text-white transition-all">Create Profile</button>
+          <button type="button" id="tab-signin" class="py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all">Sign In</button>
         </div>
 
-        <!-- 1. Sign In Form -->
-        <form id="form-signin" class="space-y-4">
-          <div>
-            <label class="field-label" for="signin-email">Email Address</label>
-            <input id="signin-email" type="email" required placeholder="driver@f1team.com" class="text-input" autocomplete="email">
-          </div>
-          <div>
-            <label class="field-label" for="signin-password">Password</label>
-            <input id="signin-password" type="password" required placeholder="••••••••" class="text-input" autocomplete="current-password">
-          </div>
-          <div id="signin-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
-          <button type="submit" id="btn-signin-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
-            Sign In to Pit Wall &rarr;
-          </button>
-        </form>
-
-        <!-- 2. Create Account Form -->
-        <form id="form-register" class="space-y-4 hidden">
+        <!-- 1. Create Profile Form (Default Visible) -->
+        <form id="form-register" class="space-y-4">
           <div>
             <label class="field-label" for="reg-username">Driver Callsign / Username</label>
             <input id="reg-username" type="text" required placeholder="e.g. norris_04" class="text-input" autocomplete="username">
@@ -98,22 +83,25 @@
             <label class="field-label" for="reg-confirm">Confirm Password</label>
             <input id="reg-confirm" type="password" required minlength="6" placeholder="Repeat password" class="text-input" autocomplete="new-password">
           </div>
-          <div>
-            <label class="field-label">Preferred Experience</label>
-            <div class="grid grid-cols-2 gap-2 mt-1">
-              <label class="sub-box p-3 cursor-pointer flex items-center gap-2 text-xs">
-                <input type="radio" name="reg-mode" value="guided" checked class="accent-[#E10600]">
-                <span class="text-white">Guided (Learn)</span>
-              </label>
-              <label class="sub-box p-3 cursor-pointer flex items-center gap-2 text-xs">
-                <input type="radio" name="reg-mode" value="pro" class="accent-[#E10600]">
-                <span class="text-white">Pro (Direct)</span>
-              </label>
-            </div>
-          </div>
           <div id="reg-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
           <button type="submit" id="btn-reg-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
             Create Profile &amp; Launch &rarr;
+          </button>
+        </form>
+
+        <!-- 2. Sign In Form (Hidden by default) -->
+        <form id="form-signin" class="space-y-4 hidden">
+          <div>
+            <label class="field-label" for="signin-email">Email Address</label>
+            <input id="signin-email" type="email" required placeholder="driver@f1team.com" class="text-input" autocomplete="email">
+          </div>
+          <div>
+            <label class="field-label" for="signin-password">Password</label>
+            <input id="signin-password" type="password" required placeholder="••••••••" class="text-input" autocomplete="current-password">
+          </div>
+          <div id="signin-feedback" class="hidden text-xs mono px-3 py-2 rounded-lg"></div>
+          <button type="submit" id="btn-signin-submit" class="btn-primary w-full py-3.5 text-sm mt-2">
+            Sign In to Pit Wall &rarr;
           </button>
         </form>
 
@@ -157,7 +145,7 @@
         document.getElementById('returning-username').textContent = state.username;
         banner.classList.remove('hidden');
         document.getElementById('btn-quick-resume').addEventListener('click', () => {
-          goTo(state.userMode === 'pro' ? 3 : 2);
+          goTo(state.hasCompletedGuide ? 3 : 2);
         });
       }
 
@@ -220,25 +208,34 @@
 
       checkConnectionStatus();
 
-      // Tab Switching
+      // Tab Switching (Default: Create Profile)
       const tabSignIn = document.getElementById('tab-signin');
       const tabRegister = document.getElementById('tab-register');
       const formSignIn = document.getElementById('form-signin');
       const formRegister = document.getElementById('form-register');
 
-      tabSignIn.addEventListener('click', () => {
-        formSignIn.classList.remove('hidden');
-        formRegister.classList.add('hidden');
-        tabSignIn.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
-        tabRegister.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
-      });
-
-      tabRegister.addEventListener('click', () => {
+      function activateRegisterTab() {
         formRegister.classList.remove('hidden');
         formSignIn.classList.add('hidden');
         tabRegister.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
         tabSignIn.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
-      });
+      }
+
+      function activateSignInTab() {
+        formSignIn.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        tabSignIn.className = 'py-2.5 rounded-lg bg-white/10 text-white transition-all';
+        tabRegister.className = 'py-2.5 rounded-lg text-zinc-400 hover:text-white transition-all';
+      }
+
+      tabSignIn.addEventListener('click', activateSignInTab);
+      tabRegister.addEventListener('click', activateRegisterTab);
+
+      if (window.location.hash === '#signin' || window.location.search.includes('mode=signin')) {
+        activateSignInTab();
+      } else {
+        activateRegisterTab();
+      }
 
       // Sign In Form Submission
       formSignIn.addEventListener('submit', async (e) => {
@@ -263,7 +260,7 @@
             return;
           }
           const curState = getState();
-          goTo(curState.userMode === 'pro' ? 3 : 2);
+          goTo(curState.hasCompletedGuide ? 3 : 2);
         } catch (err) {
           fb.textContent = 'Supabase authentication failed: ' + (err.message || 'Check database connection.');
           fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
@@ -280,7 +277,6 @@
         const email = document.getElementById('reg-email').value.trim();
         const password = document.getElementById('reg-password').value;
         const confirm = document.getElementById('reg-confirm').value;
-        const preferredMode = document.querySelector('input[name="reg-mode"]:checked')?.value || 'guided';
         const fb = document.getElementById('reg-feedback');
         fb.classList.add('hidden');
 
@@ -296,7 +292,7 @@
         btn.disabled = true;
 
         try {
-          const result = await TrackLabDB.signUp(email, password, username, preferredMode);
+          const result = await TrackLabDB.signUp(email, password, username);
           if (!result.ok) {
             fb.textContent = result.error || 'Could not register profile in Supabase.';
             fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
@@ -305,8 +301,8 @@
             btn.disabled = false;
             return;
           }
-          saveState({ userMode: preferredMode });
-          goTo(preferredMode === 'pro' ? 3 : 2);
+          saveState({ hasCompletedGuide: false });
+          goTo(2);
         } catch (err) {
           fb.textContent = 'Supabase registration error: ' + (err.message || 'Check database connection.');
           fb.className = 'text-xs mono px-3 py-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300';
@@ -318,7 +314,7 @@
 
       // Guest Flow
       document.getElementById('btn-guest-enter').addEventListener('click', () => {
-        saveState({ username: 'Guest Driver' });
+        saveState({ username: 'Guest Driver', hasCompletedGuide: false });
         goTo(2);
       });
     });

@@ -3,292 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab — Learn F1 Strategy. Create Your Own.</title>
+  <title>TrackLab — Ready to Learn Race Strategy?</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="assets/css/styles.css">
   <style>
-    .hero-car-stage {
-      position: relative;
-      overflow: hidden;
-    }
-    .hero-car-img {
-      animation: carDriveIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
-      mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 58%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 58%, transparent 100%);
-    }
-    @keyframes carDriveIn {
-      from {
-        opacity: 0;
-        transform: translateX(-18%) scale(0.96);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-      }
-    }
-    .image-edge-fade {
-      mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 50%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, #000 50%, transparent 100%);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .hero-car-img { animation: none !important; opacity: 1; transform: none; }
+    .intro-fullscreen {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 35%, rgba(225, 6, 0, 0.14), transparent 70%),
+                  radial-gradient(circle at 80% 85%, rgba(24, 24, 27, 0.8), #09090B);
     }
   </style>
 </head>
-<body class="no-dock f1-grid-bg">
+<body class="no-dock intro-fullscreen f1-grid-bg flex flex-col justify-between text-white selection:bg-[#E10600] selection:text-white">
 
-  <!-- Minimal Floating Top Bar -->
+  <!-- Top Minimal Navigation -->
   <header class="app-header">
     <div class="flex items-center gap-3">
       <span class="f1-badge">F1</span>
-      <span class="header-title">TRACKLAB</span>
+      <span class="header-title tracking-widest">TRACKLAB</span>
     </div>
     <div class="flex items-center gap-5">
-      <button data-goto="12" class="header-link">What is F1?</button>
-      <button data-goto="11" class="header-link">Dashboard</button>
-      <a href="pages/login/index.html" class="btn-primary py-1.5 px-4 text-xs">Driver Sign In</a>
+      <a href="pages/about/index.html" class="header-link">About TrackLab</a>
+      <a href="pages/12-f1-explained/index.html" class="header-link">What is F1?</a>
+      <a href="pages/login/index.html" class="btn-ghost text-xs text-zinc-400 hover:text-white">Sign In</a>
     </div>
   </header>
 
-  <main>
-
-    <!-- =====================================================================
-         SECTION 1: APPLE-STYLE FULL-VIEWPORT HERO + PROJECT INTRODUCTION
-         ===================================================================== -->
-    <section class="min-h-[94vh] flex flex-col justify-between items-center text-center px-6 pt-16 pb-10 hero-car-stage">
-      <div class="max-w-4xl mx-auto z-10">
-        <span class="section-tag">Formula 1 Strategy Simulator</span>
-        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.04] mt-2">
-          Learn F1 Strategy.<br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#E10600]">Create Your Own to Master the Race.</span>
-        </h1>
-
-        <!-- Clear Project Introduction -->
-        <p class="body-copy text-base sm:text-lg max-w-3xl mx-auto mt-6 font-normal text-zinc-300">
-          Welcome to <strong class="text-white">TrackLab</strong> - an interactive Formula 1 strategy laboratory and educational simulator. Learn how tire compounds, degradation curves, and pit stop timing determine Grand Prix victories, then build and simulate your very own custom race strategy against computer-modeled telemetry on Germany's high-speed Norisring street circuit.
-        </p>
-
-        <!-- Prominent "What does Boxing mean?" Callout Box -->
-        <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-white/[0.04] border border-white/10 max-w-2xl mx-auto text-left shadow-lg">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="f1-badge text-[10px]">F1 TERMINOLOGY</span>
-            <h3 class="font-bold text-white text-base">What does "Boxing" mean?</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-            In Formula 1, when an engineer radios <strong class="text-white">"Box, box, box!"</strong>, they are instructing the driver to enter the pit lane immediately for a pit stop. The term comes from the German word <em class="text-zinc-200">Boxenstopp</em> and refers to the team's designated <em>"pit box"</em> area where 20 mechanics change all 4 wheels in under 2.5 seconds. In TrackLab, deciding which lap you box determines whether you win or lose.
-          </p>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
-          <a href="pages/login/index.html" class="btn-primary px-8 py-3.5 text-sm">
-            Launch Simulator &rarr;
-          </a>
-          <a href="#story-circuits" class="btn-outline px-7 py-3.5 text-sm">
-            Explore Walkthrough
-          </a>
-        </div>
-      </div>
-
-      <!-- High-Resolution Full Grand Prix Grid Visual -->
-      <div class="w-full max-w-5xl mx-auto my-6 relative px-4">
-        <div class="relative rounded-2xl overflow-hidden border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)]">
-          <img src="assets/images/f1-hero-car.jpg" alt="Formula 1 World Championship Grid Pack on Track"
-               class="w-full h-auto max-h-[480px] object-cover mx-auto select-none">
-          <div class="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-transparent opacity-60 pointer-events-none"></div>
-        </div>
-      </div>
-
-      <!-- Subtle Scroll Indicator -->
-      <a href="#story-circuits" class="flex flex-col items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors">
-        <span class="mono uppercase tracking-widest text-[10px]">Scroll to discover</span>
-        <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-      </a>
-    </section>
-
-    <!-- =====================================================================
-         SECTION 2: WALKTHROUGH & CIRCUIT GEOMETRY (NORISRING ONLY)
-         ===================================================================== -->
-    <section id="story-circuits" class="min-h-[82vh] flex flex-col justify-center px-6 py-24 max-w-6xl mx-auto">
+  <!-- Full Screen Hero Question -->
+  <main class="flex-1 flex flex-col justify-center items-center text-center px-6 py-16">
+    <div class="max-w-4xl mx-auto space-y-8 animate-on-scroll scale-in">
       
-      <!-- Prominent Section Title Requested by User -->
-      <div class="text-center mb-14 animate-on-scroll">
-        <span class="section-tag">Step-by-Step Interactive Workflow</span>
-        <h2 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
-          Let’s walk through it.
-        </h2>
-        <p class="body-copy text-base sm:text-lg max-w-2xl mx-auto mt-4 text-zinc-400">
-          Here is how you go from a complete beginner to building a winning Formula 1 Grand Prix race strategy on the Norisring street circuit.
-        </p>
+      <!-- High-Tech Pill -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs mono tracking-wider text-zinc-300">
+        <span class="w-2 h-2 rounded-full bg-[#E10600] shadow-[0_0_8px_#E10600]"></span>
+        FORMULA 1 TELEMETRY SIMULATOR
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
-        <div class="animate-on-scroll slide-left">
-          <span class="section-tag">01 // Track Geometry</span>
-          <h3 class="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight mt-2">
-            Norisring — Nuremberg Street Circuit
-          </h3>
-          <p class="body-copy text-lg mt-6 text-zinc-300">
-            A historic 2.300 km street circuit in Bavaria, Germany. With 72 rapid laps, heavy braking into the famous Grundig hairpin, and a 285 km/h blast along the Dutzendteich straight, tire management and pit stop timing decide the race.
-          </p>
-          <div class="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-white/10 mono">
-            <div>
-              <div class="text-2xl font-bold text-white">72</div>
-              <div class="text-xs text-zinc-500 mt-1">Race Laps</div>
-            </div>
-            <div>
-              <div class="text-2xl font-bold text-[#E10600]">18.4s</div>
-              <div class="text-xs text-zinc-500 mt-1">Pit Lane Transit</div>
-            </div>
-            <div>
-              <div class="text-2xl font-bold text-white">2.30 km</div>
-              <div class="text-xs text-zinc-500 mt-1">Lap Distance</div>
-            </div>
-          </div>
-        </div>
+      <!-- Main Headline Question -->
+      <h1 class="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight text-white leading-[1.05]">
+        Ready to learn<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#E10600]">
+          race strategy?
+        </span>
+      </h1>
 
-        <div class="animate-on-scroll slide-right flex justify-center">
-          <div class="panel p-8 sm:p-12 w-full max-w-lg relative overflow-hidden">
-            <div class="mono text-[11px] text-zinc-500 uppercase tracking-widest mb-4">Norisring Vector Telemetry</div>
-            <svg viewBox="0 0 500 220" class="w-full h-auto stroke-white fill-none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
-              <path class="svg-circuit-draw" d="M 80 150 L 380 150 C 430 150, 440 120, 410 100 L 370 75 C 340 55, 300 70, 270 85 L 120 85 C 80 85, 60 110, 80 150 Z"/>
-              <circle cx="80" cy="150" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
-            </svg>
-            <div class="flex justify-between items-center mt-6 pt-4 border-t border-white/10 mono text-xs text-zinc-400">
-              <span>NORISRING // 8 CORNERS</span>
-              <span class="text-[#22C55E] font-semibold">LOW TIRE DEGRADATION</span>
-            </div>
-          </div>
-        </div>
+      <p class="text-base sm:text-xl text-zinc-400 max-w-xl mx-auto font-normal leading-relaxed">
+        Step into the shoes of a Formula 1 Race Strategist. Master the secrets of tire degradation, pit timing, and fuel weight on the Norisring street circuit.
+      </p>
+
+      <!-- The Big YES Action Button -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-center gap-5">
+        <a href="pages/login/index.html" id="btn-start-yes"
+           class="btn-primary text-xl font-extrabold px-14 py-5 rounded-full shadow-[0_0_35px_rgba(225,6,0,0.5)] hover:shadow-[0_0_60px_rgba(225,6,0,0.85)] hover:scale-105 active:scale-95 transition-all">
+          Yes &rarr;
+        </a>
       </div>
-    </section>
 
-    <!-- =====================================================================
-         SECTION 3: COMPOUND PHYSICS
-         ===================================================================== -->
-    <section class="min-h-[82vh] flex items-center px-6 py-24 max-w-6xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
-        <div class="animate-on-scroll slide-left order-2 lg:order-1">
-          <img src="assets/images/f1-pit-tires.jpg" alt="Formula 1 Soft Medium Hard slick tires"
-               class="image-edge-fade w-full h-auto rounded-2xl object-cover max-h-[420px]">
-        </div>
-
-        <div class="animate-on-scroll slide-right order-1 lg:order-2">
-          <span class="section-tag">02 // Tires Explained Simply</span>
-          <h2 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mt-2">
-            Speed vs. Durability.
-          </h2>
-          <p class="body-copy text-lg mt-6">
-            In F1, tires are called <strong>compounds</strong>. Soft tires give you the fastest speed and cornering grip, but wear out quickly. Hard tires are slightly slower, but last for dozens of laps. Medium tires give you a balanced blend of both.
-          </p>
-          <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300">
-            <strong class="text-white block mb-1">What is "The Cliff"?</strong>
-            As tires wear down, grip drops slowly at first. But when rubber overheats too much, you hit <em>the cliff</em>—where lap times suddenly become 2+ seconds slower and you are forced to make a pit stop.
-          </div>
-          <div class="flex flex-col sm:flex-row gap-4 mt-6">
-            <div class="sub-box flex items-center gap-3 flex-1">
-              <span class="tire-ring tire-soft"></span>
-              <div>
-                <div class="font-semibold text-sm text-white">Soft (Red)</div>
-                <div class="mono text-xs text-zinc-500">Fastest pace • ~13 laps</div>
-              </div>
-            </div>
-            <div class="sub-box flex items-center gap-3 flex-1">
-              <span class="tire-ring tire-medium"></span>
-              <div>
-                <div class="font-semibold text-sm text-white">Medium (Yellow)</div>
-                <div class="mono text-xs text-zinc-500">Balanced • ~22 laps</div>
-              </div>
-            </div>
-            <div class="sub-box flex items-center gap-3 flex-1">
-              <span class="tire-ring tire-hard"></span>
-              <div>
-                <div class="font-semibold text-sm text-white">Hard (White)</div>
-                <div class="mono text-xs text-zinc-500">Long lasting • ~34 laps</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Quick Subtext Navigation -->
+      <div class="pt-6 flex items-center justify-center gap-6 text-xs text-zinc-500 mono">
+        <a href="pages/about/index.html" class="hover:text-zinc-300 underline transition-colors">
+          Read About the Simulator &rarr;
+        </a>
+        <span>•</span>
+        <a href="pages/login/index.html" class="hover:text-zinc-300 underline transition-colors">
+          Returning Driver Sign In
+        </a>
       </div>
-    </section>
 
-    <!-- =====================================================================
-         SECTION 4: PIT STOP STRATEGY & THE UNDERCUT
-         ===================================================================== -->
-    <section class="min-h-[82vh] flex items-center px-6 py-24 max-w-6xl mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
-        <div class="animate-on-scroll slide-left">
-          <span class="section-tag">03 // Pit Stop Tactics</span>
-          <h2 class="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-tight mt-2">
-            The art of the pit stop.
-          </h2>
-          <p class="body-copy text-base mt-4 text-zinc-300">
-            A pit stop costs roughly 18.4 seconds at Norisring. Winning races is all about knowing the exact lap to come in:
-          </p>
-          <div class="space-y-3 mt-6 text-xs mono">
-            <div class="sub-box p-3.5">
-              <strong class="text-white block text-sm mb-1">🛑 "Box, Box" = Pit Stop</strong>
-              <span class="text-zinc-400">The team radio instruction telling the driver to enter the pit lane to change tires right now.</span>
-            </div>
-            <div class="sub-box p-3.5">
-              <strong class="text-[#22C55E] block text-sm mb-1">⚡ The Undercut (Pit Early)</strong>
-              <span class="text-zinc-400">Pitting a lap or two <em>before</em> your rival. Fresh tires are so fast that when your rival pits later, you've already jumped ahead of them.</span>
-            </div>
-            <div class="sub-box p-3.5">
-              <strong class="text-amber-400 block text-sm mb-1">🔄 The Overcut (Pit Late)</strong>
-              <span class="text-zinc-400">Staying out on track while your rival pits. If your car is light and your old tires still have grip, you race in clean air to build a lead.</span>
-            </div>
-          </div>
-          <div class="mt-6 flex items-center gap-6 mono text-xs text-zinc-400">
-            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22C55E]"></span> Cars get faster as fuel burns</span>
-            <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Must use 2 different tire types</span>
-          </div>
-        </div>
-
-        <div class="animate-on-scroll slide-right">
-          <div class="relative rounded-2xl overflow-hidden border border-white/10">
-            <img src="assets/images/f1-pitstop-action.jpg" alt="Formula 1 car entering illuminated pit lane"
-                 class="w-full h-[360px] object-cover">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#09090B] via-transparent to-transparent"></div>
-            <div class="absolute bottom-5 left-5 right-5 glass-panel p-4 flex justify-between items-center">
-              <div>
-                <div class="mono text-[10px] uppercase text-zinc-400">Norisring Pit Window</div>
-                <div class="text-sm font-semibold text-white">Optimal Undercut Detected</div>
-              </div>
-              <div class="mono text-lg font-bold text-[#22C55E]">-1.84s</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =====================================================================
-         SECTION 5: CLOSING CALL-TO-ACTION (DIRECT ACCESS TO DEDICATED LOGIN)
-         ===================================================================== -->
-    <section class="py-24 px-6 text-center border-t border-white/10 bg-gradient-to-b from-transparent to-[#111114]">
-      <div class="max-w-2xl mx-auto animate-on-scroll">
-        <span class="f1-badge mb-3">PIT WALL TELEMETRY</span>
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Ready to Build Your Strategy?</h2>
-        <p class="text-sm sm:text-base text-zinc-400 mt-4 max-w-xl mx-auto">
-          Sign in to your driver profile, or jump right into the academy lessons to design your race plan for the Norisring street circuit.
-        </p>
-
-        <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
-          <a href="pages/login/index.html" class="btn-primary px-8 py-3.5 text-sm">
-            Driver Sign In &rarr;
-          </a>
-          <button data-goto="2" class="btn-outline px-7 py-3.5 text-sm">
-            Guided Briefing
-          </button>
-        </div>
-
-        <div class="mt-8 text-xs text-zinc-500 mono">
-          Synced with Supabase Cloud Telemetry Database
-        </div>
-      </div>
-    </section>
-
+    </div>
   </main>
+
+  <!-- Clean Bottom Status Strip -->
+  <footer class="w-full px-6 py-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center text-[11px] mono text-zinc-500">
+    <span>Norisring 72-Lap Championship • Nuremberg, Germany</span>
+    <span>Powered by Supabase Cloud Sync</span>
+  </footer>
 
   <script src="assets/js/simulation-engine.js"></script>
   <script src="assets/js/shared-state.js"></script>

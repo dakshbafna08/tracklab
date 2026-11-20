@@ -60,7 +60,7 @@ def init_db() -> None:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL COLLATE NOCASE,
             password_hash TEXT NOT NULL,
-            preferred_mode TEXT DEFAULT 'guided',
+            has_completed_guide BOOLEAN DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
@@ -124,7 +124,7 @@ def verify_password(password: str, stored_hash: str) -> bool:
 class AuthRequest(BaseModel):
     username: str
     password: str
-    preferred_mode: Optional[str] = "guided"
+    has_completed_guide: bool = False
 
 
 class StrategyStateRequest(BaseModel):
@@ -134,7 +134,7 @@ class StrategyStateRequest(BaseModel):
     stint1: str = "SOFT"
     stint2: str = "HARD"
     pit_lap: int = 28
-    preferred_mode: Optional[str] = None
+    has_completed_guide: Optional[bool] = None
 
 
 class SaveRaceRequest(BaseModel):
@@ -200,10 +200,9 @@ def register(payload: AuthRequest):
             raise HTTPException(status_code=409, detail="Driver callsign already registered.")
 
         pw_hash = hash_password(payload.password)
-        mode = payload.preferred_mode if payload.preferred_mode in ("guided", "pro") else "guided"
         conn.execute(
-            "INSERT INTO users (username, password_hash, preferred_mode) VALUES (?, ?, ?)",
-            (username, pw_hash, mode),
+            "INSERT INTO users (username, password_hash, has_completed_guide) VALUES (?, ?, ?)",
+            (username, pw_hash, int(payload.has_completed_guide)),
         )
         conn.execute(
             """
@@ -221,7 +220,7 @@ def register(payload: AuthRequest):
         return {
             "success": True,
             "username": username,
-            "preferred_mode": mode,
+            "has_completed_guide": payload.has_completed_guide,
             "state": dict(state_row) if state_row else None,
         }
     finally:
@@ -238,7 +237,7 @@ def login(payload: AuthRequest):
     conn = get_db()
     try:
         user = conn.execute(
-            "SELECT username, password_hash, preferred_mode FROM users WHERE username = ?",
+            "SELECT username, password_hash, has_completed_guide FROM users WHERE username = ?",
             (username,),
         ).fetchone()
         if not user or not verify_password(payload.password, user["password_hash"]):
@@ -252,7 +251,7 @@ def login(payload: AuthRequest):
         return {
             "success": True,
             "username": user["username"],
-            "preferred_mode": user["preferred_mode"],
+            "has_completed_guide": bool(user["has_completed_guide"]),
             "state": dict(state_row) if state_row else None,
         }
     finally:
@@ -264,7 +263,7 @@ def get_user_state(username: str = Query(..., min_length=1)):
     conn = get_db()
     try:
         user = conn.execute(
-            "SELECT username, preferred_mode FROM users WHERE username = ?", (username.strip(),)
+            "SELECT username, has_completed_guide FROM users WHERE username = ?", (username.strip(),)
         ).fetchone()
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")
@@ -275,7 +274,7 @@ def get_user_state(username: str = Query(..., min_length=1)):
         ).fetchone()
         return {
             "username": user["username"],
-            "preferred_mode": user["preferred_mode"],
+            "has_completed_guide": bool(user["has_completed_guide"]),
             "state": dict(row) if row else None,
         }
     finally:
@@ -296,14 +295,14 @@ def save_user_state(payload: StrategyStateRequest):
         if not user:
             # Auto-provision guest/offline callsign state record cleanly if user registered locally
             conn.execute(
-                "INSERT INTO users (username, password_hash, preferred_mode) VALUES (?, ?, ?)",
-                (username, hash_password(secrets.token_hex(8)), payload.preferred_mode or "guided"),
+                "INSERT INTO users (username, password_hash, has_completed_guide) VALUES (?, ?, ?)",
+                (username, hash_password(secrets.token_hex(8)), int(payload.has_completed_guide or False)),
             )
 
-        if payload.preferred_mode in ("guided", "pro"):
+        if payload.has_completed_guide is not None:
             conn.execute(
-                "UPDATE users SET preferred_mode = ? WHERE username = ?",
-                (payload.preferred_mode, username),
+                "UPDATE users SET has_completed_guide = ? WHERE username = ?",
+                (int(payload.has_completed_guide), username),
             )
 
         conn.execute(

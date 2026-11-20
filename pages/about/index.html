@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackLab — About the Strategy Laboratory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <style>
+    .hero-car-stage {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-car-img {
+      animation: carDriveIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+      mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 58%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 88% 82% at 50% 50%, #000 58%, transparent 100%);
+    }
+    @keyframes carDriveIn {
+      from {
+        opacity: 0;
+        transform: translateX(-18%) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-car-img { animation: none !important; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body class="no-dock f1-grid-bg min-h-screen flex flex-col">
+
+  <!-- Floating App Header -->
+  <header class="app-header">
+    <div class="flex items-center gap-3">
+      <span class="f1-badge">F1</span>
+      <span class="header-title">TRACKLAB // ABOUT</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <button data-goto="1" class="header-link">&larr; Home</button>
+      <button data-goto="12" class="header-link">What is F1?</button>
+      <button data-goto="11" class="header-link">Dashboard</button>
+      <a href="../login/index.html" class="btn-primary py-1.5 px-4 text-xs">Driver Profile</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-14 space-y-20">
+
+    <!-- Section 1: Project Overview -->
+    <section class="text-center max-w-4xl mx-auto pt-6 animate-on-scroll">
+      <span class="section-tag">Interactive Strategy Simulator</span>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mt-2 leading-tight">
+        Learn F1 Strategy.<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-[#E10600]">
+          Create Your Own to Master the Race.
+        </span>
+      </h1>
+
+      <p class="body-copy text-base sm:text-lg mt-6 text-zinc-300 max-w-3xl mx-auto">
+        <strong class="text-white">TrackLab</strong> is an interactive Formula 1 strategy laboratory and educational simulator. Learn how tire compounds, degradation curves, and pit stop timing determine Grand Prix victories, then build and simulate your very own custom race strategy against computer-modeled telemetry on Germany's high-speed Norisring street circuit.
+      </p>
+
+      <!-- Prominent "What does Boxing mean?" Callout Box -->
+      <div class="mt-8 p-6 rounded-2xl bg-white/[0.04] border border-white/10 max-w-2xl mx-auto text-left shadow-lg">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="f1-badge text-[10px]">F1 TERMINOLOGY</span>
+          <h3 class="font-bold text-white text-base">What does "Boxing" mean?</h3>
+        </div>
+        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+          In Formula 1, when an engineer radios <strong class="text-white">"Box, box, box!"</strong>, they are instructing the driver to enter the pit lane immediately for a pit stop. The term comes from the German word <em class="text-zinc-200">Boxenstopp</em> and refers to the team's designated <em>"pit box"</em> area where 20 mechanics change all 4 wheels in under 2.5 seconds. In TrackLab, deciding which lap you box determines whether you win or lose.
+        </p>
+      </div>
+
+      <!-- Hero Visual -->
+      <div class="w-full max-w-4xl mx-auto my-10 rounded-2xl overflow-hidden border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)]">
+        <img src="../../assets/images/f1-hero-car.jpg" alt="Formula 1 Championship Grid" class="w-full h-auto max-h-[440px] object-cover">
+      </div>
+    </section>
+
+    <!-- Section 2: Walkthrough & Norisring Circuit Geometry -->
+    <section class="py-12 border-t border-white/10">
+      <div class="text-center mb-14 animate-on-scroll">
+        <span class="section-tag">Step-by-Step Interactive Workflow</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+          Let’s walk through it.
+        </h2>
+        <p class="body-copy text-sm sm:text-base max-w-2xl mx-auto mt-3 text-zinc-400">
+          How TrackLab models real-world Formula 1 dynamics on the Norisring street circuit.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+        <div class="animate-on-scroll slide-left">
+          <span class="section-tag">Track Geometry</span>
+          <h3 class="text-2xl sm:text-4xl font-bold tracking-tight text-white mt-1">
+            Norisring — Nuremberg Street Circuit
+          </h3>
+          <p class="body-copy text-sm sm:text-base mt-4 text-zinc-300">
+            A historic 2.300 km street circuit in Bavaria, Germany. With 72 rapid laps, heavy braking into the famous Grundig hairpin, and a 285 km/h blast along the Dutzendteich straight, tire management and pit stop timing decide the race.
+          </p>
+          <div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/10 mono text-center">
+            <div class="sub-box p-3">
+              <div class="text-2xl font-bold text-white">72</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Race Laps</div>
+            </div>
+            <div class="sub-box p-3">
+              <div class="text-2xl font-bold text-[#E10600]">18.4s</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Pit Transit Delta</div>
+            </div>
+            <div class="sub-box p-3">
+              <div class="text-2xl font-bold text-white">2.30 km</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Lap Distance</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="animate-on-scroll slide-right flex justify-center">
+          <div class="panel p-8 w-full max-w-md relative overflow-hidden">
+            <div class="mono text-[10px] text-zinc-500 uppercase tracking-widest mb-3">Norisring Vector Layout</div>
+            <svg viewBox="0 0 500 220" class="w-full h-auto stroke-white fill-none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+              <path class="svg-circuit-draw" d="M 80 150 L 380 150 C 430 150, 440 120, 410 100 L 370 75 C 340 55, 300 70, 270 85 L 120 85 C 80 85, 60 110, 80 150 Z"/>
+              <circle cx="80" cy="150" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
+            </svg>
+            <div class="flex justify-between items-center mt-5 pt-3 border-t border-white/10 mono text-xs text-zinc-400">
+              <span>8 CORNERS // STREETS</span>
+              <span class="text-[#22C55E] font-semibold">LOW DEGRADATION</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Call to Action -->
+    <section class="py-16 text-center border-t border-white/10">
+      <div class="max-w-xl mx-auto space-y-6 animate-on-scroll">
+        <h3 class="text-2xl sm:text-4xl font-extrabold text-white">Step onto the Pit Wall</h3>
+        <p class="text-sm text-zinc-400">
+          Create your driver profile now to save custom strategies, race telemetry, and personal lap histories to the cloud.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <a href="../login/index.html" class="btn-primary px-8 py-3.5 text-sm">
+            Create Driver Profile &rarr;
+          </a>
+          <button data-goto="1" class="btn-outline px-6 py-3.5 text-sm">
+            &larr; Back to Home
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../../assets/js/simulation-engine.js"></script>
+  <script src="../../assets/js/shared-state.js"></script>
+</body>
+</html>
