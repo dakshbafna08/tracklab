@@ -20,6 +20,7 @@ class RaceCarEnv(gym.Env):
         self.crash_penalty = 50.0
         self.car_mass = car["car_mass_kg"]
         self.drag = car["drag_coeff"]
+        self.downforce = car["downforce_coeff"]
         self.fuel_start = car["fuel_start_kg"]
         self.power = car["power_w"]
         self.max_tyre_age = car["max_tyre_age_laps"]
@@ -52,7 +53,6 @@ class RaceCarEnv(gym.Env):
         tyre = self.compounds[self.compound]
         self.mu = tyre["mu"] - tyre["wear_per_lap"] * self.tyre_age
         self.mass = self.car_mass + self.fuel_kg
-        self.max_accel = self.mu * 9.81
 
 
         self.position = self.start_position.copy()
@@ -107,6 +107,7 @@ class RaceCarEnv(gym.Env):
         action = np.clip(np.asarray(action, dtype=np.float64), -1.0, 1.0)
 
         speed = np.linalg.norm(self.velocity)
+        self.max_accel = self.mu * (9.81 + self.downforce * speed**2 / self.mass)
 
         # this is the throttle, the acceleration along the vehicle
         accel_longitudinal = action[0] * self.max_accel

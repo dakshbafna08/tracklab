@@ -2,6 +2,7 @@
   "car_mass_kg": 600,
   "power_w": 750000,
   "drag_coeff": 0.9,
+  "downforce_coeff": 3,
   "fuel_start_kg": 100,
   "fuel_burn_per_lap": 1.7,
   "max_tyre_age_laps": 40,
