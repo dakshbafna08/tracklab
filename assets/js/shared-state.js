@@ -44,7 +44,10 @@ const DEFAULT_STATE = {
   userId: null,
   email: '',
   startingFuelKg: 105,
-  hasCompletedGuide: false
+  hasCompletedGuide: false,
+  trackLocked: true,
+  tiresLocked: false,
+  pitLocked: false
 };
 
 const ALLOWED_TYRES = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'];
@@ -594,11 +597,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepsMarkup = flow.map((step, idx) => {
       const isActive = step.screen === currentScreen;
       const isDone = activeIdx !== -1 && idx < activeIdx;
-      const cls = isActive ? 'is-active' : (isDone ? 'is-done' : '');
+      const isLocked = activeIdx !== -1 && idx > activeIdx;
+      const cls = isActive ? 'is-active' : (isDone ? 'is-done' : 'is-locked opacity-35 cursor-not-allowed pointer-events-none');
+      const title = isLocked ? `Locked — Complete step ${activeIdx + 1} first` : `Jump to ${step.label}`;
       return `
-        <button type="button" data-dock-target="${step.screen}" class="dock-step ${cls}" title="Jump to ${step.label}">
+        <button type="button" ${isLocked ? 'disabled' : `data-dock-target="${step.screen}"`} class="dock-step ${cls}" title="${title}">
           <span class="dock-step-dot"></span>
           <span class="${isActive ? 'inline' : 'hidden md:inline'}">${step.label}</span>
+          ${isLocked ? '<span class="text-[9px] opacity-70 ml-0.5">🔒</span>' : ''}
         </button>
       `;
     }).join('<span class="dock-divider"></span>');
@@ -738,6 +744,155 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+/**
+ * F1 Strategy Car Builder Tracker (Assembles parts across Steps 3, 5, 7)
+ */
+function renderStrategyCarTracker(containerEl, currentStep = 1) {
+  const state = getState();
+  const trackLocked = state.trackLocked !== false; // Norisring auto-selected & locked
+  const tiresLocked = Boolean(state.tiresLocked);
+  const pitLocked = Boolean(state.pitLocked);
+
+  const s1 = state.stint1 || 'SOFT';
+  const s2 = state.stint2 || 'HARD';
+  const pitLap = state.pitLap || 28;
+
+  const compoundColors = {
+    'SOFT': '#E10600',
+    'MEDIUM': '#EAB308',
+    'HARD': '#FFFFFF',
+    'INTERMEDIATE': '#22C55E',
+    'WET': '#3B82F6'
+  };
+
+  const frontWheelColor = tiresLocked ? (compoundColors[s1] || '#E10600') : '#52525B';
+  const rearWheelColor = tiresLocked ? (compoundColors[s2] || '#FFFFFF') : '#52525B';
+
+  const partsCompleted = (trackLocked ? 1 : 0) + (tiresLocked ? 1 : 0) + (pitLocked ? 1 : 0);
+
+  const html = `
+    <div class="strategy-builder-sidebar animate-on-scroll">
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center gap-2">
+          <span class="f1-badge text-[9px]">CAR TRACKER</span>
+          <h3 class="font-bold text-white text-xs uppercase tracking-wider">Strategy Assembly</h3>
+        </div>
+        <span class="mono text-[11px] font-bold text-[#E10600]">${partsCompleted}/3 PARTS</span>
+      </div>
+
+      <!-- Assembly Progress Bar -->
+      <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-4">
+        <div class="bg-gradient-to-r from-[#E10600] to-[#22C55E] h-full transition-all duration-500" style="width: ${(partsCompleted / 3) * 100}%"></div>
+      </div>
+
+      <!-- Visual F1 Car Blueprint -->
+      <div class="car-assembly-stage">
+        <svg class="car-svg-container" viewBox="0 0 320 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Part 1: Rear Wing & Wing Endplates -->
+          <rect x="20" y="10" width="16" height="42" rx="3" fill="${trackLocked ? '#E10600' : 'rgba(255,255,255,0.08)'}" stroke="${trackLocked ? '#FFFFFF' : '#52525B'}" stroke-width="1.5" class="${trackLocked ? 'car-part-active' : 'car-part-ghost'}"/>
+          <path d="M 36 28 L 85 46 L 85 58 L 30 58 Z" fill="${trackLocked ? '#18181B' : 'rgba(255,255,255,0.04)'}"/>
+
+          <!-- Part 1: Main Monocoque Chassis -->
+          <path d="M 85 52 L 130 25 C 145 22, 175 22, 190 32 L 245 48 L 290 56 L 290 62 L 75 62 Z" 
+                fill="${trackLocked ? '#09090B' : 'rgba(255,255,255,0.05)'}" 
+                stroke="${trackLocked ? '#E10600' : '#52525B'}" 
+                stroke-width="2.5" 
+                class="${trackLocked ? 'car-part-active' : 'car-part-ghost'}"/>
+
+          <!-- Part 3: Power Unit Engine Bay Core & Halo -->
+          <path d="M 145 25 C 160 22, 175 24, 185 30 L 175 38 C 165 34, 155 33, 145 35 Z" 
+                fill="${pitLocked ? '#22C55E' : (trackLocked ? '#E10600' : 'rgba(255,255,255,0.08)')}"
+                class="${pitLocked ? 'car-part-active' : ''}"/>
+          ${pitLocked ? '<circle cx="160" cy="30" r="4.5" fill="#22C55E"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.2s" repeatCount="indefinite"/></circle>' : ''}
+
+          <!-- Part 1: Front Nosecone & Wing -->
+          <path d="M 285 55 L 315 58 L 315 65 L 275 65 Z" fill="${trackLocked ? '#E10600' : 'rgba(255,255,255,0.08)'}" class="${trackLocked ? 'car-part-active' : 'car-part-ghost'}"/>
+
+          <!-- Part 2: Rear Wheel (Stint 2 Compound) -->
+          <circle cx="70" cy="58" r="16" fill="#18181B" stroke="${rearWheelColor}" stroke-width="${tiresLocked ? '4.5' : '1.5'}" class="${tiresLocked ? 'car-part-active' : 'car-part-ghost'}"/>
+          <circle cx="70" cy="58" r="7" fill="${tiresLocked ? rearWheelColor : '#3F3F46'}" opacity="0.9"/>
+
+          <!-- Part 2: Front Wheel (Stint 1 Compound) -->
+          <circle cx="265" cy="58" r="15" fill="#18181B" stroke="${frontWheelColor}" stroke-width="${tiresLocked ? '4.5' : '1.5'}" class="${tiresLocked ? 'car-part-active' : 'car-part-ghost'}"/>
+          <circle cx="265" cy="58" r="6" fill="${tiresLocked ? frontWheelColor : '#3F3F46'}" opacity="0.9"/>
+        </svg>
+      </div>
+
+      <!-- 3 Locked Part Checklist -->
+      <div class="space-y-2 mono text-xs">
+        <div class="p-2.5 rounded-lg flex items-center justify-between ${trackLocked ? 'bg-white/5 border border-white/10 text-white' : 'bg-black/30 text-zinc-500'}">
+          <div class="flex items-center gap-2">
+            <span class="${trackLocked ? 'text-[#22C55E]' : 'text-zinc-600'}">${trackLocked ? '✓' : '○'}</span>
+            <span class="font-semibold">1. Chassis: Norisring</span>
+          </div>
+          <span class="text-[10px] ${trackLocked ? 'text-[#22C55E]' : 'text-zinc-500'}">${trackLocked ? 'LOCKED' : 'PENDING'}</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg flex items-center justify-between ${tiresLocked ? 'bg-white/5 border border-white/10 text-white' : 'bg-black/30 text-zinc-500'}">
+          <div class="flex items-center gap-2">
+            <span class="${tiresLocked ? 'text-[#22C55E]' : 'text-zinc-600'}">${tiresLocked ? '✓' : '○'}</span>
+            <span class="font-semibold">2. Rubber: ${tiresLocked ? `${s1} &rarr; ${s2}` : 'Pirelli Tires'}</span>
+          </div>
+          <span class="text-[10px] ${tiresLocked ? 'text-[#22C55E]' : 'text-zinc-500'}">${tiresLocked ? 'LOCKED' : 'PENDING'}</span>
+        </div>
+
+        <div class="p-2.5 rounded-lg flex items-center justify-between ${pitLocked ? 'bg-white/5 border border-white/10 text-white' : 'bg-black/30 text-zinc-500'}">
+          <div class="flex items-center gap-2">
+            <span class="${pitLocked ? 'text-[#22C55E]' : 'text-zinc-600'}">${pitLocked ? '✓' : '○'}</span>
+            <span class="font-semibold">3. Pit Brain: ${pitLocked ? `Lap ${pitLap}` : 'Pit Window'}</span>
+          </div>
+          <span class="text-[10px] ${pitLocked ? 'text-[#22C55E]' : 'text-zinc-500'}">${pitLocked ? 'LOCKED' : 'PENDING'}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const target = typeof containerEl === 'string' ? document.getElementById(containerEl) : containerEl;
+  if (target) {
+    target.innerHTML = html;
+  }
+}
+
+/**
+ * Drive across screen animation when strategy is fully locked
+ */
+function triggerStrategyLockAndLaunch(onComplete) {
+  let overlay = document.getElementById('strategy-launch-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'strategy-launch-overlay';
+    overlay.className = 'strategy-car-launch-overlay';
+    overlay.innerHTML = `
+      <div class="text-center space-y-6">
+        <span class="f1-badge text-xs">TELEMETRY SYNCHRONIZED</span>
+        <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight">STRATEGY LOCKED IN</h2>
+        <p class="text-zinc-400 text-sm mono">Deploying Car to the Starting Grid...</p>
+        <div class="launching-car-wrap my-8">
+          <svg class="w-72 sm:w-96 h-auto" viewBox="0 0 320 80" fill="none">
+            <rect x="20" y="10" width="16" height="42" rx="3" fill="#E10600" stroke="#FFFFFF" stroke-width="2"/>
+            <path d="M 36 28 L 85 46 L 85 58 L 30 58 Z" fill="#18181B"/>
+            <path d="M 85 52 L 130 25 C 145 22, 175 22, 190 32 L 245 48 L 290 56 L 290 62 L 75 62 Z" fill="#09090B" stroke="#E10600" stroke-width="3"/>
+            <path d="M 145 25 C 160 22, 175 24, 185 30 L 175 38 C 165 34, 155 33, 145 35 Z" fill="#22C55E"/>
+            <path d="M 285 55 L 315 58 L 315 65 L 275 65 Z" fill="#E10600"/>
+            <circle cx="70" cy="58" r="16" fill="#18181B" stroke="#FFFFFF" stroke-width="5"/>
+            <circle cx="265" cy="58" r="15" fill="#18181B" stroke="#E10600" stroke-width="5"/>
+          </svg>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  overlay.classList.add('active');
+  setTimeout(() => {
+    if (typeof onComplete === 'function') {
+      onComplete();
+    } else {
+      goTo(8);
+    }
+  }, 1300);
+}
+
 if (typeof window !== 'undefined') {
   window.getState = getState;
   window.saveState = saveState;
@@ -746,4 +901,6 @@ if (typeof window !== 'undefined') {
   window.navigateTo = navigateTo;
   window.getCurrentScreen = getCurrentScreen;
   window.TrackLabDB = TrackLabDB;
+  window.renderStrategyCarTracker = renderStrategyCarTracker;
+  window.triggerStrategyLockAndLaunch = triggerStrategyLockAndLaunch;
 }

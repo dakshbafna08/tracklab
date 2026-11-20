@@ -3,124 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab — F1 Race Strategy Guide</title>
+  <title>TrackLab — Welcome to the Pit Wall</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col f1-grid-bg">
+<body class="min-h-screen flex flex-col justify-between f1-grid-bg text-white">
 
+  <!-- Header -->
   <header class="app-header">
     <div class="flex items-center gap-3">
       <span class="f1-badge">F1</span>
-      <span class="header-title">TRACKLAB // STRATEGY GUIDE</span>
+      <span class="header-title">TRACKLAB // PIT WALL</span>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="about" class="header-link">About</button>
       <button data-goto="12" class="header-link">What is F1?</button>
-      <button data-goto="3" class="header-link">Strategy Builder</button>
       <button data-goto="11" class="header-link">Dashboard</button>
       <span class="mono text-xs px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300" id="header-driver-name">Driver</span>
     </div>
   </header>
 
-  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col justify-center">
+  <!-- Main Brief Greeting Card -->
+  <main class="flex-1 w-full max-w-3xl mx-auto px-6 py-16 flex flex-col justify-center items-center text-center">
+    
+    <div class="glass-panel p-8 sm:p-14 w-full space-y-8 animate-on-scroll scale-in border border-white/15 shadow-[0_20px_70px_rgba(0,0,0,0.8)]">
+      
+      <span class="f1-badge mb-2">RACE STRATEGIST ONBOARDING</span>
 
-    <!-- Header Section -->
-    <section class="text-center max-w-3xl mx-auto mb-10 animate-on-scroll">
-      <span class="section-tag">Race Engineer Academy</span>
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-2">
-        Welcome to the Pit Wall, <span id="welcome-driver" class="text-[#E10600]">Driver</span>.
-      </h1>
-      <p class="body-copy text-base sm:text-lg mt-4 text-zinc-300">
-        In Formula 1, raw speed alone doesn't win Grand Prix championships. Races are won and lost on the pit wall through tire selection, fuel management, and precise pit window timing.
-      </p>
-    </section>
-
-    <!-- Strategy Fundamentals Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-      <div class="panel p-6 flex flex-col justify-between animate-on-scroll slide-left">
-        <div>
-          <div class="mono text-xs uppercase text-[#E10600] font-semibold mb-2">01 // Rubber Science</div>
-          <h2 class="text-xl font-bold text-white mb-2">Tire Compounds &amp; Cliffs</h2>
-          <p class="text-xs text-zinc-400 leading-relaxed">
-            Softer tires are lightning-fast off the line but degrade rapidly. Harder tires last longer but are slower. Every tire eventually hits a "cliff" where lap times drop off by multiple seconds.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/10 text-[11px] mono text-zinc-400">
-          FIA Rule: Must run 2 distinct dry compounds
-        </div>
+      <div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+          Welcome to the Pit Wall, <span id="welcome-driver" class="text-[#E10600]">Driver</span>.
+        </h1>
+        <p class="text-xl sm:text-2xl font-bold text-zinc-300 mt-3">
+          Let's walk through it.
+        </p>
       </div>
 
-      <div class="panel p-6 flex flex-col justify-between animate-on-scroll">
-        <div>
-          <div class="mono text-xs uppercase text-amber-400 font-semibold mb-2">02 // The Pit Delta</div>
-          <h2 class="text-xl font-bold text-white mb-2">Pit Lane Time Loss</h2>
-          <p class="text-xs text-zinc-400 leading-relaxed">
-            Stopping for fresh rubber is never free. At Norisring, driving through the speed-limited pit lane costs approximately <strong class="text-white">18.4 seconds</strong>. Your tire pace advantage must overcome this deficit.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/10 text-[11px] mono text-zinc-400">
-          Norisring Pit Loss: 18.4s fixed delta
-        </div>
-      </div>
-
-      <div class="panel p-6 flex flex-col justify-between animate-on-scroll slide-right">
-        <div>
-          <div class="mono text-xs uppercase text-[#22C55E] font-semibold mb-2">03 // Tactical Overtaking</div>
-          <h2 class="text-xl font-bold text-white mb-2">The Undercut</h2>
-          <p class="text-xs text-zinc-400 leading-relaxed">
-            Can't pass the car ahead on track? "Box" (pit stop) a lap before them. Your brand new tires deliver an immediate 2-second pace advantage on your out-lap, jumping you ahead when they pit.
-          </p>
-        </div>
-        <div class="mt-4 pt-3 border-t border-white/10 text-[11px] mono text-zinc-400">
-          Clean Air + Fresh Rubber = Net Position Gain
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Actions & Launch -->
-    <section class="glass-panel p-8 text-center animate-on-scroll">
-      <h3 class="text-xl font-bold text-white mb-2">Ready to Design Your Strategy?</h3>
-      <p class="text-xs sm:text-sm text-zinc-400 max-w-xl mx-auto mb-6">
-        Walk through the interactive circuit and tire selectors step-by-step. Once you finish your first run, future sessions take you directly to building strategies unless you open this guide again.
+      <p class="body-copy text-sm sm:text-base text-zinc-400 max-w-xl mx-auto leading-relaxed">
+        You're stepping in as Lead Race Strategist for the 72-lap Norisring Grand Prix. We'll lock in your circuit, allocate your starting and finishing tire compounds, and pinpoint the exact lap to box to beat the mathematical optimum.
       </p>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <button id="btn-start-guide" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-sm">
-          Start Strategy Walkthrough &rarr;
-        </button>
-        <button id="btn-skip-guide" class="btn-outline w-full sm:w-auto px-6 py-3.5 text-sm">
-          Direct to Strategy Builder &rarr;
+      <!-- Single Clear Action Button -->
+      <div class="pt-4">
+        <button id="btn-start-builder" class="btn-primary w-full sm:w-auto px-10 py-4 text-base font-bold shadow-[0_0_25px_rgba(225,6,0,0.4)] hover:shadow-[0_0_40px_rgba(225,6,0,0.7)] transition-all">
+          Let's Start Building Your Strategy Now &rarr;
         </button>
       </div>
-    </section>
 
-    <div class="mt-8 flex justify-between items-center text-xs text-zinc-500">
-      <button data-goto="login" class="text-zinc-400 hover:text-white">&larr; Switch Driver</button>
-      <button data-goto="11" class="text-zinc-400 hover:text-white">Open Driver Dashboard &rarr;</button>
     </div>
 
   </main>
+
+  <footer class="w-full px-6 py-4 text-center text-xs text-zinc-500 mono">
+    Norisring 72-Lap Championship • Nuremberg, Germany
+  </footer>
 
   <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const state = getState();
-      if (state.username) {
+      if (state.username && state.username !== 'Guest Driver') {
         document.getElementById('welcome-driver').textContent = state.username;
       }
 
-      // Start full walkthrough (first-time experience)
-      document.getElementById('btn-start-guide').addEventListener('click', () => {
-        goTo(3);
-      });
-
-      // Skip directly to circuit builder and mark guide as completed
-      document.getElementById('btn-skip-guide').addEventListener('click', () => {
-        saveState({ hasCompletedGuide: true });
+      document.getElementById('btn-start-builder').addEventListener('click', () => {
         goTo(3);
       });
     });

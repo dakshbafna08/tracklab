@@ -3,112 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrackLab — Tire Physics</title>
+  <title>TrackLab — Tire &amp; Pit Strategy Guide</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col f1-grid-bg">
+<body class="min-h-screen flex flex-col justify-between f1-grid-bg text-white">
 
+  <!-- Header -->
   <header class="app-header">
     <div class="flex items-center gap-3">
       <span class="f1-badge">F1</span>
-      <span class="header-title">TRACKLAB</span>
+      <span class="header-title">TRACKLAB // STRATEGY REFERENCE GUIDE</span>
     </div>
     <div class="flex items-center gap-5">
       <button data-goto="12" class="header-link">What is F1?</button>
-      <button data-goto="5" class="btn-ghost text-xs">Skip Lesson &rarr;</button>
+      <button data-goto="5" class="btn-primary py-1.5 px-4 text-xs">Return to Tires &rarr;</button>
       <button data-goto="11" class="header-link">Dashboard</button>
     </div>
   </header>
 
-  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col justify-between">
+  <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 space-y-12">
 
-    <!-- Friendly Hero Banner -->
-    <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12 animate-on-scroll">
+    <!-- Hero Header -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center animate-on-scroll">
       <div>
-        <span class="section-tag">02 // Tires Explained Simply</span>
+        <span class="f1-badge mb-2">COMPLETE PIT WALL MANUAL</span>
         <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight mt-2">
-          Soft, Medium, or Hard.<br>Which wins the race?
+          Tire Physics &amp;<br>Pit Stop Strategy
         </h1>
-        <p class="body-copy text-lg mt-5">
-          In Formula 1, tires are called <strong>compounds</strong> (the rubber recipe). Softer rubber gives huge grip but wears out quickly. Harder rubber lasts for dozens of laps but is slightly slower.
+        <p class="body-copy text-base sm:text-lg mt-4 text-zinc-300">
+          In Formula 1, races aren't won on horsepower alone. They are won by understanding when tire degradation overwhelms pit stop time loss, and using the undercut to pass rivals.
         </p>
-        <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300">
-          <strong class="text-white">What is a "Stint"?</strong>
-          A stint is simply the chunk of the race you drive on one set of tires. In a 1-stop race, you have two stints: Stint 1 before your pit stop, and Stint 2 after it.
+
+        <!-- Quick Section Anchor Links -->
+        <div class="flex flex-wrap items-center gap-2 mt-6 mono text-xs">
+          <a href="#section-tires" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-zinc-200">
+            ↓ Tire Compounds
+          </a>
+          <a href="#section-fia-rule" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-zinc-200">
+            ↓ 2-Compound Rule
+          </a>
+          <a href="#section-pit-stops" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-zinc-200">
+            ↓ "Box, Box" &amp; Undercut
+          </a>
         </div>
       </div>
+
       <div class="rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]">
-        <img src="../../assets/images/f1-pit-tires.jpg" alt="Soft Medium and Hard Formula 1 Pirelli slick tires"
-             class="w-full h-[300px] sm:h-[340px] object-cover">
+        <img src="../../assets/images/f1-pit-tires.jpg" alt="Pirelli Formula 1 Slick Tires in Pit Lane"
+             class="w-full h-[280px] sm:h-[320px] object-cover">
       </div>
     </section>
 
-    <!-- 3 Simple Compound Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <article class="panel p-8 animate-on-scroll delay-1">
-        <div class="flex items-center justify-between mb-6">
-          <span class="tire-ring tire-soft w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-[#E10600] font-semibold">Fastest Tire</span>
+    <!-- =====================================================================
+         PART 1: TIRE COMPOUNDS & DEGRADATION
+         ===================================================================== -->
+    <section id="section-tires" class="space-y-6 animate-on-scroll pt-6 border-t border-white/10">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-2">
+        <div>
+          <span class="section-tag mb-1">Part 01 // Compound Chemistry</span>
+          <h2 class="text-3xl font-extrabold text-white">The Three Dry Compounds</h2>
+          <p class="text-sm text-zinc-400 mt-1">
+            A <strong>stint</strong> is simply the continuous segment of laps driven on one set of tires.
+          </p>
         </div>
-        <h2 class="text-2xl font-bold text-white">Soft (Red)</h2>
-        <p class="text-sm text-zinc-400 mt-2 mb-6">
-          Maximum speed off the start line and for overtaking sprints, but the rubber wears out quickly.
-        </p>
-        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-[#22C55E] font-semibold">Fastest (0.00s)</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~13 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-[#E10600] font-semibold">~Lap 18</span></div>
-        </div>
-      </article>
+      </div>
 
-      <article class="panel p-8 animate-on-scroll delay-2">
-        <div class="flex items-center justify-between mb-6">
-          <span class="tire-ring tire-medium w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-yellow-400 font-semibold">Balanced Pick</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white">Medium (Yellow)</h2>
-        <p class="text-sm text-zinc-400 mt-2 mb-6">
-          The strategic workhorse. Balances great speed with strong durability—used in almost every winning race.
-        </p>
-        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-white font-semibold">+0.48s / lap</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~22 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-yellow-400 font-semibold">~Lap 30</span></div>
-        </div>
-      </article>
+      <!-- 3 Compound Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-      <article class="panel p-8 animate-on-scroll delay-3">
-        <div class="flex items-center justify-between mb-6">
-          <span class="tire-ring tire-hard w-10 h-10 border-[6px]"></span>
-          <span class="mono text-xs text-zinc-300 font-semibold">Toughest Tire</span>
-        </div>
-        <h2 class="text-2xl font-bold text-white">Hard (White)</h2>
-        <p class="text-sm text-zinc-400 mt-2 mb-6">
-          The marathon tire. Slightly slower single lap speed, but resists overheating and runs the longest.
-        </p>
-        <div class="space-y-2 pt-4 border-t border-white/10 mono text-xs">
-          <div class="flex justify-between"><span class="text-zinc-500">Lap Pace</span><span class="text-white font-semibold">+0.92s / lap</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Best Life</span><span class="text-white">~34 Laps</span></div>
-          <div class="flex justify-between"><span class="text-zinc-500">Loses Grip ('Cliff')</span><span class="text-zinc-300 font-semibold">~Lap 46</span></div>
-        </div>
-      </article>
+        <!-- Soft -->
+        <article class="panel p-6 border-t-2 border-t-[#E10600] space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="tire-ring tire-soft w-9 h-9 border-[5px]"></span>
+            <span class="mono text-xs text-[#E10600] font-bold uppercase">Fastest Pace</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">Soft (Red)</h3>
+            <p class="text-xs text-zinc-400 mt-1">
+              Maximum launch grip off the grid and explosive qualifying pace. The softest compound grips asphalt instantly but burns out quickly.
+            </p>
+          </div>
+          <div class="space-y-2 pt-3 border-t border-white/10 mono text-xs">
+            <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-[#22C55E] font-semibold">Fastest (0.00s)</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Peak Life</span><span class="text-white">~13 Laps</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Degradation Cliff</span><span class="text-[#E10600] font-semibold">~Lap 18</span></div>
+          </div>
+        </article>
+
+        <!-- Medium -->
+        <article class="panel p-6 border-t-2 border-t-yellow-400 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="tire-ring tire-medium w-9 h-9 border-[5px]"></span>
+            <span class="mono text-xs text-yellow-400 font-bold uppercase">Race Workhorse</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">Medium (Yellow)</h3>
+            <p class="text-xs text-zinc-400 mt-1">
+              The strategic favorite. Offers excellent cornering grip with balanced degradation—featured in nearly every winning Grand Prix strategy.
+            </p>
+          </div>
+          <div class="space-y-2 pt-3 border-t border-white/10 mono text-xs">
+            <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.48s / lap</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Peak Life</span><span class="text-white">~22 Laps</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Degradation Cliff</span><span class="text-yellow-400 font-semibold">~Lap 30</span></div>
+          </div>
+        </article>
+
+        <!-- Hard -->
+        <article class="panel p-6 border-t-2 border-t-zinc-300 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="tire-ring tire-hard w-9 h-9 border-[5px]"></span>
+            <span class="mono text-xs text-zinc-300 font-bold uppercase">Marathon Rubber</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-white">Hard (White)</h3>
+            <p class="text-xs text-zinc-400 mt-1">
+              The endurance tire. Slower to reach optimal temperature, but resists heat blistering and lasts deepest into the race.
+            </p>
+          </div>
+          <div class="space-y-2 pt-3 border-t border-white/10 mono text-xs">
+            <div class="flex justify-between"><span class="text-zinc-500">Pace Delta</span><span class="text-white font-semibold">+0.92s / lap</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Peak Life</span><span class="text-white">~34 Laps</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500">Degradation Cliff</span><span class="text-zinc-300 font-semibold">~Lap 46</span></div>
+          </div>
+        </article>
+
+      </div>
     </section>
 
-    <!-- Clear Callout Box -->
-    <div class="sub-box p-5 mb-8 animate-on-scroll space-y-2 text-xs">
-      <div class="flex items-center gap-2 text-amber-400 font-semibold uppercase tracking-wider text-[11px]">
-        <span>⚠</span> <span>F1 Two-Compound Rule</span>
+    <!-- =====================================================================
+         PART 2: MANDATORY FIA TWO-COMPOUND RULE
+         ===================================================================== -->
+    <section id="section-fia-rule" class="sub-box p-6 sm:p-8 animate-on-scroll border border-amber-500/30 bg-amber-500/5">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="px-2.5 py-1 rounded bg-amber-500 text-black mono font-bold text-xs uppercase">Mandatory Rule</span>
+        <h3 class="text-xl font-bold text-white">The FIA Two-Compound Mandate</h3>
       </div>
-      <p class="text-zinc-300 leading-relaxed">
-        In a dry F1 race, the rules mandate that every driver must use <strong>at least two different tire types</strong> during the race (for example, Soft then Hard, or Medium then Soft). You cannot stay on the same tire type all race long.
+      <p class="body-copy text-sm leading-relaxed text-zinc-300">
+        In dry track conditions, Formula 1 Sporting Regulations require every driver to use <strong>at least two different tire compounds</strong> during the race (e.g. starting on Soft, then switching to Medium or Hard). You cannot drive the entire race on one compound—even if the tires never wear out.
       </p>
-    </div>
+    </section>
 
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
-      <button data-goto="3" class="btn-outline w-full sm:w-auto">&larr; Back to Circuits</button>
-      <button data-goto="5" class="btn-primary w-full sm:w-auto px-8 py-3.5">Select Your Compounds &rarr;</button>
+    <!-- =====================================================================
+         PART 3: PIT STOP STRATEGY (BOX, UNDERCUT, OVERCUT)
+         ===================================================================== -->
+    <section id="section-pit-stops" class="space-y-6 animate-on-scroll pt-6 border-t border-white/10">
+      <div>
+        <span class="section-tag mb-1">Part 02 // Pit Wall Tactics</span>
+        <h2 class="text-3xl font-extrabold text-white">Box, Undercut &amp; Overcut</h2>
+        <p class="text-sm text-zinc-400 mt-1">
+          How teams use pit lane timing to overtake rivals without passing on track.
+        </p>
+      </div>
+
+      <!-- What is "Box, Box"? -->
+      <div class="panel p-6 border-l-4 border-l-[#E10600]">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="mono text-xs text-[#E10600] font-bold">RADIO COMMAND: "BOX, BOX, BOX!"</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-1">Why do engineers say "Box"?</h3>
+        <p class="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+          Originating from the German word <em>Boxenstopp</em>, "Box" refers to the team's pit garage stall. When the race engineer commands "Box, box!", the driver must immediately enter the pit lane on that lap for 4 fresh tires.
+        </p>
+      </div>
+
+      <!-- Undercut vs Overcut Grids -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- The Undercut -->
+        <div class="panel p-6 border-[#22C55E]/30 bg-gradient-to-b from-[#22C55E]/5 to-transparent space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="mono text-xs text-[#22C55E] font-semibold uppercase">Strategy #1</span>
+            <span class="mono text-[11px] px-2.5 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E] font-bold">Pit Earlier</span>
+          </div>
+          <h3 class="text-xl font-bold text-white">The Undercut</h3>
+          <p class="text-xs text-zinc-400 font-mono">"Pit 1–2 laps before the car ahead of you."</p>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Stuck behind a rival in dirty air? You pit <strong>first</strong> for brand-new tires. While your rival remains on worn rubber, your fresh grip allows you to set an ultra-fast out-lap. When they pit on the next lap, you emerge ahead!
+          </p>
+        </div>
+
+        <!-- The Overcut -->
+        <div class="panel p-6 border-amber-400/30 bg-gradient-to-b from-amber-400/5 to-transparent space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="mono text-xs text-amber-400 font-semibold uppercase">Strategy #2</span>
+            <span class="mono text-[11px] px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-400 font-bold">Pit Later</span>
+          </div>
+          <h3 class="text-xl font-bold text-white">The Overcut</h3>
+          <p class="text-xs text-zinc-400 font-mono">"Stay out on track while your rival pits."</p>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            Your rival pits early. Instead of covering immediately, you stay out with an empty track ahead. If your tires still have life, you pump in fast laps without traffic and pit a few laps later, exiting cleanly ahead.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Bottom Actions -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-white/10">
+      <button onclick="window.close()" class="btn-outline w-full sm:w-auto text-xs">
+        ✕ Close Tab
+      </button>
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button data-goto="3" class="btn-ghost text-xs">Circuit Selection</button>
+        <button data-goto="5" class="btn-primary w-full sm:w-auto px-8 py-3 text-xs font-bold">
+          Pick Your Tires in Strategy Builder &rarr;
+        </button>
+      </div>
     </div>
 
   </main>

@@ -8,14 +8,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="../../assets/css/styles.css">
 </head>
-<body class="min-h-screen flex flex-col f1-grid-bg">
+<body class="min-h-screen flex flex-col justify-between f1-grid-bg text-white">
 
+  <!-- Header -->
   <header class="app-header">
     <div class="flex items-center gap-3">
       <span class="f1-badge">F1</span>
-      <span class="header-title">TRACKLAB</span>
+      <span class="header-title">TRACKLAB // STRATEGY BUILDER</span>
     </div>
     <div class="flex items-center gap-5">
+      <button data-goto="about" class="header-link">About</button>
       <button data-goto="12" class="header-link">What is F1?</button>
       <button data-goto="5" class="header-link">Change Tires</button>
       <button data-goto="11" class="header-link">Dashboard</button>
@@ -23,92 +25,164 @@
     </div>
   </header>
 
-  <main class="flex-1 w-full max-w-5xl mx-auto px-6 py-12 flex flex-col justify-center">
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-10 flex flex-col justify-between">
 
-    <section class="panel p-8 sm:p-12 animate-on-scroll">
-      <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 border-b border-white/10 pb-6 mb-8">
-        <div>
-          <span class="section-tag">04 // Pit Stop Timing</span>
-          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">When Do You Pit?</h1>
-          <p class="body-copy text-sm text-zinc-300 mt-2">
-            In F1, teams say "Box" for a pit stop. Slide below to pick which lap you want to enter the pit lane for fresh rubber.
+    <!-- 1. FULL-SCREEN GUIDED INTRO STAGE (Visible First) -->
+    <section id="guided-pit-screen" class="guided-stage flex-1 flex flex-col justify-center items-center text-center py-12">
+      <div class="glass-panel p-8 sm:p-14 max-w-2xl mx-auto space-y-6 border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)]">
+        
+        <span class="f1-badge">STEP 03 // PIT STOP TIMING</span>
+
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white">
+          When Do You Pit?
+        </h1>
+
+        <p class="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-xl mx-auto">
+          In Formula 1, pit timing is everything. Pit too early, and your fresh tires hit the degradation cliff before the checkered flag. Pit too late, and you lose seconds crawling on dead rubber.
+        </p>
+
+        <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 text-left space-y-1">
+          <div class="flex items-center gap-2 font-bold text-amber-300">
+            <span>⚡</span> <span>The Pit Stop Window:</span>
+          </div>
+          <p class="text-[11px] text-zinc-300">
+            When your race engineer yells <em>"Box, box, box!"</em>, your car dives into the pit lane for 4 fresh tires. Use the interactive slider to find the optimal crossover lap where fresh rubber overcomes the ~20s pit lane time loss.
           </p>
         </div>
-        <div class="sub-box px-4 py-2.5 mono text-xs">
+
+        <div class="pt-4">
+          <button id="btn-pit-understand" class="btn-primary text-base font-bold px-10 py-4 rounded-full shadow-[0_0_25px_rgba(225,6,0,0.45)] hover:shadow-[0_0_40px_rgba(225,6,0,0.8)] transition-all">
+            I understand &rarr;
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. INTERACTIVE SLIDER STAGE (Revealed after clicking Understand) -->
+    <section id="pit-main-screen" class="selector-stage hidden-stage space-y-8">
+
+      <!-- Compact Top Header -->
+      <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 pb-6 border-b border-white/10">
+        <div>
+          <span class="section-tag">Step 03 // Pit Window Timing</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Choose Your Box Lap</h1>
+          <p class="body-copy text-xs sm:text-sm mt-1 max-w-xl text-zinc-400">
+            Slide below to pick which lap you want to enter the pit lane for fresh rubber.
+          </p>
+        </div>
+        <div class="glass-panel px-4 py-2.5 mono text-xs flex items-center gap-3">
           <span class="text-zinc-500 block text-[10px]">CIRCUIT</span>
           <span id="slider-track-name" class="text-white font-semibold">Norisring (72 Laps)</span>
         </div>
       </div>
 
-      <!-- Interactive Slider Console -->
-      <div class="sub-box p-6 sm:p-8 mb-8">
-        <div class="flex flex-wrap justify-between items-baseline gap-4 mb-6 mono">
-          <span class="text-xs text-zinc-500">START (LAP 1)</span>
-          <div class="text-2xl sm:text-3xl font-bold text-white">
-            PIT STOP: <span class="text-[#E10600]">LAP <span id="pit-lap-val">28</span></span> <span class="text-xs text-zinc-400 font-normal">("Box Lap")</span>
+      <!-- Main Layout: Left 7 Cols (Slider & Telemetry) + Right 5 Cols (Car Tracker) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Left Column: Pit Slider & Stint Breakdown -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <!-- Interactive Slider Console -->
+          <div class="panel p-6 sm:p-8">
+            <div class="flex flex-wrap justify-between items-baseline gap-4 mb-6 mono">
+              <span class="text-xs text-zinc-500">START (LAP 1)</span>
+              <div class="text-2xl sm:text-3xl font-bold text-white">
+                PIT STOP: <span class="text-[#E10600]">LAP <span id="pit-lap-val">28</span></span> <span class="text-xs text-zinc-400 font-normal">("Box Lap")</span>
+              </div>
+              <span class="text-xs text-zinc-500">FINISH (LAP <span class="total-laps-label">72</span>)</span>
+            </div>
+
+            <input type="range" id="pit-slider" min="5" max="67" value="28" class="my-6">
+
+            <!-- Proportional Compound Timeline -->
+            <div class="w-full h-14 flex rounded-xl overflow-hidden border border-white/15 mono text-xs font-bold mt-4">
+              <div id="bar-s1" style="width: 31%;" class="transition-all duration-150 flex items-center justify-center border-r-2 border-white px-2">
+                SOFT (28L)
+              </div>
+              <div id="bar-s2" style="width: 69%;" class="transition-all duration-150 flex items-center justify-center px-2">
+                HARD (44L)
+              </div>
+            </div>
+
+            <div id="wear-warning" class="mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]">
+              <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+              <span>Pit window inside safe thermal operating window.</span>
+            </div>
           </div>
-          <span class="text-xs text-zinc-500">FINISH (LAP <span class="total-laps-label">72</span>)</span>
+
+          <!-- Clean Metrics Summary -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mono">
+            <div class="sub-box p-4 text-center">
+              <span class="text-[10px] text-zinc-500 uppercase">Stint 1 Length</span>
+              <div id="stint1-length-display" class="text-xl font-bold text-white mt-1">28 Laps</div>
+            </div>
+            <div class="sub-box p-4 text-center">
+              <span class="text-[10px] text-zinc-500 uppercase">Pit Lane Loss</span>
+              <div id="pit-loss-display" class="text-xl font-bold text-[#E10600] mt-1">21.2s</div>
+            </div>
+            <div class="sub-box p-4 text-center">
+              <span class="text-[10px] text-zinc-500 uppercase">Stint 2 Length</span>
+              <div id="stint2-length-display" class="text-xl font-bold text-white mt-1">44 Laps</div>
+            </div>
+          </div>
+
+          <!-- Progressive Details Toggle -->
+          <details class="sub-box p-4 mono text-xs">
+            <summary class="cursor-pointer font-semibold text-zinc-300 hover:text-white select-none flex justify-between items-center">
+              <span>Tire Cliff Thresholds &amp; Fuel Dissipation Details</span>
+              <span class="text-zinc-500 text-[11px]">Click to Expand</span>
+            </summary>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10 text-zinc-400">
+              <div>
+                <span class="text-white font-semibold block mb-1" id="detail-s1-title">Stint 1 Profile</span>
+                <span id="detail-s1-info">Optimal grip up to ~13L</span>
+              </div>
+              <div>
+                <span class="text-white font-semibold block mb-1" id="detail-s2-title">Stint 2 Profile</span>
+                <span id="detail-s2-info">Optimal grip up to ~34L</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Back & Re-read Buttons -->
+          <div class="flex items-center justify-between pt-2">
+            <button data-goto="5" class="btn-outline text-xs">&larr; Change Compounds</button>
+            <div class="flex items-center gap-4">
+              <a href="../06-pit-lesson/index.html" target="_blank" rel="noopener" class="btn-ghost text-xs text-zinc-300 hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20">
+                <span>Read Pit &amp; Tire Guide</span>
+                <span class="text-[10px] text-[#E10600]">↗</span>
+              </a>
+              <button id="btn-re-read-guide" class="text-xs mono text-zinc-400 hover:text-white underline">
+                Guided Screen
+              </button>
+            </div>
+          </div>
+
         </div>
 
-        <input type="range" id="pit-slider" min="5" max="67" value="28" class="my-6">
+        <!-- Right Column: F1 Car Strategy Builder Tracker Widget -->
+        <div class="lg:col-span-5 flex flex-col justify-between">
+          <div id="car-tracker-slot"></div>
 
-        <!-- Proportional Compound Timeline -->
-        <div class="w-full h-14 flex rounded-xl overflow-hidden border border-white/15 mono text-xs font-bold mt-4">
-          <div id="bar-s1" style="width: 31%;" class="transition-all duration-150 flex items-center justify-center border-r-2 border-white px-2">
-            SOFT (18L)
-          </div>
-          <div id="bar-s2" style="width: 69%;" class="transition-all duration-150 flex items-center justify-center px-2">
-            HARD (40L)
+          <!-- Lock In Strategy Action Panel -->
+          <div class="panel p-6 mt-6 border-t-2 border-t-[#22C55E]/40 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-bold text-white">Final Strategy Lock</h4>
+                <p class="text-[11px] text-zinc-400">Mount pit brain telemetry and complete assembly.</p>
+              </div>
+              <span class="f1-badge text-[9px] bg-green-500/20 text-[#22C55E] border-green-500/30">READY</span>
+            </div>
+
+            <button id="btn-lock-strategy" class="btn-primary w-full py-4 text-sm font-bold tracking-wider rounded-xl shadow-[0_0_30px_rgba(34,197,94,0.35)] hover:shadow-[0_0_45px_rgba(34,197,94,0.7)] transition-all">
+              Lock In Strategy &rarr;
+            </button>
           </div>
         </div>
 
-        <div id="wear-warning" class="mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]">
-          <span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
-          <span>Pit window inside safe thermal operating window.</span>
-        </div>
       </div>
 
-      <!-- Clean Metrics Summary -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 mono">
-        <div class="sub-box p-5 text-center">
-          <span class="text-[10px] text-zinc-500 uppercase">Stint 1 Length</span>
-          <div id="stint1-length-display" class="text-2xl font-bold text-white mt-1">18 Laps</div>
-        </div>
-        <div class="sub-box p-5 text-center">
-          <span class="text-[10px] text-zinc-500 uppercase">Pit Lane Loss</span>
-          <div id="pit-loss-display" class="text-2xl font-bold text-[#E10600] mt-1">21.2s</div>
-        </div>
-        <div class="sub-box p-5 text-center">
-          <span class="text-[10px] text-zinc-500 uppercase">Stint 2 Length</span>
-          <div id="stint2-length-display" class="text-2xl font-bold text-white mt-1">40 Laps</div>
-        </div>
-      </div>
-
-      <!-- Progressive Details Toggle -->
-      <details class="sub-box p-4 mb-8 mono text-xs">
-        <summary class="cursor-pointer font-semibold text-zinc-300 hover:text-white select-none flex justify-between items-center">
-          <span>Tire Cliff Thresholds &amp; Fuel Dissipation Details</span>
-          <span class="text-zinc-500">Expand</span>
-        </summary>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10 text-zinc-400">
-          <div>
-            <span class="text-white font-semibold block mb-1" id="detail-s1-title">Stint 1 Profile</span>
-            <span id="detail-s1-info">Optimal grip up to ~13L</span>
-          </div>
-          <div>
-            <span class="text-white font-semibold block mb-1" id="detail-s2-title">Stint 2 Profile</span>
-            <span id="detail-s2-info">Optimal grip up to ~34L</span>
-          </div>
-        </div>
-      </details>
-
-      <!-- Actions -->
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
-        <button data-goto="5" class="btn-outline w-full sm:w-auto">&larr; Change Compounds</button>
-        <button id="btn-confirm-pit" class="btn-primary w-full sm:w-auto px-8 py-3.5">
-          Confirm Strategy &rarr;
-        </button>
-      </div>
     </section>
 
   </main>
@@ -121,6 +195,33 @@
       const track = TrackLabSim.getTrack(state.track);
       const s1Spec = TrackLabSim.getCompound(state.stint1);
       const s2Spec = TrackLabSim.getCompound(state.stint2);
+
+      const guidedScreen = document.getElementById('guided-pit-screen');
+      const mainScreen = document.getElementById('pit-main-screen');
+      const btnUnderstand = document.getElementById('btn-pit-understand');
+      const btnReRead = document.getElementById('btn-re-read-guide');
+
+      // Check if user already locked or visited
+      function showMain() {
+        guidedScreen.classList.add('hidden-stage');
+        mainScreen.classList.remove('hidden-stage');
+        renderStrategyCarTracker('car-tracker-slot', 3);
+      }
+
+      function showGuided() {
+        mainScreen.classList.add('hidden-stage');
+        guidedScreen.classList.remove('hidden-stage');
+      }
+
+      btnUnderstand.addEventListener('click', showMain);
+      if (btnReRead) {
+        btnReRead.addEventListener('click', showGuided);
+      }
+
+      // If user already locked pit or previously acknowledged, show main directly
+      if (state.pitLocked) {
+        showMain();
+      }
 
       document.getElementById('slider-track-name').textContent = `${track.name} (${track.laps} Laps)`;
       document.getElementById('pit-loss-display').textContent = `${track.pitLoss}s`;
@@ -189,12 +290,27 @@
       }
 
       render(slider.value);
-      slider.addEventListener('input', e => render(e.target.value));
-      slider.addEventListener('change', e => saveState({ pitLap: parseInt(e.target.value, 10) }));
+      renderStrategyCarTracker('car-tracker-slot', 3);
 
-      document.getElementById('btn-confirm-pit').addEventListener('click', () => {
-        saveState({ pitLap: parseInt(slider.value, 10) });
-        goTo(8);
+      slider.addEventListener('input', e => render(e.target.value));
+      slider.addEventListener('change', e => {
+        saveState({ pitLap: parseInt(e.target.value, 10) });
+        renderStrategyCarTracker('car-tracker-slot', 3);
+      });
+
+      // Lock In Strategy & Animate Car to Screen 8
+      const btnLock = document.getElementById('btn-lock-strategy');
+      btnLock.addEventListener('click', () => {
+        const pitLap = parseInt(slider.value, 10);
+        saveState({ pitLap, pitLocked: true });
+
+        // Update car tracker view immediately
+        renderStrategyCarTracker('car-tracker-slot', 3);
+
+        // Drive car across screen into center, then navigate to Screen 8
+        triggerStrategyLockAndLaunch(() => {
+          goTo(8);
+        });
       });
     });
   </script>
