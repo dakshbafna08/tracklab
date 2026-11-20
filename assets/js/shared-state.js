@@ -104,20 +104,17 @@ function saveState(updates) {
     sessionStorage.setItem('tracklab_session_state', JSON.stringify(next));
   } catch {}
 
-  // Sync state directly to Supabase user_strategy_state table in real time
-  if (next.username && next.username !== 'Guest Driver') {
+  // Remember guide progress on the user's profile in Supabase,
+  // so returning users can skip the tutorial on any device
+  if ('hasCompletedGuide' in updates && next.userId) {
     const sb = getSupabase();
     if (sb) {
-      sb.from('user_strategy_state').upsert({
-        username: next.username,
-        track: next.track || 'NORISRING',
-        total_laps: next.totalLaps || 72,
-        stint1: next.stint1 || 'SOFT',
-        stint2: next.stint2 || 'HARD',
-        pit_lap: next.pitLap || 28,
-        has_completed_guide: Boolean(next.hasCompletedGuide),
-        updated_at: new Date().toISOString()
-      }).then(() => {}).catch(err => console.warn('[TrackLab] Supabase state sync notice:', err));
+      sb.from('profiles')
+        .update({ has_completed_guide: Boolean(next.hasCompletedGuide) })
+        .eq('id', next.userId)
+        .then(({ error }) => {
+          if (error) console.warn('[TrackLab] Guide progress sync notice:', error);
+        });
     }
   }
 
@@ -315,12 +312,12 @@ const TrackLabDB = {
       // Check whether user has previously completed the guide in Supabase
       let hasCompleted = false;
       try {
-        const { data: stateData } = await sb
-          .from('user_strategy_state')
-          .select('has_completed_guide')
-          .eq('username', driverName)
-          .maybeSingle();
-        if (stateData && stateData.has_completed_guide) {
+          const { data: profileData } = await sb
+            .from('profiles')
+            .select('has_completed_guide')
+            .eq('id', user.id)
+            .maybeSingle();
+        if (profileData && profileData.has_completed_guide) {
           hasCompleted = true;
         }
       } catch {}
@@ -485,7 +482,7 @@ const TrackLabDB = {
       let query = sb
         .from('strategies')
         .select('*, pit_stops(*)')
-        .order('id', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (state.userId) {
         query = query.eq('user_id', state.userId);
@@ -711,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const sb = getSupabase();
       if (sb) {
         try {
-          const { error } = await sb.from('race_history').select('id').limit(1);
+          const { error } = await sb.from('tracks').select('id').limit(1);
           if (!error || error.code === 'PGRST116' || error.message) {
             isSupabaseOnline = true;
           }
