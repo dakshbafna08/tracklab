@@ -8,6 +8,8 @@ dependencies = [
     "stable-baselines3",
     "tensorboard",
     "matplotlib",
+    "requests",
+    "pandas",
 ]
 
 [build-system]
