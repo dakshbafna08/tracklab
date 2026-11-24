@@ -35,8 +35,8 @@
     </div>
 
     <div class="hidden md:flex items-center gap-3 mono text-xs">
-      <span id="sim-data-source-pill" class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300">
-        MODELED ESTIMATE
+      <span class="px-3 py-1 rounded-full bg-green-500/15 border border-green-500/40 text-[#22C55E]">
+        2022 F1 RACE DATA
       </span>
       <span id="sim-flag-pill" class="px-3 py-1 rounded-full bg-green-500/15 border border-green-500/40 text-[#22C55E] font-semibold">
         GREEN FLAG
@@ -49,12 +49,14 @@
     </div>
   </header>
 
-  <!-- Full-Viewport Telemetry Cockpit -->
   <main class="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 py-5 flex flex-col gap-4">
+
+    <!-- Shown if the backend can't be reached -->
+    <div id="sim-error" class="hidden panel p-5 border-l-4 border-l-[#E10600] mono text-sm text-zinc-200"></div>
 
     <div class="cockpit-grid">
 
-      <!-- LEFT: LIVE TIMING TOWER & GAP MATRIX -->
+      <!-- LEFT: LEADERBOARD (YOU vs OPTIMAL) -->
       <section class="panel p-5 flex flex-col justify-between">
         <div>
           <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
@@ -63,15 +65,13 @@
           </div>
 
           <!-- Your Car Row -->
-          <div id="tower-user" class="sub-box p-4 mb-3 border-l-4 border-l-white transition-all">
+          <div class="sub-box p-4 mb-3 border-l-4 border-l-white">
             <div class="flex justify-between items-center mb-1.5">
               <span id="tower-user-name" class="font-semibold text-sm text-white">YOU</span>
               <span id="tower-user-pos" class="mono text-xs font-bold px-2 py-0.5 rounded bg-white/10 text-white">P1</span>
             </div>
             <div class="flex justify-between items-center mono text-xs">
-              <span id="tower-user-comp" class="flex items-center gap-2 text-zinc-300">
-                <span class="tire-ring tire-soft w-3 h-3 border-2"></span> SOFT
-              </span>
+              <span id="tower-user-comp" class="flex items-center gap-2 text-zinc-300">—</span>
               <span id="tower-user-gap" class="font-bold text-white">LEADER</span>
             </div>
             <div class="flex justify-between mono text-[11px] text-zinc-500 mt-2">
@@ -80,17 +80,15 @@
             </div>
           </div>
 
-          <!-- Optimal Strategy Model Row -->
-          <div id="tower-opt" class="sub-box p-4 mb-5 border-l-4 border-l-[#E10600] transition-all">
+          <!-- Optimal Strategy Row -->
+          <div class="sub-box p-4 mb-5 border-l-4 border-l-[#E10600]">
             <div class="flex justify-between items-center mb-1.5">
               <span class="font-semibold text-sm text-[#E10600]">OPTIMAL MODEL</span>
               <span id="tower-opt-pos" class="mono text-xs font-bold px-2 py-0.5 rounded bg-[#E10600]/20 text-[#E10600]">P2</span>
             </div>
             <div class="flex justify-between items-center mono text-xs">
-              <span id="tower-opt-comp" class="flex items-center gap-2 text-zinc-300">
-                <span class="tire-ring tire-medium w-3 h-3 border-2"></span> MEDIUM
-              </span>
-              <span id="tower-opt-gap" class="font-bold text-[#E10600]">+0.00s</span>
+              <span id="tower-opt-comp" class="flex items-center gap-2 text-zinc-300">—</span>
+              <span id="tower-opt-gap" class="font-bold text-[#E10600]">—</span>
             </div>
             <div class="flex justify-between mono text-[11px] text-zinc-500 mt-2">
               <span>Last Lap</span>
@@ -98,26 +96,26 @@
             </div>
           </div>
 
-          <!-- Stint Strategy Summary -->
+          <!-- Stint Plans -->
           <div class="sub-box p-4 mono text-xs space-y-3">
             <div>
               <div class="flex justify-between text-[10px] text-zinc-500 mb-1">
                 <span>YOUR PLAN</span>
-                <span id="plan-user-label" class="text-white">BOX L18</span>
+                <span id="plan-user-label" class="text-white">—</span>
               </div>
               <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden flex">
-                <div id="sim-user-bar1" class="bg-[#E10600] h-full" style="width: 31%;"></div>
-                <div id="sim-user-bar2" class="bg-zinc-500 h-full" style="width: 69%;"></div>
+                <div id="sim-user-bar1" class="h-full" style="width: 50%;"></div>
+                <div id="sim-user-bar2" class="h-full" style="width: 50%;"></div>
               </div>
             </div>
             <div>
               <div class="flex justify-between text-[10px] text-zinc-500 mb-1">
                 <span>OPTIMAL TARGET</span>
-                <span id="plan-opt-label" class="text-[#E10600]">BOX L32</span>
+                <span id="plan-opt-label" class="text-[#E10600]">—</span>
               </div>
               <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden flex">
-                <div id="sim-opt-bar1" class="bg-yellow-500 h-full" style="width: 55%;"></div>
-                <div id="sim-opt-bar2" class="bg-zinc-300 h-full" style="width: 45%;"></div>
+                <div id="sim-opt-bar1" class="h-full" style="width: 50%;"></div>
+                <div id="sim-opt-bar2" class="h-full" style="width: 50%;"></div>
               </div>
             </div>
           </div>
@@ -135,29 +133,30 @@
         </div>
       </section>
 
-      <!-- CENTER: CIRCUIT RADAR + LIVE CAR TELEMETRY HUD -->
+      <!-- CENTER: CIRCUIT RADAR + HUD -->
       <section class="panel p-5 flex flex-col justify-between gap-4">
         <div class="flex justify-between items-center border-b border-white/10 pb-3">
           <div>
             <span class="section-tag mb-0">Track Radar</span>
-            <h1 id="radar-circuit-title" class="text-xl font-bold text-white">Albert Park Circuit</h1>
+            <h1 id="radar-circuit-title" class="text-xl font-bold text-white">—</h1>
           </div>
           <div class="text-right mono">
             <span class="text-xs text-zinc-500 uppercase mr-1">LAP</span>
             <span class="text-3xl font-bold text-white" id="live-lap-num">1</span>
-            <span class="text-sm text-zinc-500">/<span class="total-laps-label">58</span></span>
+            <span class="text-sm text-zinc-500">/<span class="total-laps-label">—</span></span>
           </div>
         </div>
 
-        <!-- Visual Track Representation with Moving Markers -->
+        <!-- Real track outline with both cars on it -->
         <div class="relative flex-1 min-h-[250px] bg-black/40 border border-white/10 rounded-2xl flex items-center justify-center p-4 overflow-hidden">
           <svg id="radar-svg" viewBox="0 0 500 220" class="w-full h-full max-h-[300px]">
-            <path id="radar-path" d="M 70 155 Z" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle id="dot-opt" cx="70" cy="155" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
-            <circle id="dot-user" cx="70" cy="155" r="7" fill="#FFFFFF" stroke="#09090B" stroke-width="2"/>
+            <path id="radar-path" d="M 250 110 Z" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle id="dot-opt" cx="250" cy="110" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
+            <circle id="dot-user" cx="250" cy="110" r="7" fill="#FFFFFF" stroke="#09090B" stroke-width="2"/>
           </svg>
 
-          <!-- Pit Stop Notification Pill -->
+          <div id="radar-loading" class="absolute mono text-xs text-zinc-400">Running simulation...</div>
+
           <div id="pit-alert-pill" class="hidden absolute top-4 px-4 py-1.5 rounded-full bg-[#E10600] text-white mono text-xs font-bold tracking-wider shadow-lg">
             BOXING THIS LAP — FRESH COMPOUND FIT
           </div>
@@ -168,15 +167,15 @@
           </div>
         </div>
 
-        <!-- Live Cockpit HUD Strip -->
+        <!-- HUD -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mono">
           <div class="sub-box p-3.5 text-center">
             <span class="text-[10px] text-zinc-500 uppercase">Speed</span>
-            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-speed">298</span> <span class="text-[10px] text-zinc-500 font-normal">km/h</span></div>
+            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-speed">—</span> <span class="text-[10px] text-zinc-500 font-normal">km/h</span></div>
           </div>
           <div class="sub-box p-3.5 text-center">
             <span class="text-[10px] text-zinc-500 uppercase">Gear / DRS</span>
-            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-gear">7</span> <span id="hud-drs" class="text-[10px] text-[#22C55E] align-middle">DRS</span></div>
+            <div class="text-2xl font-bold text-white mt-0.5"><span id="hud-gear">—</span> <span id="hud-drs" class="text-[10px] text-[#22C55E] align-middle">DRS</span></div>
           </div>
           <div class="sub-box p-3.5">
             <div class="flex justify-between text-[10px] text-zinc-500">
@@ -189,21 +188,20 @@
             <div class="text-[10px] text-zinc-500 mt-1.5" id="hud-tire-age">Age: 1 Lap</div>
           </div>
           <div class="sub-box p-3.5 text-center">
-            <span class="text-[10px] text-zinc-500 uppercase">Race Gap</span>
+            <span class="text-[10px] text-zinc-500 uppercase">Gap to Optimal</span>
             <div id="hud-delta" class="text-2xl font-bold text-white mt-0.5">+0.00s</div>
           </div>
         </div>
       </section>
 
-      <!-- RIGHT: LAP TIME PROGRESSION & RACE ENGINEER FEED -->
+      <!-- RIGHT: PACE CHART & RADIO -->
       <section class="panel p-5 flex flex-col justify-between gap-4">
         <div>
           <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
             <span class="section-tag mb-0">Lap Progression</span>
-            <span class="mono text-[10px] text-zinc-500">Pace Curve</span>
+            <span class="mono text-[10px] text-zinc-500">higher = faster</span>
           </div>
 
-          <!-- Real-Time Canvas Pace Progression Chart -->
           <div class="sub-box p-3 mb-4 bg-black/40">
             <canvas id="paceChart" width="290" height="145" class="w-full h-[145px]"></canvas>
             <div class="flex justify-between mono text-[10px] text-zinc-500 mt-2">
@@ -212,25 +210,23 @@
             </div>
           </div>
 
-          <!-- Pit Window Countdown -->
           <div class="sub-box p-4 mb-4 mono text-xs">
             <div class="flex justify-between items-center">
-              <span class="text-zinc-500">Pit Window</span>
-              <span id="pit-countdown" class="font-bold text-white">In 17 Laps</span>
+              <span class="text-zinc-500">Pit Stop</span>
+              <span id="pit-countdown" class="font-bold text-white">—</span>
             </div>
             <div class="text-[11px] text-zinc-400 mt-1.5">
-              Fuel weight gain: <span id="fuel-gain-stat" class="text-[#22C55E]">0.00s</span>
+              Time gained from burning fuel: <span id="fuel-gain-stat" class="text-[#22C55E]">0.00s</span>
             </div>
           </div>
 
-          <!-- Engineer Radio Feed -->
           <div class="sub-box p-3.5 mono text-xs">
             <div class="text-[10px] text-zinc-500 uppercase mb-2 flex justify-between">
               <span>Pit Wall Radio</span>
               <span class="text-[#E10600]">LIVE</span>
             </div>
             <div id="radio-feed" class="space-y-2 text-[11px] text-zinc-300 max-h-28 overflow-y-auto">
-              <div><strong class="text-white">ENG:</strong> Clean launch. Bring tires up to window cleanly.</div>
+              <div><strong class="text-white">ENG:</strong> Lights out. Bring the tyres up to temperature.</div>
             </div>
           </div>
         </div>
@@ -241,220 +237,327 @@
       </section>
 
     </div>
-
   </main>
 
+  <!-- simulation-engine.js is only used here for the radio chime sound -->
   <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
     (async function () {
       const state = getState();
-      const trackKey = state.track || 'MELBOURNE';
-      const track = TrackLabSim.getTrack(trackKey);
 
-      document.getElementById('sim-circuit-subtitle').textContent = `${track.name} • ${track.laps} Laps`;
-      document.getElementById('radar-circuit-title').textContent = track.name;
-      document.querySelectorAll('.total-laps-label').forEach(el => el.textContent = track.laps);
+      // ---------- small helpers ----------
+      function formatLapTime(sec) {
+        if (sec == null || !Number.isFinite(sec)) return '—';
+        const m = Math.floor(sec / 60);
+        return `${m}:${(sec - m * 60).toFixed(3).padStart(6, '0')}`;
+      }
+      function formatGap(sec) {
+        return `${sec >= 0 ? '+' : '-'}${Math.abs(sec).toFixed(2)}s`;
+      }
+      const ringClass = (c) => c === 'SOFT' ? 'tire-soft' : (c === 'MEDIUM' ? 'tire-medium' : 'tire-hard');
+      const compoundColor = (c) => ({ SOFT: '#E10600', MEDIUM: '#EAB308', HARD: '#E4E4E7', INTERMEDIATE: '#22C55E', WET: '#3B82F6' }[c] || '#71717A');
+
+      function showError(msg) {
+        const box = document.getElementById('sim-error');
+        box.textContent = msg;
+        box.classList.remove('hidden');
+        document.getElementById('radar-loading').textContent = 'Simulation unavailable';
+      }
+
+      function setPlanBar(prefix, labelId, s1, s2, pit, total) {
+        const pct = (pit / total) * 100;
+        document.getElementById(labelId).textContent = `${s1} → ${s2} @ L${pit}`;
+        const b1 = document.getElementById(`${prefix}-bar1`);
+        const b2 = document.getElementById(`${prefix}-bar2`);
+        b1.style.width = `${pct}%`; b1.style.background = compoundColor(s1);
+        b2.style.width = `${100 - pct}%`; b2.style.background = compoundColor(s2);
+      }
+
+      // ---------- the strategy the user picked ----------
+      const trackName = state.track || 'Melbourne';
+      const totalLaps = Number(state.totalLaps) || 58;
+      const stint1 = (state.stint1 || 'MEDIUM').toUpperCase();
+      const stint2 = (state.stint2 || 'HARD').toUpperCase();
+      const pitLap = Math.min(totalLaps - 1, Math.max(1, Number(state.pitLap) || 18));
+
+      document.getElementById('sim-circuit-subtitle').textContent = `${trackName} • ${totalLaps} Laps`;
+      document.getElementById('radar-circuit-title').textContent = trackName;
+      document.querySelectorAll('.total-laps-label').forEach(el => el.textContent = totalLaps);
       if (state.username) {
         document.getElementById('tower-user-name').textContent = state.username.toUpperCase();
       }
+      setPlanBar('sim-user', 'plan-user-label', stint1, stint2, pitLap, totalLaps);
 
-      // Check real FastF1 historical context if available
-      const f1Ctx = await TrackLabSim.fetchFastF1Context(trackKey);
-      const pill = document.getElementById('sim-data-source-pill');
-      if (f1Ctx.available) {
-        pill.textContent = `FASTF1 CALIBRATED (${f1Ctx.year})`;
-        pill.className = 'px-3 py-1 rounded-full bg-green-500/15 border border-green-500/40 text-[#22C55E]';
-      } else {
-        pill.textContent = 'MODELED ESTIMATE (PIRELLI PHYSICS)';
+      if (!state.trackId) {
+        showError('No circuit selected. Go back and pick a circuit first.');
+        return;
       }
 
-      const pitLap = Math.min(track.laps - 3, Math.max(3, Number(state.pitLap) || 18));
-      const userStrategy = { trackKey, stint1: state.stint1 || 'SOFT', stint2: state.stint2 || 'HARD', pitLap };
-
-      const userSim = TrackLabSim.simulate(userStrategy, f1Ctx.weather);
-      const optResult = TrackLabSim.optimise(trackKey, f1Ctx.weather);
-      const optStrategy = optResult.strategy;
-
-      // Update Stint Plan Bars
-      const uPct1 = ((pitLap / track.laps) * 100).toFixed(1);
-      document.getElementById('plan-user-label').textContent = `BOX L${pitLap}`;
-      document.getElementById('sim-user-bar1').style.width = `${uPct1}%`;
-      document.getElementById('sim-user-bar2').style.width = `${100 - uPct1}%`;
-
-      const oPct1 = ((optStrategy.pitLap / track.laps) * 100).toFixed(1);
-      document.getElementById('plan-opt-label').textContent = `${optStrategy.stint1}→${optStrategy.stint2} @ L${optStrategy.pitLap}`;
-      document.getElementById('sim-opt-bar1').style.width = `${oPct1}%`;
-      document.getElementById('sim-opt-bar2').style.width = `${100 - oPct1}%`;
-
-      // Persist simulation outputs immediately for Results screen
-      saveState({
-        simUserResult: JSON.stringify(userSim),
-        simOptResult: JSON.stringify(optResult),
-        simUserStrategy: JSON.stringify(userStrategy),
-        simOptStrategy: JSON.stringify(optStrategy),
-        simDataSource: f1Ctx.available ? 'FASTF1_CALIBRATED' : 'MODELED_ESTIMATE'
-      });
-
-      // Track SVG geometry setup
+      // ---------- draw the real track outline (TUM centerline) ----------
       const pathEl = document.getElementById('radar-path');
-      pathEl.setAttribute('d', track.svgPath);
-      const pathLen = pathEl.getTotalLength ? pathEl.getTotalLength() : 900;
       const dotUser = document.getElementById('dot-user');
       const dotOpt = document.getElementById('dot-opt');
+      let pathLen = 0;
 
-      // Pace chart canvas
+      async function drawTrack() {
+        try {
+          const sb = getSupabase();
+          if (!sb) return;
+          const { data } = await sb.from('tracks').select('centerline_file').eq('id', state.trackId).single();
+          if (!data?.centerline_file) return;
+          const res = await fetch('../../' + data.centerline_file);
+          if (!res.ok) return;
+          const pts = (await res.text()).split('\n')
+            .filter(line => line.trim() && !line.startsWith('#'))
+            .map(line => line.split(',').slice(0, 2).map(Number))
+            .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+          if (pts.length < 3) return;
+
+          // Fit the track into the 500 x 220 box with a margin
+          const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+          const minX = Math.min(...xs), maxX = Math.max(...xs);
+          const minY = Math.min(...ys), maxY = Math.max(...ys);
+          const scale = Math.min(470 / (maxX - minX), 195 / (maxY - minY));
+          const offX = (500 - (maxX - minX) * scale) / 2;
+          const offY = (220 - (maxY - minY) * scale) / 2;
+          const d = pts.map(([x, y], i) =>
+            `${i ? 'L' : 'M'}${(offX + (x - minX) * scale).toFixed(1)},${(offY + (maxY - y) * scale).toFixed(1)}`
+          ).join(' ') + ' Z';
+          pathEl.setAttribute('d', d);
+          pathLen = pathEl.getTotalLength();
+        } catch (e) {
+          console.warn('[TrackLab] Could not draw track:', e);
+        }
+      }
+
+      // ---------- get both races from the backend ----------
+      // Same strategy as last time? Reuse the stored result so a replay doesn't save a duplicate.
+      const simKey = `${state.trackId}|${stint1}|${stint2}|${pitLap}|${state.userId || 'guest'}`;
+
+      async function callApi(method, url, body) {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(json.detail || `Backend error ${res.status}`);
+        return json;
+      }
+
+      async function runUserRace() {
+        if (state.userId) {
+          // Logged in: save the strategy, then simulate it (the backend saves the result too)
+          const save = await TrackLabDB.saveStrategy({
+            track: trackName,
+            name: `${trackName}: ${stint1} → ${stint2} (L${pitLap})`,
+            starting_compound: stint1,
+            new_compound: stint2,
+            lap: pitLap
+          });
+          if (!save.ok || !save.strategyId) throw new Error(`Could not save strategy: ${save.error || 'unknown error'}`);
+          return { data: await callApi('POST', `${API_BASE}/simulate/${save.strategyId}`), saved: true };
+        }
+        // Guest: simulate without saving anything
+        const data = await callApi('POST', `${API_BASE}/simulate-preview`, {
+          track_id: state.trackId,
+          starting_compound: stint1,
+          pit_stops: [{ lap: pitLap, new_compound: stint2 }]
+        });
+        return { data, saved: false };
+      }
+
+      async function getResult() {
+        try {
+          const cached = JSON.parse(state.simUserResult || 'null');
+          if (cached && cached.key === simKey && cached.opt) return cached;
+        } catch {}
+
+        const [user, opt] = await Promise.all([
+          runUserRace(),
+          callApi('GET', `${API_BASE}/optimal/${state.trackId}`)
+        ]);
+
+        const result = {
+          key: simKey,
+          track: user.data.track || trackName,
+          totalLaps,
+          totalTime: user.data.total_time_seconds,
+          laps: user.data.laps,
+          strategy: { stint1, stint2, pitLap },
+          pitLoss: Number(state.pitLossSeconds) || null,
+          saved: user.saved,
+          opt: {
+            totalTime: opt.total_time_seconds,
+            laps: opt.laps,
+            strategy: opt.strategy
+          }
+        };
+        saveState({ simUserResult: JSON.stringify(result) });
+        return result;
+      }
+
+      let sim;
+      try {
+        [sim] = await Promise.all([getResult(), drawTrack()]);
+      } catch (e) {
+        console.warn('[TrackLab] Simulation failed:', e);
+        showError(`Couldn't run the simulation: ${e.message}. Make sure the backend is running (${API_BASE}).`);
+        return;
+      }
+      document.getElementById('radar-loading').classList.add('hidden');
+      const laps = sim.laps;
+      const optLaps = sim.opt.laps;
+      const optStrat = sim.opt.strategy;
+      setPlanBar('sim-opt', 'plan-opt-label', optStrat.stint1, optStrat.stint2, optStrat.pitLap, totalLaps);
+
+      // ---------- pace chart (faster laps drawn higher) ----------
       const canvas = document.getElementById('paceChart');
       const ctx = canvas.getContext('2d');
+      const allTimes = laps.concat(optLaps).map(l => l.time);
+      const minT = Math.min(...allTimes) - 0.3;
+      const maxT = Math.max(...allTimes) + 0.3;
+      const range = Math.max(0.5, maxT - minT);
 
+      function plotLine(arr, color) {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        arr.forEach((l, idx) => {
+          const x = (idx / Math.max(1, totalLaps - 1)) * (canvas.width - 16) + 8;
+          const y = canvas.height - 10 - ((maxT - l.time) / range) * (canvas.height - 20);
+          if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      }
       function drawPaceChart(upToIdx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (upToIdx < 1) return;
-
-        const sliceU = userSim.laps.slice(0, upToIdx + 1);
-        const sliceO = optResult.laps.slice(0, upToIdx + 1);
-        const allTimes = sliceU.map(l => l.time).concat(sliceO.map(l => l.time));
-        const minT = Math.min(...allTimes) - 0.3;
-        const maxT = Math.max(...allTimes) + 0.3;
-        const range = Math.max(0.5, maxT - minT);
-
-        const plotLine = (arr, color) => {
-          ctx.beginPath();
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 2;
-          arr.forEach((lapObj, idx) => {
-            const x = (idx / Math.max(1, track.laps - 1)) * (canvas.width - 16) + 8;
-            const y = canvas.height - 10 - ((lapObj.time - minT) / range) * (canvas.height - 20);
-            if (idx === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          });
-          ctx.stroke();
-        };
-
-        plotLine(sliceO, '#E10600');
-        plotLine(sliceU, '#FFFFFF');
+        plotLine(optLaps.slice(0, upToIdx + 1), '#E10600');
+        plotLine(laps.slice(0, upToIdx + 1), '#FFFFFF');
       }
 
-      // Radio helper
+      // ---------- radio ----------
       const radioFeed = document.getElementById('radio-feed');
       function logRadio(speaker, msg, playBeep = false) {
         const div = document.createElement('div');
         div.innerHTML = `<strong class="text-white">${speaker}:</strong> ${msg}`;
         radioFeed.prepend(div);
-        if (playBeep) TrackLabAudio.playRadioChime();
+        if (playBeep && window.TrackLabAudio) {
+          try { TrackLabAudio.playRadioChime(); } catch {}
+        }
       }
 
-      // Live race animation loop
-      let lapIdx = 0;
-      let speedMult = 1;
-      let tickCounter = 0;
-      let timer = null;
+      // ---------- update everything for one lap ----------
+      let currentGap = 0;
 
       function updateLapUI(idx) {
-        const uLap = userSim.laps[idx];
-        const oLap = optResult.laps[idx];
-        const lapNumber = uLap.lap;
+        const lap = laps[idx];
+        const oLap = optLaps[idx];
+        const lapNumber = lap.lap;
 
         document.getElementById('live-lap-num').textContent = lapNumber;
-        document.getElementById('tower-user-lap').textContent = TrackLabSim.formatLapTime(uLap.time);
-        document.getElementById('tower-opt-lap').textContent = TrackLabSim.formatLapTime(oLap.time);
+        document.getElementById('tower-user-lap').textContent = formatLapTime(lap.time);
+        document.getElementById('tower-opt-lap').textContent = formatLapTime(oLap.time);
 
-        const gap = uLap.cumTime - oLap.cumTime;
-        const gapStr = TrackLabSim.formatGap(gap);
+        // Gap: positive = you are behind the optimal car
+        currentGap = lap.cumTime - oLap.cumTime;
         const hudDelta = document.getElementById('hud-delta');
-        hudDelta.textContent = gapStr;
-        hudDelta.className = gap <= 0 ? 'text-2xl font-bold text-[#22C55E] mt-0.5' : 'text-2xl font-bold text-[#E10600] mt-0.5';
+        hudDelta.textContent = formatGap(currentGap);
+        hudDelta.className = `text-2xl font-bold mt-0.5 ${currentGap <= 0 ? 'text-[#22C55E]' : 'text-[#E10600]'}`;
 
-        // Timing Tower order
-        if (gap <= 0) {
+        if (currentGap <= 0) {
           document.getElementById('tower-user-pos').textContent = 'P1';
           document.getElementById('tower-user-gap').textContent = 'LEADER';
           document.getElementById('tower-opt-pos').textContent = 'P2';
-          document.getElementById('tower-opt-gap').textContent = TrackLabSim.formatGap(Math.abs(gap));
+          document.getElementById('tower-opt-gap').textContent = formatGap(-currentGap);
         } else {
           document.getElementById('tower-opt-pos').textContent = 'P1';
           document.getElementById('tower-opt-gap').textContent = 'LEADER';
           document.getElementById('tower-user-pos').textContent = 'P2';
-          document.getElementById('tower-user-gap').textContent = TrackLabSim.formatGap(gap);
+          document.getElementById('tower-user-gap').textContent = formatGap(currentGap);
         }
 
-        // Compound indicators
-        const ringClass = (c) => c === 'SOFT' ? 'tire-soft' : (c === 'MEDIUM' ? 'tire-medium' : 'tire-hard');
-        document.getElementById('tower-user-comp').innerHTML = `<span class="tire-ring ${ringClass(uLap.compound)} w-3 h-3 border-2"></span> ${uLap.compound}`;
-        document.getElementById('tower-opt-comp').innerHTML = `<span class="tire-ring ${ringClass(oLap.compound)} w-3 h-3 border-2"></span> ${oLap.compound}`;
+        document.getElementById('tower-user-comp').innerHTML =
+          `<span class="tire-ring ${ringClass(lap.compound)} w-3 h-3 border-2"></span> ${lap.compound}`;
+        document.getElementById('tower-opt-comp').innerHTML =
+          `<span class="tire-ring ${ringClass(oLap.compound)} w-3 h-3 border-2"></span> ${oLap.compound}`;
 
-        // Tire wear & age
+        // Tyre life & age
         const wearBar = document.getElementById('hud-wear-bar');
-        document.getElementById('hud-wear-pct').textContent = `${uLap.wearPct}%`;
-        wearBar.style.width = `${uLap.wearPct}%`;
-        wearBar.className = `h-full transition-all duration-200 ${uLap.wearPct > 55 ? 'bg-[#22C55E]' : (uLap.wearPct > 30 ? 'bg-amber-400' : 'bg-[#E10600]')}`;
-        document.getElementById('hud-tire-age').textContent = `Age: ${uLap.tireAge} Laps`;
-        document.getElementById('fuel-gain-stat').textContent = `-${uLap.fuelSaving.toFixed(2)}s`;
+        document.getElementById('hud-wear-pct').textContent = `${lap.wearPct}%`;
+        wearBar.style.width = `${lap.wearPct}%`;
+        wearBar.className = `h-full transition-all duration-200 ${lap.wearPct > 55 ? 'bg-[#22C55E]' : (lap.wearPct > 30 ? 'bg-amber-400' : 'bg-[#E10600]')}`;
+        document.getElementById('hud-tire-age').textContent = `Age: ${lap.tireAge} Lap${lap.tireAge === 1 ? '' : 's'}`;
+        document.getElementById('fuel-gain-stat').textContent = `-${Math.abs(lap.fuelSaving).toFixed(2)}s`;
 
-        // Dynamic Speed / Gear simulation aligned with circuit top speed
-        const speedBase = track.topSpeedKmh - 28 + Math.round(Math.sin(lapNumber * 1.4) * 18);
-        document.getElementById('hud-speed').textContent = uLap.event === 'PIT' ? 80 : speedBase;
-        document.getElementById('hud-gear').textContent = uLap.event === 'PIT' ? '2' : (speedBase > 315 ? '8' : '7');
-        document.getElementById('hud-drs').textContent = uLap.event === 'PIT' ? 'PIT' : 'DRS';
+        // Speed / gear are just for show (not part of the simulation)
+        const speedBase = 290 + Math.round(Math.sin(lapNumber * 1.4) * 15);
+        const pitting = lap.event === 'PIT';
+        document.getElementById('hud-speed').textContent = pitting ? 80 : speedBase;
+        document.getElementById('hud-gear').textContent = pitting ? '2' : (speedBase > 300 ? '8' : '7');
+        document.getElementById('hud-drs').textContent = pitting ? 'PIT' : 'DRS';
 
-        // Pit alert & countdown
+        // Pit countdown & alert
         const lapsLeftToPit = pitLap - lapNumber;
         const pitCountEl = document.getElementById('pit-countdown');
         const pitAlert = document.getElementById('pit-alert-pill');
         if (lapsLeftToPit > 0) {
-          pitCountEl.textContent = `In ${lapsLeftToPit} Laps`;
+          pitCountEl.textContent = `In ${lapsLeftToPit} Lap${lapsLeftToPit === 1 ? '' : 's'}`;
           pitAlert.classList.add('hidden');
         } else if (lapsLeftToPit === 0) {
           pitCountEl.textContent = 'BOX THIS LAP';
           pitAlert.classList.remove('hidden');
-          logRadio('ENG', `Box, box at the end of Lap ${lapNumber}. Switching to ${userStrategy.stint2}.`, true);
+          logRadio('ENG', `Box, box at the end of Lap ${lapNumber}. Switching to ${stint2}.`, true);
         } else {
-          pitCountEl.textContent = 'Completed';
+          pitCountEl.textContent = `Done (Lap ${pitLap})`;
           pitAlert.classList.add('hidden');
         }
 
-        if (uLap.pastCliff && uLap.tireAge === TrackLabSim.getCompound(uLap.compound).cliffStart + 1) {
-          logRadio('DATA', `${uLap.compound} tires entering thermal cliff zone.`, false);
-        }
+        if (pitting) logRadio('ENG', `Out of the pits on fresh ${lap.compound}s.`);
+        if (oLap.event === 'PIT') logRadio('DATA', `Optimal car has pitted for ${oLap.compound}s.`);
 
-        if (lapNumber === track.laps) {
+        if (lapNumber === totalLaps) {
           document.getElementById('sim-flag-pill').textContent = 'CHECKERED FLAG';
-          logRadio('ENG', 'Checkered flag! Saving telemetry for post-race debrief.', true);
+          logRadio('ENG', `Checkered flag! ${currentGap <= 0 ? 'You beat' : 'You finished ' + formatGap(currentGap) + ' behind'} the optimal model.`, true);
         }
 
         drawPaceChart(idx);
       }
 
-      // Smooth radar marker movement
+      // ---------- animation ----------
+      const TICKS_PER_LAP = 6;
+      let lapIdx = 0;
+      let tick = 0;
+      let timer = null;
+
+      function moveDots() {
+        if (!pathLen) return;
+        const frac = (tick % TICKS_PER_LAP) / TICKS_PER_LAP;
+        // Put the optimal car ahead/behind by the time gap (as a fraction of a lap)
+        const lapTime = laps[lapIdx].time;
+        const ahead = Math.max(-0.45, Math.min(0.45, currentGap / lapTime));
+        const pU = pathEl.getPointAtLength(frac * pathLen);
+        const pO = pathEl.getPointAtLength((((frac + ahead) % 1) + 1) % 1 * pathLen);
+        dotUser.setAttribute('cx', pU.x); dotUser.setAttribute('cy', pU.y);
+        dotOpt.setAttribute('cx', pO.x); dotOpt.setAttribute('cy', pO.y);
+      }
+
       function stepFrame() {
-        tickCounter++;
-        const fracU = ((lapIdx + (tickCounter % 8) / 8) * pathLen) % pathLen;
-        const fracO = (((lapIdx + 0.04) + (tickCounter % 8) / 8) * pathLen) % pathLen;
-
-        if (pathEl.getPointAtLength) {
-          const pU = pathEl.getPointAtLength(fracU);
-          const pO = pathEl.getPointAtLength(fracO);
-          dotUser.setAttribute('cx', pU.x);
-          dotUser.setAttribute('cy', pU.y);
-          dotOpt.setAttribute('cx', pO.x);
-          dotOpt.setAttribute('cy', pO.y);
-        }
-
-        if (tickCounter % 4 === 0 && lapIdx < track.laps - 1) {
+        tick++;
+        moveDots();
+        if (tick % TICKS_PER_LAP === 0 && lapIdx < laps.length - 1) {
           lapIdx++;
           updateLapUI(lapIdx);
-          if (lapIdx === track.laps - 1) {
-            clearInterval(timer);
-          }
+          if (lapIdx === laps.length - 1) clearInterval(timer);
         }
       }
 
       function startLoop(mult) {
         if (timer) clearInterval(timer);
-        speedMult = mult;
-        if (mult === 0) return;
-        const interval = Math.max(40, Math.round(140 / mult));
-        timer = setInterval(stepFrame, interval);
+        if (mult === 0 || lapIdx >= laps.length - 1) return;
+        timer = setInterval(stepFrame, Math.max(30, Math.round(160 / mult)));
       }
 
       document.querySelectorAll('.speed-btn').forEach(btn => {
@@ -471,14 +574,17 @@
 
       document.getElementById('btn-skip-finish').addEventListener('click', () => {
         if (timer) clearInterval(timer);
-        lapIdx = track.laps - 1;
+        lapIdx = laps.length - 1;
+        tick = 0;
         updateLapUI(lapIdx);
+        moveDots();
       });
 
       document.getElementById('btn-go-results').addEventListener('click', () => goTo(10));
       document.getElementById('btn-finish-debrief').addEventListener('click', () => goTo(10));
 
       updateLapUI(0);
+      moveDots();
       startLoop(1);
     })();
   </script>
