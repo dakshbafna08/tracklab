@@ -35,8 +35,9 @@ if (typeof window !== 'undefined' && typeof window.supabase === 'undefined' && t
 }
 
 const DEFAULT_STATE = {
-  track: 'NORISRING',
-  totalLaps: 72,
+  track: 'Melbourne',
+  trackId: null,
+  totalLaps: 58,
   stint1: 'SOFT',
   stint2: 'HARD',
   pitLap: 28,
@@ -214,7 +215,7 @@ async function hashPassword(plainText, salt = 'tracklab_f1_telemetry') {
  * Helper to fetch a valid Track UUID from Supabase 'tracks' table
  */
 let cachedTrackId = '8242f5b2-4c1b-4387-b790-8ace8fce93a0';
-async function getSupabaseTrackId(trackName = 'Norisring') {
+async function getSupabaseTrackId(trackName = 'Melbourne') {
   const sb = getSupabase();
   if (sb) {
     try {
@@ -392,7 +393,7 @@ const TrackLabDB = {
     }
 
     // Resolve valid track UUID from Supabase tracks table
-    const trackUuid = await getSupabaseTrackId(strategyParams.track || state.track || 'Norisring');
+    const trackUuid = state.trackId || await getSupabaseTrackId(strategyParams.track || state.track || 'Melbourne');
 
     // Ensure tyre compounds are strictly uppercase & valid
     const rawStart = (strategyParams.starting_compound || strategyParams.stint1 || state.stint1 || 'SOFT').toUpperCase();
@@ -402,7 +403,7 @@ const TrackLabDB = {
 
     const pitLap = Number(strategyParams.lap || strategyParams.pit_lap || state.pitLap || 28);
     const startingFuelKg = Number(strategyParams.starting_fuel_kg || strategyParams.fuel || state.startingFuelKg || 105);
-    const stratName = strategyParams.name || `${state.track || 'Norisring'} Strategy: ${startingCompound} → ${newCompound} (L${pitLap})`;
+    const stratName = strategyParams.name || `${state.track || 'Melbourne'} Strategy: ${startingCompound} → ${newCompound} (L${pitLap})`;
 
     try {
       // 1. Insert into 'strategies'
@@ -463,7 +464,7 @@ const TrackLabDB = {
   async saveRace(raceRecord) {
     return this.saveStrategy({
       track: raceRecord.track,
-      name: raceRecord.track_name || `${raceRecord.track || 'Norisring'} Grand Prix Run`,
+      name: raceRecord.track_name || `${raceRecord.track || 'Melbourne'} Grand Prix Run`,
       starting_compound: raceRecord.stint1,
       starting_fuel_kg: 105,
       lap: raceRecord.pit_lap,
@@ -484,7 +485,7 @@ const TrackLabDB = {
       const state = getState();
       let query = sb
         .from('strategies')
-        .select('*, pit_stops(*)')
+        .select('*, pit_stops(*), tracks(name, total_laps, pit_loss_seconds), simulation_results(total_time_seconds, optimal_time_seconds, created_at)')
         .order('created_at', { ascending: false });
 
       if (state.userId) {
@@ -506,21 +507,32 @@ const TrackLabDB = {
 
   async getRaces() {
     const res = await this.getStrategies();
-    const races = (res.strategies || []).map(s => {
-      const stop = (s.pit_stops && s.pit_stops[0]) || {};
-      return {
-        id: s.id,
-        track: s.track_id,
-        track_name: s.name || 'F1 Strategy Run',
-        stint1: s.starting_compound || 'SOFT',
-        stint2: stop.new_compound || 'HARD',
-        pit_lap: stop.lap || 28,
-        fuel_kg: s.starting_fuel_kg || 105,
-        total_time: 3528.4,
-        gap: 0.0,
-        data_source: 'SUPABASE_CLOUD'
-      };
-    });
+    const races = (res.strategies || [])
+      .map(s => {
+        const stop = (s.pit_stops && s.pit_stops[0]) || {};
+        // Latest simulation result for this strategy
+        const result = (s.simulation_results || [])
+          .slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        if (!result) return null; // never raced - skip it
+        const total = Number(result.total_time_seconds);
+        const optimal = result.optimal_time_seconds != null ? Number(result.optimal_time_seconds) : null;
+        return {
+          id: s.id,
+          track: s.track_id,
+          track_name: (s.tracks && s.tracks.name) || s.name || 'F1 Strategy Run',
+          stint1: s.starting_compound || 'SOFT',
+          stint2: stop.new_compound || 'HARD',
+          pit_lap: stop.lap || 0,
+          fuel_kg: s.starting_fuel_kg || 105,
+          total_laps: s.tracks && s.tracks.total_laps,
+          pit_loss: s.tracks && Number(s.tracks.pit_loss_seconds),
+          total_time: total,
+          optimal_time: optimal,
+          gap: optimal != null ? total - optimal : null, // null = no optimal saved for this run
+          data_source: 'SUPABASE_CLOUD'
+        };
+      })
+      .filter(Boolean);
     return { source: res.source, races, error: res.error };
   },
 

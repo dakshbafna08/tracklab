@@ -284,8 +284,32 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       let state = getState();
-      const track = TrackLabSim.getTrack(state.track);
-      document.getElementById('active-track-label').textContent = `${track.name} (${track.laps} Laps)`;
+
+      // Show the track chosen on the track select page
+      document.getElementById('active-track-label').textContent =
+        `${state.track} (${state.totalLaps} Laps)`;
+
+      // Only allow the tyres this track has real race data for
+      const available = state.availableCompounds || [];
+      if (available.length) {
+        document.querySelectorAll('.compound-btn').forEach(btn => {
+          const ok = available.includes(btn.dataset.compound);
+          btn.disabled = !ok;
+          btn.classList.toggle('opacity-30', !ok);
+          btn.classList.toggle('cursor-not-allowed', !ok);
+          btn.title = ok ? '' : 'No race data for this tyre at this track';
+        });
+
+        // If the current picks aren't available here, switch to valid ones
+        const s1 = available.includes(state.stint1) ? state.stint1 : available[0];
+        let s2 = state.stint2;
+        if (!available.includes(s2) || s2 === s1) {
+          s2 = available.find(c => c !== s1) || s1;
+        }
+        if (s1 !== state.stint1) document.getElementById('s1-' + s1).click();
+        if (s2 !== state.stint2) document.getElementById('s2-' + s2).click();
+        state = getState();
+      }
 
       const introScreen = document.getElementById('guided-intro-screen');
       const selectorScreen = document.getElementById('selector-main-screen');

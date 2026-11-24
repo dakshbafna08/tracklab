@@ -157,25 +157,36 @@
         document.getElementById('empty-history').classList.add('hidden');
         document.getElementById('history-table-wrap').classList.remove('hidden');
 
-        const nearOpt = races.filter(r => Math.abs(r.gap) < 3.0).length;
-        document.getElementById('stat-optimal-rate').textContent = `${Math.round((nearOpt / races.length) * 100)}%`;
-
-        const minGap = Math.min(...races.map(r => r.gap));
-        document.getElementById('stat-best-gap').textContent = Math.abs(minGap) <= 0.15 ? 'OPTIMAL' : TrackLabSim.formatGap(minGap);
+        // Only runs with a saved optimal time can be compared
+        const withGap = races.filter(r => r.gap != null);
+        const fmtGap = (g) => `${g >= 0 ? '+' : '-'}${Math.abs(g).toFixed(2)}s`;
+        if (withGap.length) {
+          const nearOpt = withGap.filter(r => r.gap < 3.0).length;
+          document.getElementById('stat-optimal-rate').textContent = `${Math.round((nearOpt / withGap.length) * 100)}%`;
+          const minGap = Math.min(...withGap.map(r => r.gap));
+          document.getElementById('stat-best-gap').textContent = minGap <= 0.15 ? 'OPTIMAL' : fmtGap(minGap);
+        } else {
+          document.getElementById('stat-optimal-rate').textContent = '—';
+          document.getElementById('stat-best-gap').textContent = '—';
+        }
 
         const tbody = document.getElementById('history-tbody');
         tbody.innerHTML = races.map((r, idx) => {
-          const isOpt = Math.abs(r.gap) <= 0.15;
-          const gapCls = isOpt || r.gap < 0 ? 'text-[#22C55E]' : (r.gap < 6 ? 'text-amber-400' : 'text-[#E10600]');
+          let gapText = '—', gapCls = 'text-zinc-500';
+          if (r.gap != null) {
+            const isOpt = r.gap <= 0.15;
+            gapText = isOpt ? 'OPTIMAL' : fmtGap(r.gap);
+            gapCls = isOpt ? 'text-[#22C55E]' : (r.gap < 6 ? 'text-amber-400' : 'text-[#E10600]');
+          }
           return `
             <tr class="hover:bg-white/[0.02] transition-colors">
-              <td class="py-3.5 px-3 font-semibold text-white">${r.track_name || r.track}</td>
+              <td class="py-3.5 px-3 font-semibold text-white">${r.track_name}</td>
               <td class="py-3.5 px-3 text-zinc-300">${r.stint1} → ${r.stint2} <span class="text-zinc-500">(L${r.pit_lap})</span></td>
               <td class="py-3.5 px-3 text-white">${TrackLabSim.formatTime(r.total_time)}</td>
-              <td class="py-3.5 px-3 font-bold ${gapCls}">${isOpt ? 'OPTIMAL' : TrackLabSim.formatGap(r.gap)}</td>
+              <td class="py-3.5 px-3 font-bold ${gapCls}">${gapText}</td>
               <td class="py-3.5 px-3 text-right space-x-2">
                 <button type="button" data-replay-idx="${idx}" class="btn-outline py-1 px-3 text-[11px]">Replay</button>
-                <button type="button" data-del-id="${r.id || ''}" data-del-idx="${idx}" class="btn-ghost py-1 px-2 text-[11px] text-zinc-500 hover:text-red-400">Delete</button>
+                <button type="button" data-del-id="${r.id}" class="btn-ghost py-1 px-2 text-[11px] text-zinc-500 hover:text-red-400">Delete</button>
               </td>
             </tr>
           `;
@@ -184,10 +195,11 @@
         tbody.querySelectorAll('[data-replay-idx]').forEach(btn => {
           btn.addEventListener('click', () => {
             const run = races[Number(btn.dataset.replayIdx)];
-            const trackObj = TrackLabSim.getTrack(run.track);
             saveState({
-              track: run.track,
-              totalLaps: trackObj.laps,
+              trackId: run.track,
+              track: run.track_name,
+              totalLaps: run.total_laps,
+              pitLossSeconds: run.pit_loss,
               stint1: run.stint1,
               stint2: run.stint2,
               pitLap: run.pit_lap
@@ -196,11 +208,9 @@
           });
         });
 
-        tbody.querySelectorAll('[data-del-idx]').forEach(btn => {
+        tbody.querySelectorAll('[data-del-id]').forEach(btn => {
           btn.addEventListener('click', async () => {
-            const id = btn.dataset.delId ? Number(btn.dataset.delId) : null;
-            const idx = Number(btn.dataset.delIdx);
-            await TrackLabDB.clearOrDeleteRace(id, idx);
+            await TrackLabDB.clearOrDeleteRace(btn.dataset.delId); // IDs are UUID strings
             loadHistory();
           });
         });
@@ -208,15 +218,23 @@
 
       await loadHistory();
 
-      // Quick launch circuit grid
+      // Quick launch: 6 real circuits from Supabase
       const quickGrid = document.getElementById('quick-tracks-grid');
-      quickGrid.innerHTML = Object.values(TrackLabSim.TRACKS).map(t => `
-        <button type="button" data-qtrack="${t.id}" data-qlaps="${t.laps}"
+      const sb = getSupabase();
+      const { data: tracks } = sb
+        ? await sb.from('tracks')
+            .select('id, name, fastf1_event, total_laps, pit_loss_seconds, tyre_degradation(compound)')
+            .order('name')
+        : { data: [] };
+      const quick = (tracks || []).slice(0, 6);
+
+      quickGrid.innerHTML = quick.map(t => `
+        <button type="button" data-qtrack="${t.id}"
                 class="panel p-5 text-left hover:border-white/30 transition-all flex justify-between items-center">
           <div>
-            <div class="mono text-[10px] text-zinc-500 uppercase">${t.country}</div>
-            <div class="font-bold text-white text-base mt-0.5">${t.shortName}</div>
-            <div class="mono text-xs text-zinc-400 mt-1">${t.laps} Laps • ${t.pitLoss}s Pit Loss</div>
+            <div class="mono text-[10px] text-zinc-500 uppercase">${t.fastf1_event || ''}</div>
+            <div class="font-bold text-white text-base mt-0.5">${t.name}</div>
+            <div class="mono text-xs text-zinc-400 mt-1">${t.total_laps} Laps • ${Number(t.pit_loss_seconds).toFixed(1)}s Pit Loss</div>
           </div>
           <span class="text-[#E10600] font-bold text-sm">&rarr;</span>
         </button>
@@ -224,9 +242,13 @@
 
       quickGrid.querySelectorAll('[data-qtrack]').forEach(btn => {
         btn.addEventListener('click', () => {
+          const t = quick.find(x => x.id === btn.dataset.qtrack);
           saveState({
-            track: btn.dataset.qtrack,
-            totalLaps: Number(btn.dataset.qlaps)
+            trackId: t.id,
+            track: t.name,
+            totalLaps: t.total_laps,
+            pitLossSeconds: Number(t.pit_loss_seconds),
+            availableCompounds: (t.tyre_degradation || []).map(d => d.compound)
           });
           goTo(5);
         });

@@ -192,7 +192,16 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const state = getState();
-      const track = TrackLabSim.getTrack(state.track);
+            // Use the real track chosen on the track select page;
+      // the old engine only fills in the values for the wear hints
+      const simTrack = TrackLabSim.getTrack(state.track);
+      const track = {
+        ...simTrack,
+        name: state.track,
+        shortName: state.track,
+        laps: state.totalLaps,
+        pitLoss: state.pitLossSeconds ?? simTrack.pitLoss
+      };
       const s1Spec = TrackLabSim.getCompound(state.stint1);
       const s2Spec = TrackLabSim.getCompound(state.stint2);
 

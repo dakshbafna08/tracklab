@@ -28,210 +28,209 @@
 
   <main class="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col gap-8">
 
-    <!-- Verdict Hero -->
-    <section class="panel p-8 sm:p-10 animate-on-scroll">
-      <div class="flex flex-col md:flex-row justify-between md:items-center gap-8">
-        <div>
-          <span class="section-tag">Race Debrief</span>
-          <h1 id="verdict-title" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-1">
-            Strategy Analysis
-          </h1>
-          <p id="verdict-desc" class="body-copy text-base mt-3 max-w-2xl">
-            Here is how your pit stop and tire plan stacked up against the computer's optimal strategy.
-          </p>
-        </div>
-
-        <div class="sub-box p-6 mono text-right min-w-[240px]">
-          <span class="text-[10px] uppercase text-zinc-400 font-semibold block">Time vs. Optimal</span>
-          <div id="big-delta-value" class="text-4xl font-bold text-white mt-1">+0.00s</div>
-          <span id="verdict-badge" class="inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 text-zinc-200">
-            ANALYZING
-          </span>
-        </div>
-      </div>
+    <!-- Shown if there is no race result yet -->
+    <section id="no-result" class="hidden panel p-8 text-center">
+      <h1 class="text-2xl font-bold text-white mb-3">No race result yet</h1>
+      <p class="body-copy mb-6">Run the race simulation first, then come back here for your debrief.</p>
+      <button data-goto="9" class="btn-primary px-6 py-3 text-sm">Go to Race &rarr;</button>
     </section>
 
-    <!-- Strategy Stint Timeline Comparison -->
-    <section class="panel p-8 animate-on-scroll">
-      <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
-        <h2 class="text-xl font-bold text-white">Stint Comparison</h2>
-        <span id="res-provenance" class="mono text-xs text-zinc-500">MODELED ESTIMATE</span>
-      </div>
+    <div id="results-content" class="flex flex-col gap-8">
 
-      <div class="space-y-6 mono text-xs">
-        <div class="sub-box p-5">
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-semibold text-[#E10600]">OPTIMAL BENCHMARK</span>
-            <span id="opt-time-label" class="text-white font-bold text-sm">—</span>
+      <!-- Verdict -->
+      <section class="panel p-8 sm:p-10 animate-on-scroll">
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-8">
+          <div>
+            <span class="section-tag">Race Debrief</span>
+            <h1 id="verdict-title" class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mt-1">Strategy Analysis</h1>
+            <p id="verdict-desc" class="body-copy text-base mt-3 max-w-2xl">—</p>
           </div>
-          <div id="opt-stint-desc" class="text-zinc-400 mb-3">—</div>
-          <div class="w-full h-9 flex rounded-xl overflow-hidden border border-white/15 font-bold">
-            <div id="opt-bar-1" class="flex items-center justify-center px-2 border-r border-white"></div>
-            <div id="opt-bar-2" class="flex items-center justify-center px-2"></div>
-          </div>
-        </div>
 
-        <div class="sub-box p-5">
-          <div class="flex justify-between items-center mb-3">
-            <span class="font-semibold text-white">YOUR STRATEGY</span>
-            <span id="user-time-label" class="text-white font-bold text-sm">—</span>
+          <div class="sub-box p-6 mono text-right min-w-[240px]">
+            <span class="text-[10px] uppercase text-zinc-400 font-semibold block">Time vs. Optimal</span>
+            <div id="big-delta-value" class="text-4xl font-bold text-white mt-1">—</div>
+            <span id="verdict-badge" class="inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 text-zinc-200">—</span>
           </div>
-          <div id="user-stint-desc" class="text-zinc-400 mb-3">—</div>
-          <div class="w-full h-9 flex rounded-xl overflow-hidden border border-white/15 font-bold">
-            <div id="user-bar-1" class="flex items-center justify-center px-2 border-r border-white"></div>
-            <div id="user-bar-2" class="flex items-center justify-center px-2"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Two-Column Metrics & Delta Progression -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <section class="panel p-7 animate-on-scroll slide-left">
-        <span class="section-tag">Telemetry Metrics</span>
-        <h3 class="text-lg font-bold text-white mb-5">Session Breakdown</h3>
-        <div id="metrics-rows" class="mono text-xs divide-y divide-white/10">
-          <!-- populated by JS -->
         </div>
       </section>
 
-      <section class="panel p-7 animate-on-scroll slide-right flex flex-col justify-between">
-        <div>
-          <span class="section-tag">Cumulative Gap Trace</span>
-          <h3 class="text-lg font-bold text-white mb-2">Gap Progression (You vs Optimal)</h3>
-          <p class="mono text-[11px] text-zinc-500 mb-4">Positive bars above zero indicate time lost to optimal.</p>
-          <canvas id="deltaCanvas" width="480" height="190" class="w-full h-[190px] bg-black/40 rounded-xl border border-white/10 p-2"></canvas>
+      <!-- Stint comparison -->
+      <section class="panel p-8 animate-on-scroll">
+        <div class="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
+          <h2 class="text-xl font-bold text-white">Stint Comparison</h2>
+          <span class="mono text-xs text-zinc-500">2022 F1 RACE DATA</span>
         </div>
-        <div class="mono text-[11px] text-zinc-500 mt-4 pt-3 border-t border-white/10 flex justify-between">
-          <span>Model: Empirical Pirelli Physics</span>
-          <span id="fia-rule-check" class="text-[#22C55E]">FIA 2-Compound Compliant</span>
+
+        <div class="space-y-6 mono text-xs">
+          <div class="sub-box p-5">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-semibold text-[#E10600]">OPTIMAL BENCHMARK</span>
+              <span id="opt-time-label" class="text-white font-bold text-sm">—</span>
+            </div>
+            <div id="opt-stint-desc" class="text-zinc-400 mb-3">—</div>
+            <div class="w-full h-9 flex rounded-xl overflow-hidden border border-white/15 font-bold">
+              <div id="opt-bar-1" class="flex items-center justify-center px-2 border-r border-white"></div>
+              <div id="opt-bar-2" class="flex items-center justify-center px-2"></div>
+            </div>
+          </div>
+
+          <div class="sub-box p-5">
+            <div class="flex justify-between items-center mb-3">
+              <span class="font-semibold text-white">YOUR STRATEGY</span>
+              <span id="user-time-label" class="text-white font-bold text-sm">—</span>
+            </div>
+            <div id="user-stint-desc" class="text-zinc-400 mb-3">—</div>
+            <div class="w-full h-9 flex rounded-xl overflow-hidden border border-white/15 font-bold">
+              <div id="user-bar-1" class="flex items-center justify-center px-2 border-r border-white"></div>
+              <div id="user-bar-2" class="flex items-center justify-center px-2"></div>
+            </div>
+          </div>
         </div>
       </section>
-    </div>
 
-    <!-- Engineer Debrief -->
-    <section class="panel p-8 border-l-4 border-l-[#E10600] animate-on-scroll">
-      <span class="section-tag">Race Engineer Debrief</span>
-      <h3 class="text-xl font-bold text-white mb-3">Strategic Assessment</h3>
-      <p id="engineer-debrief" class="body-copy text-sm sm:text-base"></p>
-    </section>
+      <!-- Metrics & gap chart -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section class="panel p-7 animate-on-scroll slide-left">
+          <span class="section-tag">Telemetry Metrics</span>
+          <h3 class="text-lg font-bold text-white mb-2">Session Breakdown</h3>
+          <div class="flex justify-end gap-6 mono text-[10px] text-zinc-500 mb-2">
+            <span class="text-white">YOU</span>
+            <span class="text-[#E10600]">OPTIMAL</span>
+          </div>
+          <div id="metrics-rows" class="mono text-xs divide-y divide-white/10"></div>
+        </section>
 
-    <!-- Actions -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
-      <div class="flex gap-3 w-full sm:w-auto">
-        <button data-goto="5" class="btn-outline w-full sm:w-auto text-xs">Retry Compounds</button>
-        <button data-goto="3" class="btn-outline w-full sm:w-auto text-xs">Switch Circuit</button>
+        <section class="panel p-7 animate-on-scroll slide-right flex flex-col justify-between">
+          <div>
+            <span class="section-tag">Cumulative Gap Trace</span>
+            <h3 class="text-lg font-bold text-white mb-2">Gap Progression (You vs Optimal)</h3>
+            <p class="mono text-[11px] text-zinc-500 mb-4">Red bars above the line = time lost to optimal. Green below = ahead.</p>
+            <canvas id="deltaCanvas" width="480" height="190" class="w-full h-[190px] bg-black/40 rounded-xl border border-white/10 p-2"></canvas>
+          </div>
+          <div class="mono text-[11px] text-zinc-500 mt-4 pt-3 border-t border-white/10 flex justify-between">
+            <span>Model: 2022 race data (FastF1)</span>
+            <span id="fia-rule-check" class="text-[#22C55E]">FIA 2-Compound Compliant</span>
+          </div>
+        </section>
       </div>
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <span id="save-status-badge" class="mono text-xs text-zinc-400"></span>
-        <button data-goto="11" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-sm">
-          View Driver Dashboard &rarr;
-        </button>
-      </div>
-    </div>
 
+      <!-- Engineer Debrief -->
+      <section class="panel p-8 border-l-4 border-l-[#E10600] animate-on-scroll">
+        <span class="section-tag">Race Engineer Debrief</span>
+        <h3 class="text-xl font-bold text-white mb-3">Strategic Assessment</h3>
+        <p id="engineer-debrief" class="body-copy text-sm sm:text-base"></p>
+      </section>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-white/10">
+        <div class="flex gap-3 w-full sm:w-auto">
+          <button data-goto="5" class="btn-outline w-full sm:w-auto text-xs">Retry Compounds</button>
+          <button data-goto="3" class="btn-outline w-full sm:w-auto text-xs">Switch Circuit</button>
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <span id="save-status-badge" class="mono text-xs text-zinc-400"></span>
+          <button data-goto="11" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-sm">
+            View Driver Dashboard &rarr;
+          </button>
+        </div>
+      </div>
+
+    </div>
   </main>
 
-  <script src="../../assets/js/simulation-engine.js"></script>
   <script src="../../assets/js/shared-state.js"></script>
   <script>
-    (async function () {
+    (function () {
       const state = getState();
-      const trackKey = state.track || 'MELBOURNE';
-      const track = TrackLabSim.getTrack(trackKey);
 
-      let userSim = null;
-      let optSim = null;
-      let userStrat = null;
-      let optStrat = null;
+      function formatLapTime(sec) {
+        const m = Math.floor(sec / 60);
+        return `${m}:${(sec - m * 60).toFixed(3).padStart(6, '0')}`;
+      }
+      function formatRaceTime(sec) {
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = (sec % 60).toFixed(3).padStart(6, '0');
+        return h ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
+      }
+      const formatGap = (sec) => `${sec >= 0 ? '+' : '-'}${Math.abs(sec).toFixed(2)}s`;
+      const compoundColor = (c) => ({ SOFT: '#E10600', MEDIUM: '#EAB308', HARD: '#E4E4E7', INTERMEDIATE: '#22C55E', WET: '#3B82F6' }[c] || '#71717A');
 
-      try {
-        userSim = JSON.parse(state.simUserResult || 'null');
-        optSim = JSON.parse(state.simOptResult || 'null');
-        userStrat = JSON.parse(state.simUserStrategy || 'null');
-        optStrat = JSON.parse(state.simOptStrategy || 'null');
-      } catch {}
-
-      if (!userSim || !optSim) {
-        userStrat = { trackKey, stint1: state.stint1 || 'SOFT', stint2: state.stint2 || 'HARD', pitLap: Number(state.pitLap) || 18 };
-        userSim = TrackLabSim.simulate(userStrat);
-        optSim = TrackLabSim.optimise(trackKey);
-        optStrat = optSim.strategy;
+      // The race page stores both results here (and saves yours to Supabase if logged in)
+      let sim = null;
+      try { sim = JSON.parse(state.simUserResult || 'null'); } catch {}
+      if (!sim || !Array.isArray(sim.laps) || !sim.laps.length || !sim.opt) {
+        document.getElementById('results-content').classList.add('hidden');
+        document.getElementById('no-result').classList.remove('hidden');
+        return;
       }
 
-      document.getElementById('res-track-subtitle').textContent = `${track.name} • ${track.laps} Laps`;
-      document.getElementById('res-provenance').textContent = state.simDataSource || 'MODELED ESTIMATE';
+      saveState({ hasCompletedGuide: true });
 
-      const gap = userSim.totalTime - optSim.totalTime;
-      const isMatch = Math.abs(gap) <= 0.15;
+      const user = sim.strategy;
+      const opt = sim.opt.strategy;
+      const laps = sim.laps;
+      const optLaps = sim.opt.laps;
+      const totalLaps = sim.totalLaps || laps.length;
+
+      document.getElementById('res-track-subtitle').textContent = `${sim.track} • ${totalLaps} Laps`;
+
+      // ---------- verdict ----------
+      const gap = sim.totalTime - sim.opt.totalTime; // >= 0, since optimal is the fastest possible
+      const isMatch = gap <= 0.15;
       const deltaEl = document.getElementById('big-delta-value');
-      deltaEl.textContent = isMatch ? 'OPTIMAL' : TrackLabSim.formatGap(gap);
-      deltaEl.className = isMatch || gap < 0
-        ? 'text-4xl font-bold text-[#22C55E] mt-1'
-        : (gap < 6 ? 'text-4xl font-bold text-amber-400 mt-1' : 'text-4xl font-bold text-[#E10600] mt-1');
+      deltaEl.textContent = isMatch ? 'OPTIMAL' : formatGap(gap);
+      deltaEl.className = `text-4xl font-bold mt-1 ${isMatch ? 'text-[#22C55E]' : (gap < 6 ? 'text-amber-400' : 'text-[#E10600]')}`;
 
       const badge = document.getElementById('verdict-badge');
       const title = document.getElementById('verdict-title');
       const vDesc = document.getElementById('verdict-desc');
+      const optPlan = `${opt.stint1} → ${opt.stint2}, pitting on Lap ${opt.pitLap}`;
       if (isMatch) {
-        title.textContent = 'Perfect Strategy! Optimal Matched';
+        title.textContent = 'Perfect Strategy!';
         badge.textContent = 'P1 // OPTIMAL STRATEGY';
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-green-500/15 text-[#22C55E]';
-        vDesc.textContent = 'Incredible race craft! You chose the exact fastest tire pairing and pitted at the perfect lap before your tires lost grip.';
+        vDesc.textContent = 'You found the fastest possible strategy for this track: the best tyre pair and the best lap to pit.';
       } else if (gap < 6) {
         title.textContent = 'Solid Strategy — Very Close!';
         badge.textContent = `WITHIN ${gap.toFixed(2)}s OF OPTIMAL`;
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-300';
-        vDesc.textContent = `Great race! You finished within ${gap.toFixed(1)} seconds of the computer. The optimal plan boxed on Lap ${optStrat.pitLap} using ${optStrat.stint1} → ${optStrat.stint2}.`;
+        vDesc.textContent = `You finished ${gap.toFixed(1)}s behind the fastest possible strategy (${optPlan}).`;
       } else {
         title.textContent = 'Room for Improvement';
-        badge.textContent = `+${gap.toFixed(2)}s BEHIND OPTIMAL`;
+        badge.textContent = `${gap.toFixed(2)}s BEHIND OPTIMAL`;
         badge.className = 'inline-block mt-2 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E10600]/20 text-[#E10600]';
-        vDesc.textContent = `The computer gained ${gap.toFixed(1)}s by running ${optStrat.stint1} then ${optStrat.stint2} and pitting on Lap ${optStrat.pitLap}. Adjusting your pit stop lap keeps tires in their prime grip window.`;
+        vDesc.textContent = `The fastest strategy here is ${optPlan}. It beat yours by ${gap.toFixed(1)}s.`;
       }
 
-      // Render Stint Bars
-      function styleCompoundBar(el, compound, laps, total) {
-        const pct = ((laps / total) * 100).toFixed(1);
-        el.style.width = `${pct}%`;
-        el.textContent = `${compound} (${laps}L)`;
-        if (compound === 'SOFT') {
-          el.style.background = 'linear-gradient(90deg, #7F1D1D, #E10600)';
-          el.style.color = '#FFFFFF';
-        } else if (compound === 'MEDIUM') {
-          el.style.background = 'linear-gradient(90deg, #713F12, #EAB308)';
-          el.style.color = '#09090B';
-        } else if (compound === 'INTERMEDIATE') {
-          el.style.background = 'linear-gradient(90deg, #14532D, #22C55E)';
-          el.style.color = '#FFFFFF';
-        } else if (compound === 'WET') {
-          el.style.background = 'linear-gradient(90deg, #1E3A8A, #3B82F6)';
-          el.style.color = '#FFFFFF';
-        } else {
-          el.style.background = 'linear-gradient(90deg, #3F3F46, #E4E4E7)';
-          el.style.color = '#09090B';
-        }
+      // ---------- stint bars ----------
+      function styleCompoundBar(el, compound, n) {
+        el.style.width = `${((n / totalLaps) * 100).toFixed(1)}%`;
+        el.textContent = `${compound} (${n}L)`;
+        el.style.background = compoundColor(compound);
+        el.style.color = (compound === 'SOFT' || compound === 'INTERMEDIATE' || compound === 'WET') ? '#FFFFFF' : '#09090B';
       }
+      const stintDesc = (s) => `${s.stint1} (L1–${s.pitLap}) → Box L${s.pitLap} → ${s.stint2} (L${s.pitLap + 1}–${totalLaps})`;
 
-      document.getElementById('opt-time-label').textContent = TrackLabSim.formatTime(optSim.totalTime);
-      document.getElementById('opt-stint-desc').textContent = `${optStrat.stint1} (L1–${optStrat.pitLap}) → Box L${optStrat.pitLap} → ${optStrat.stint2} (L${optStrat.pitLap + 1}–${track.laps})`;
-      styleCompoundBar(document.getElementById('opt-bar-1'), optStrat.stint1, optStrat.pitLap, track.laps);
-      styleCompoundBar(document.getElementById('opt-bar-2'), optStrat.stint2, track.laps - optStrat.pitLap, track.laps);
+      document.getElementById('opt-time-label').textContent = formatRaceTime(sim.opt.totalTime);
+      document.getElementById('opt-stint-desc').textContent = stintDesc(opt);
+      styleCompoundBar(document.getElementById('opt-bar-1'), opt.stint1, opt.pitLap);
+      styleCompoundBar(document.getElementById('opt-bar-2'), opt.stint2, totalLaps - opt.pitLap);
 
-      document.getElementById('user-time-label').textContent = TrackLabSim.formatTime(userSim.totalTime);
-      document.getElementById('user-stint-desc').textContent = `${userStrat.stint1} (L1–${userStrat.pitLap}) → Box L${userStrat.pitLap} → ${userStrat.stint2} (L${userStrat.pitLap + 1}–${track.laps})`;
-      styleCompoundBar(document.getElementById('user-bar-1'), userStrat.stint1, userStrat.pitLap, track.laps);
-      styleCompoundBar(document.getElementById('user-bar-2'), userStrat.stint2, track.laps - userStrat.pitLap, track.laps);
+      document.getElementById('user-time-label').textContent = formatRaceTime(sim.totalTime);
+      document.getElementById('user-stint-desc').textContent = stintDesc(user);
+      styleCompoundBar(document.getElementById('user-bar-1'), user.stint1, user.pitLap);
+      styleCompoundBar(document.getElementById('user-bar-2'), user.stint2, totalLaps - user.pitLap);
 
-      // Populate Metrics Table
-      const fastestUserLap = Math.min(...userSim.laps.map(l => l.time));
-      const fastestOptLap = Math.min(...optSim.laps.map(l => l.time));
+      // ---------- metrics ----------
+      const fastest = (arr) => Math.min(...arr.map(l => l.time));
+      const pitLoss = sim.pitLoss ? `+${sim.pitLoss.toFixed(1)}s` : '—';
       const rows = [
-        ['Total Race Time', TrackLabSim.formatTime(userSim.totalTime), TrackLabSim.formatTime(optSim.totalTime)],
-        ['Pit Stop Made On', `Lap ${userStrat.pitLap}`, `Lap ${optStrat.pitLap}`],
-        ['Pit Lane Time Lost', `+${track.pitLoss}s`, `+${track.pitLoss}s`],
-        ['Fastest Single Lap', TrackLabSim.formatLapTime(fastestUserLap), TrackLabSim.formatLapTime(fastestOptLap)],
-        ['Tires Used', `${userStrat.stint1} → ${userStrat.stint2}`, `${optStrat.stint1} → ${optStrat.stint2}`]
+        ['Total Race Time', formatRaceTime(sim.totalTime), formatRaceTime(sim.opt.totalTime)],
+        ['Pit Stop Made On', `Lap ${user.pitLap}`, `Lap ${opt.pitLap}`],
+        ['Pit Lane Time Lost', pitLoss, pitLoss],
+        ['Fastest Single Lap', formatLapTime(fastest(laps)), formatLapTime(fastest(optLaps))],
+        ['Tires Used', `${user.stint1} → ${user.stint2}`, `${opt.stint1} → ${opt.stint2}`]
       ];
       document.getElementById('metrics-rows').innerHTML = rows.map(r => `
         <div class="py-3 flex justify-between items-center gap-2">
@@ -240,83 +239,51 @@
             <span class="text-white font-semibold">${r[1]}</span>
             <span class="text-[#E10600] font-semibold">${r[2]}</span>
           </div>
-        </div>
-      `).join('');
+        </div>`).join('');
 
-      // Check FIA rule
-      if (userStrat.stint1 === userStrat.stint2) {
+      if (user.stint1 === user.stint2) {
         const fia = document.getElementById('fia-rule-check');
-        fia.textContent = 'FIA Regulation Warning: Single Compound Used';
+        fia.textContent = 'FIA Warning: Single Compound Used';
         fia.className = 'text-amber-400';
       }
 
-      // Draw cumulative gap chart
+      // ---------- cumulative gap chart ----------
       const canvas = document.getElementById('deltaCanvas');
       const c = canvas.getContext('2d');
-      const gaps = userSim.laps.map((l, idx) => l.cumTime - optSim.laps[idx].cumTime);
+      const gaps = laps.map((l, i) => l.cumTime - optLaps[i].cumTime);
       const maxAbs = Math.max(2, ...gaps.map(g => Math.abs(g)));
       const midY = canvas.height / 2;
-
       c.strokeStyle = 'rgba(255,255,255,0.15)';
-      c.beginPath();
-      c.moveTo(0, midY);
-      c.lineTo(canvas.width, midY);
-      c.stroke();
-
+      c.beginPath(); c.moveTo(0, midY); c.lineTo(canvas.width, midY); c.stroke();
       const barW = (canvas.width - 12) / gaps.length;
-      gaps.forEach((g, idx) => {
-        const h = Math.min(midY - 8, (Math.abs(g) / maxAbs) * (midY - 10));
+      gaps.forEach((g, i) => {
+        const h = (Math.abs(g) / maxAbs) * (midY - 10);
         c.fillStyle = g <= 0 ? '#22C55E' : '#E10600';
-        const x = 6 + idx * barW;
-        if (g <= 0) {
-          c.fillRect(x, midY, Math.max(2, barW - 1), h);
-        } else {
-          c.fillRect(x, midY - h, Math.max(2, barW - 1), h);
-        }
+        c.fillRect(6 + i * barW, g <= 0 ? midY : midY - h, Math.max(2, barW - 1), h);
       });
 
-      // Engineer Debrief Text
-      const cliffHits = userSim.laps.filter(l => l.pastCliff).length;
-      let notes = [];
+      // ---------- debrief ----------
+      const notes = [];
       if (isMatch) {
-        notes.push(`Spot-on execution at ${track.shortName}. Running ${userStrat.stint1} to Lap ${userStrat.pitLap} before switching to ${userStrat.stint2} extracted peak stint efficiency.`);
+        notes.push(`Spot-on at ${sim.track}. Running ${user.stint1} to Lap ${user.pitLap} then ${user.stint2} is the fastest way through this race.`);
       } else {
-        notes.push(`You finished ${gap.toFixed(2)}s behind the theoretical optimum (${optStrat.stint1} → ${optStrat.stint2}, boxing Lap ${optStrat.pitLap}).`);
-        if (cliffHits > 0) {
-          notes.push(`Your tires ran ${cliffHits} lap${cliffHits > 1 ? 's' : ''} past the thermal degradation cliff, costing substantial pace at the end of the stint.`);
+        notes.push(`You finished ${gap.toFixed(2)}s behind the optimal strategy (${optPlan}).`);
+        if (user.stint1 !== opt.stint1 || user.stint2 !== opt.stint2) {
+          notes.push(`The optimal run used ${opt.stint1} then ${opt.stint2}; your tyre choice was ${user.stint1} then ${user.stint2}.`);
         }
-        if (userStrat.pitLap < optStrat.pitLap - 3) {
-          notes.push(`Boxing early at Lap ${userStrat.pitLap} forced your second set (${userStrat.stint2}) to absorb ${track.laps - userStrat.pitLap} laps while heavy on fuel.`);
+        if (user.pitLap < opt.pitLap - 2) {
+          notes.push(`You pitted ${opt.pitLap - user.pitLap} laps earlier than optimal, so your second set had to last longer and wore more.`);
+        } else if (user.pitLap > opt.pitLap + 2) {
+          notes.push(`You pitted ${user.pitLap - opt.pitLap} laps later than optimal, so you spent extra laps on worn tyres.`);
         }
+        notes.push('Try adjusting your pit lap or tyres and race again.');
       }
       document.getElementById('engineer-debrief').textContent = notes.join(' ');
 
-      // Auto-save real result to Supabase Cloud (avoid duplicate save on page reload if already saved)
-      const saveKey = `saved_${trackKey}_${userStrat.stint1}_${userStrat.stint2}_${userStrat.pitLap}_${Math.round(userSim.totalTime)}`;
-      const badgeEl = document.getElementById('save-status-badge');
-      if (!sessionStorage.getItem(saveKey)) {
-        const res = await TrackLabDB.saveRace({
-          track: trackKey,
-          track_name: track.name,
-          stint1: userStrat.stint1,
-          stint2: userStrat.stint2,
-          pit_lap: userStrat.pitLap,
-          total_time: Number(userSim.totalTime.toFixed(3)),
-          optimal_time: Number(optSim.totalTime.toFixed(3)),
-          optimal_stint1: optStrat.stint1,
-          optimal_stint2: optStrat.stint2,
-          optimal_pit_lap: optStrat.pitLap,
-          gap: Number(gap.toFixed(3)),
-          data_source: state.simDataSource || 'MODELED_ESTIMATE'
-        });
-        sessionStorage.setItem(saveKey, '1');
-        saveState({ hasCompletedGuide: true });
-        badgeEl.textContent = res.savedToDb ? '✓ Synced to Supabase Cloud' : (res.error ? 'Supabase Required' : '✓ Telemetry Recorded');
-        badgeEl.className = 'mono text-xs ' + (res.savedToDb ? 'text-[#22C55E]' : 'text-zinc-400');
-      } else {
-        saveState({ hasCompletedGuide: true });
-        badgeEl.textContent = '✓ Recorded in Telemetry';
-      }
+      // Saving happens on the race page now; this just shows whether it was saved
+      const saveEl = document.getElementById('save-status-badge');
+      saveEl.textContent = sim.saved ? '✓ Saved to your profile' : 'Guest run — log in to save';
+      saveEl.className = 'mono text-xs ' + (sim.saved ? 'text-[#22C55E]' : 'text-zinc-400');
     })();
   </script>
 </body>

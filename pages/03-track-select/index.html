@@ -11,22 +11,16 @@
     .track-title-transition {
       transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .coming-soon-card {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    .f1-track-card {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .coming-soon-card:hover {
+    .f1-track-card:hover {
       border-color: rgba(255, 255, 255, 0.35);
-      background: rgba(255, 255, 255, 0.05);
       transform: translateY(-2px);
     }
-    .coming-soon-badge {
-      transition: all 0.25s ease;
-    }
-    .coming-soon-card:hover .coming-soon-badge {
-      background: rgba(225, 6, 0, 0.25);
-      border-color: rgba(225, 6, 0, 0.6);
-      color: #FFFFFF;
-      box-shadow: 0 0 15px rgba(225, 6, 0, 0.4);
+    .f1-track-card.is-selected {
+      border-color: #E10600;
+      box-shadow: 0 0 25px rgba(225, 6, 0, 0.35);
     }
   </style>
 </head>
@@ -51,7 +45,7 @@
     <!-- 1. FULL-SCREEN GUIDED TITLE STAGE (Visible First) -->
     <section id="guided-track-screen" class="guided-stage flex-1 flex flex-col justify-center items-center text-center py-12">
       <div class="glass-panel p-8 sm:p-14 max-w-2xl mx-auto space-y-6 border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.85)]">
-        
+
         <span class="f1-badge">STEP 01 // CIRCUIT SELECTION</span>
 
         <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white track-title-transition">
@@ -59,7 +53,7 @@
         </h1>
 
         <p class="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-xl mx-auto">
-          We are racing at the historic 2.300 km Norisring Bavarian street circuit. With 72 fast laps, low tire degradation, and intense braking into the Grundig hairpin, pit stop timing makes all the difference.
+          Every circuit is built from real 2022 Formula 1 race data. Lap count, pit stop time loss, and how fast each tyre wears all change from track to track, so the best strategy does too.
         </p>
 
         <div class="pt-4">
@@ -74,18 +68,18 @@
     <!-- 2. FULL TRACK SELECTION CONSOLE (Revealed after clicking Next) -->
     <section id="track-main-screen" class="selector-stage hidden-stage space-y-8">
 
-      <!-- Top Headline (Minimized & Moved to Left Corner) -->
+      <!-- Top Headline -->
       <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 pb-6 border-b border-white/10">
         <div>
           <span class="section-tag">Step 01 // Championship Circuit</span>
           <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Select Your Circuit</h1>
-          <p class="body-copy text-xs sm:text-sm mt-1 max-w-2xl text-zinc-400">
-            Norisring street circuit (Nuremberg, Germany) • 72 Laps • ~18.4s pit loss.
+          <p id="selected-track-details" class="body-copy text-xs sm:text-sm mt-1 max-w-2xl text-zinc-400">
+            Loading circuits…
           </p>
         </div>
         <div class="glass-panel px-4 py-2.5 mono text-xs flex items-center gap-3">
           <span class="text-zinc-500 block text-[10px]">SELECTED TRACK</span>
-          <span id="selected-track-summary" class="text-white font-semibold">Norisring (72 Laps)</span>
+          <span id="selected-track-summary" class="text-white font-semibold">—</span>
           <span class="w-2 h-2 rounded-full bg-[#E10600] shadow-[0_0_8px_#E10600]"></span>
         </div>
       </div>
@@ -93,85 +87,11 @@
       <!-- 2-Column Layout: Left Tracks, Right Car Builder Tracker -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6">
 
-        <!-- Left 7 Cols: Track Cards -->
+        <!-- Left 7 Cols: Track Cards (filled from the Supabase tracks table) -->
         <div class="lg:col-span-7 space-y-6">
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-            <!-- 1. Active Track Card: Norisring -->
-            <article id="card-norisring" class="track-card track-selected cursor-pointer flex flex-col justify-between border-2 border-[#E10600] shadow-[0_0_25px_rgba(225,6,0,0.35)]">
-              <div>
-                <div class="flex justify-between items-start gap-2 mb-3">
-                  <div>
-                    <span class="mono text-[10px] uppercase tracking-widest text-[#E10600] font-semibold">Germany</span>
-                    <h2 class="text-xl font-bold text-white tracking-tight mt-0.5">Norisring</h2>
-                    <p class="text-xs text-zinc-400">Nuremberg Street Circuit</p>
-                  </div>
-                  <span class="selected-badge">AUTO-SELECTED</span>
-                </div>
-
-                <!-- SVG Track Map Layout -->
-                <div class="h-32 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center p-3 mb-4">
-                  <svg viewBox="0 0 500 220" class="w-full h-full stroke-white fill-none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M 80 150 L 380 150 C 430 150, 440 120, 410 100 L 370 75 C 340 55, 300 70, 270 85 L 120 85 C 80 85, 60 110, 80 150 Z"/>
-                    <circle cx="80" cy="150" r="7" fill="#E10600" stroke="#09090B" stroke-width="2"/>
-                  </svg>
-                </div>
-
-                <p class="text-xs text-zinc-300 leading-relaxed mb-4">
-                  Historic Bavarian street circuit featuring the extreme Grundig hairpin, high-speed Dutzendteich straight, and heavy braking zones.
-                </p>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 mono text-xs">
-                <div>
-                  <span class="text-[10px] text-zinc-500 block">LAPS</span>
-                  <span class="text-white font-bold">72</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-zinc-500 block">PIT LOSS</span>
-                  <span class="text-[#E10600] font-bold">18.4s</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-zinc-500 block">TIRE WEAR</span>
-                  <span class="text-[#22C55E] font-semibold">LOW</span>
-                </div>
-              </div>
-            </article>
-
-            <!-- 2. Interactive Preview: More Circuits (Smooth Hover State) -->
-            <article id="card-more-circuits" class="coming-soon-card panel p-6 border border-white/15 flex flex-col justify-between cursor-pointer select-none bg-black/30 group">
-              <div>
-                <div class="flex justify-between items-start gap-2 mb-3">
-                  <div>
-                    <span class="mono text-[10px] uppercase tracking-widest text-zinc-400">Calendar Expansion</span>
-                    <h2 class="text-xl font-bold text-white tracking-tight mt-0.5 group-hover:text-white">More Circuits</h2>
-                    <p class="text-xs text-zinc-400 group-hover:text-zinc-300">Monza, Silverstone, Spa-Francorchamps</p>
-                  </div>
-                  <span class="coming-soon-badge mono text-[10px] px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-zinc-300 font-bold">
-                    Coming soon
-                  </span>
-                </div>
-
-                <div class="h-32 rounded-xl bg-black/50 border border-white/10 flex flex-col items-center justify-center p-3 mb-4 text-center group-hover:border-white/20 transition-all">
-                  <span class="text-2xl mb-1 opacity-80 group-hover:scale-110 transition-transform">🏁</span>
-                  <span class="text-xs mono text-zinc-400 font-medium">New Circuits in Calibration</span>
-                  <span class="text-[10px] mono text-[#E10600] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Hovering: Coming soon</span>
-                </div>
-
-                <p class="text-xs text-zinc-400 leading-relaxed">
-                  Additional Grand Prix circuits are currently in telemetry testing. For this championship round, all data is configured for Norisring.
-                </p>
-              </div>
-
-              <div id="more-circuits-hint" class="pt-3 border-t border-white/10 mono text-xs text-zinc-400 flex items-center justify-between">
-                <span>Coming soon</span>
-                <span class="text-[10px] text-zinc-500">Season 2 Update</span>
-              </div>
-            </article>
-
+          <div id="f1-track-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <p class="text-sm text-zinc-400 mono">Loading circuits from database…</p>
           </div>
-
         </div>
 
         <!-- Right 5 Cols: Strategy Car Builder Tracker -->
@@ -187,7 +107,7 @@
           &larr; Back to Briefing
         </button>
 
-        <button id="btn-lock-circuit" class="btn-primary w-full sm:w-auto px-10 py-4 font-bold shadow-[0_0_20px_rgba(225,6,0,0.4)]">
+        <button id="btn-lock-circuit" class="btn-primary w-full sm:w-auto px-10 py-4 font-bold shadow-[0_0_20px_rgba(225,6,0,0.4)]" disabled>
           Lock It In &amp; Continue &rarr;
         </button>
       </div>
@@ -200,19 +120,170 @@
   <script src="../../assets/js/shared-state.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Auto-select Norisring in state
-      saveState({
-        track: 'NORISRING',
-        totalLaps: 72,
-        trackLocked: true
-      });
+      const DEFAULT_TRACK = 'Melbourne'; // matches the track the ML model trains on
 
       const guidedScreen = document.getElementById('guided-track-screen');
       const mainScreen = document.getElementById('track-main-screen');
-      const btnNext = document.getElementById('btn-track-next');
-      const btnBackIntro = document.getElementById('btn-back-intro');
-      const cardMoreCircuits = document.getElementById('card-more-circuits');
-      const hint = document.getElementById('more-circuits-hint');
+      const grid = document.getElementById('f1-track-grid');
+      const lockBtn = document.getElementById('btn-lock-circuit');
+      const summary = document.getElementById('selected-track-summary');
+      const details = document.getElementById('selected-track-details');
+
+      let tracks = [];
+      let selectedId = null;
+
+      // Escape text from the database before putting it into HTML
+      const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+
+      // Average wear across the track's compounds → LOW / MEDIUM / HIGH
+      function wearLabel(track) {
+        const rows = track.tyre_degradation || [];
+        if (!rows.length) return { text: 'N/A', color: 'text-zinc-400' };
+        const avg = rows.reduce((sum, r) => sum + Number(r.seconds_lost_per_lap), 0) / rows.length;
+        if (avg < 0.04) return { text: 'LOW', color: 'text-[#22C55E]' };
+        if (avg < 0.09) return { text: 'MEDIUM', color: 'text-[#FACC15]' };
+        return { text: 'HIGH', color: 'text-[#E10600]' };
+      }
+
+      function compoundsFor(track) {
+        const order = ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'];
+        return (track.tyre_degradation || [])
+          .map(r => r.compound)
+          .sort((a, b) => order.indexOf(a) - order.indexOf(b));
+      }
+
+      function cardHtml(track) {
+        const wear = wearLabel(track);
+        return `
+          <article data-track-id="${esc(track.id)}"
+                   class="f1-track-card track-card cursor-pointer flex flex-col justify-between border-2 border-white/15">
+            <div>
+              <div class="flex justify-between items-start gap-2 mb-3">
+                <div>
+                  <span class="mono text-[10px] uppercase tracking-widest text-[#E10600] font-semibold">${esc(track.fastf1_event || '')}</span>
+                  <h2 class="text-xl font-bold text-white tracking-tight mt-0.5">${esc(track.name)}</h2>
+                  <p class="text-xs text-zinc-400">2022 race data</p>
+                </div>
+                <span class="selected-badge hidden">SELECTED</span>
+              </div>
+
+              <div class="h-32 rounded-xl bg-black/60 border border-white/10 flex items-center justify-center p-3 mb-4">
+                <svg class="track-map w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
+              </div>
+
+              <p class="text-[11px] mono text-zinc-400 mb-4">
+                Tyres: ${esc(compoundsFor(track).join(' · ') || 'none')}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 mono text-xs">
+              <div>
+                <span class="text-[10px] text-zinc-500 block">LAPS</span>
+                <span class="text-white font-bold">${esc(track.total_laps)}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">PIT LOSS</span>
+                <span class="text-[#E10600] font-bold">${Number(track.pit_loss_seconds).toFixed(1)}s</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-zinc-500 block">TIRE WEAR</span>
+                <span class="${wear.color} font-semibold">${wear.text}</span>
+              </div>
+            </div>
+          </article>`;
+      }
+
+      // Draw each track's outline from its TUM centerline file (x, y in meters)
+      async function drawMap(svg, track) {
+        if (!track.centerline_file) return;
+        try {
+          const res = await fetch('../../' + track.centerline_file);
+          if (!res.ok) return;
+          const pts = (await res.text()).split('\n')
+            .filter(line => line.trim() && !line.startsWith('#'))
+            .map(line => line.split(',').slice(0, 2).map(Number))
+            .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+          if (pts.length < 3) return;
+
+          const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+          const minX = Math.min(...xs), maxX = Math.max(...xs);
+          const minY = Math.min(...ys), maxY = Math.max(...ys);
+          const scale = 90 / Math.max(maxX - minX, maxY - minY);
+          const offX = (100 - (maxX - minX) * scale) / 2;
+          const offY = (100 - (maxY - minY) * scale) / 2;
+          // Flip y so the map isn't drawn upside down
+          const d = pts.map(([x, y], i) =>
+            `${i ? 'L' : 'M'}${(offX + (x - minX) * scale).toFixed(1)},${(offY + (maxY - y) * scale).toFixed(1)}`
+          ).join(' ') + ' Z';
+          const [sx, sy] = [offX + (pts[0][0] - minX) * scale, offY + (maxY - pts[0][1]) * scale];
+
+          svg.innerHTML = `
+            <path d="${d}" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="3" fill="#E10600" stroke="#09090B" stroke-width="1"/>`;
+        } catch (e) {
+          console.warn('[TrackLab] Could not draw track map:', e);
+        }
+      }
+
+      function selectTrack(id) {
+        const track = tracks.find(t => t.id === id);
+        if (!track) return;
+        selectedId = id;
+
+        grid.querySelectorAll('[data-track-id]').forEach(card => {
+          const on = card.dataset.trackId === id;
+          card.classList.toggle('is-selected', on);
+          card.classList.toggle('track-selected', on);
+          card.querySelector('.selected-badge').classList.toggle('hidden', !on);
+        });
+
+        summary.textContent = `${track.name} (${track.total_laps} Laps)`;
+        details.textContent =
+          `${track.fastf1_event || track.name} • ${track.total_laps} Laps • ~${Number(track.pit_loss_seconds).toFixed(1)}s pit loss.`;
+
+        saveState({
+          trackId: track.id,
+          track: track.name,
+          totalLaps: track.total_laps,
+          pitLossSeconds: Number(track.pit_loss_seconds),
+          availableCompounds: compoundsFor(track)
+        });
+        lockBtn.disabled = false;
+      }
+
+      async function loadTracks() {
+        const sb = getSupabase();
+        if (!sb) {
+          grid.innerHTML = '<p class="text-sm text-[#E10600] mono">Could not connect to the database. Please refresh.</p>';
+          return;
+        }
+        const { data, error } = await sb
+          .from('tracks')
+          .select('id, name, fastf1_event, total_laps, pit_loss_seconds, centerline_file, tyre_degradation(compound, seconds_lost_per_lap)')
+          .order('name');
+
+        if (error || !data || !data.length) {
+          console.warn('[TrackLab] Track list error:', error);
+          grid.innerHTML = '<p class="text-sm text-[#E10600] mono">No circuits found in the database.</p>';
+          return;
+        }
+
+        tracks = data;
+        grid.innerHTML = tracks.map(cardHtml).join('');
+        grid.querySelectorAll('[data-track-id]').forEach(card => {
+          card.addEventListener('click', () => selectTrack(card.dataset.trackId));
+          const track = tracks.find(t => t.id === card.dataset.trackId);
+          drawMap(card.querySelector('.track-map'), track);
+        });
+
+        // Keep the user's earlier choice if they come back to this page, otherwise Melbourne
+        const state = getState();
+        const previous = tracks.find(t => t.id === state.trackId);
+        const fallback = tracks.find(t => t.name === DEFAULT_TRACK) || tracks[0];
+        selectTrack((previous || fallback).id);
+      }
 
       function showMain() {
         guidedScreen.classList.add('hidden-stage');
@@ -220,29 +291,17 @@
         renderStrategyCarTracker('car-tracker-slot', 1);
       }
 
-      function showGuided() {
-        mainScreen.classList.add('hidden-stage');
-        guidedScreen.classList.remove('hidden-stage');
-      }
+      document.getElementById('btn-track-next').addEventListener('click', showMain);
+      document.getElementById('btn-back-intro').addEventListener('click', () => goTo(2));
 
-      btnNext.addEventListener('click', showMain);
-      btnBackIntro.addEventListener('click', () => goTo(2));
-
-      // Interactive feedback when hovering/clicking on More Circuits
-      cardMoreCircuits.addEventListener('click', () => {
-        hint.innerHTML = '<span class="text-[#E10600] font-bold">Coming soon!</span> <span class="text-zinc-300">Norisring is currently active.</span>';
-        setTimeout(() => {
-          hint.innerHTML = '<span>Coming soon</span><span class="text-[10px] text-zinc-500">Season 2 Update</span>';
-        }, 3000);
-      });
-
-      // Render Strategy Car Tracker on Right
       renderStrategyCarTracker('car-tracker-slot', 1);
+      loadTracks();
 
       // Lock In & Continue to Pick Tires
-      document.getElementById('btn-lock-circuit').addEventListener('click', () => {
+      lockBtn.addEventListener('click', () => {
+        if (!selectedId) return;
         saveState({ trackLocked: true });
-        goTo(5); // Go straight to Pick Tires!
+        goTo(5);
       });
     });
   </script>
