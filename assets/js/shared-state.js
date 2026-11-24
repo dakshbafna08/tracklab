@@ -35,8 +35,9 @@ if (typeof window !== 'undefined' && typeof window.supabase === 'undefined' && t
 }
 
 const DEFAULT_STATE = {
-  track: 'NORISRING',
-  totalLaps: 72,
+  track: 'Melbourne',
+  trackId: null,
+  totalLaps: 58,
   stint1: 'SOFT',
   stint2: 'HARD',
   pitLap: 28,
@@ -214,7 +215,7 @@ async function hashPassword(plainText, salt = 'tracklab_f1_telemetry') {
  * Helper to fetch a valid Track UUID from Supabase 'tracks' table
  */
 let cachedTrackId = '8242f5b2-4c1b-4387-b790-8ace8fce93a0';
-async function getSupabaseTrackId(trackName = 'Norisring') {
+async function getSupabaseTrackId(trackName = 'Melbourne') {
   const sb = getSupabase();
   if (sb) {
     try {
@@ -392,7 +393,7 @@ const TrackLabDB = {
     }
 
     // Resolve valid track UUID from Supabase tracks table
-    const trackUuid = await getSupabaseTrackId(strategyParams.track || state.track || 'Norisring');
+    const trackUuid = state.trackId || await getSupabaseTrackId(strategyParams.track || state.track || 'Melbourne');
 
     // Ensure tyre compounds are strictly uppercase & valid
     const rawStart = (strategyParams.starting_compound || strategyParams.stint1 || state.stint1 || 'SOFT').toUpperCase();
@@ -402,7 +403,7 @@ const TrackLabDB = {
 
     const pitLap = Number(strategyParams.lap || strategyParams.pit_lap || state.pitLap || 28);
     const startingFuelKg = Number(strategyParams.starting_fuel_kg || strategyParams.fuel || state.startingFuelKg || 105);
-    const stratName = strategyParams.name || `${state.track || 'Norisring'} Strategy: ${startingCompound} → ${newCompound} (L${pitLap})`;
+    const stratName = strategyParams.name || `${state.track || 'Melbourne'} Strategy: ${startingCompound} → ${newCompound} (L${pitLap})`;
 
     try {
       // 1. Insert into 'strategies'
@@ -463,7 +464,7 @@ const TrackLabDB = {
   async saveRace(raceRecord) {
     return this.saveStrategy({
       track: raceRecord.track,
-      name: raceRecord.track_name || `${raceRecord.track || 'Norisring'} Grand Prix Run`,
+      name: raceRecord.track_name || `${raceRecord.track || 'Melbourne'} Grand Prix Run`,
       starting_compound: raceRecord.stint1,
       starting_fuel_kg: 105,
       lap: raceRecord.pit_lap,
