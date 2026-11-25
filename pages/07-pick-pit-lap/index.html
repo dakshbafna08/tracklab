@@ -38,7 +38,7 @@
         </h1>
 
         <p class="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-xl mx-auto">
-          In Formula 1, pit timing is everything. Pit too early, and your fresh tires hit the degradation cliff before the checkered flag. Pit too late, and you lose seconds crawling on dead rubber.
+          In Formula 1, pit timing is everything. Pit too early, and your second set wears out before the checkered flag. Pit too late, and you lose seconds crawling on dead rubber.
         </p>
 
         <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 text-left space-y-1">
@@ -274,32 +274,67 @@
         bar2.style.color = g2.color;
         bar2.textContent = `${state.stint2} (${s2Laps}L)`;
 
-        const s1Cliff = Math.round(s1Spec.cliffStart / track.degradationMult);
-        const s2Cliff = Math.round(s2Spec.cliffStart / track.degradationMult);
         const warn = document.getElementById('wear-warning');
+        const r1 = wear[state.stint1];
+        const r2 = wear[state.stint2];
 
-        if (pitLap > s1Cliff) {
-          warn.className = 'mt-6 p-4 rounded-xl bg-red-950/50 border border-[#E10600]/60 mono text-xs flex items-center gap-2.5 text-red-300';
-          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#E10600]"></span>
-            <span>THERMAL CLIFF WARNING: Stint 1 (${state.stint1}) pushed past ~${s1Cliff}L cliff on ${track.shortName}.</span>`;
-        } else if (s2Laps > s2Cliff) {
-          warn.className = 'mt-6 p-4 rounded-xl bg-amber-950/50 border border-amber-500/50 mono text-xs flex items-center gap-2.5 text-amber-300';
-          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span>
-            <span>STINT 2 STRETCH: ${state.stint2} expected to reach thermal drop-off near ${s2Cliff}L.</span>`;
+        if (r1 == null || r2 == null) {
+          warn.className = 'mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-zinc-400';
+          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-500"></span>
+            <span>Loading real tyre data...</span>`;
         } else {
-          warn.className = 'mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]';
-          warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
-            <span>Pit window inside safe thermal operating window for both compounds.</span>`;
+          // How much slower each set is at the end of its stint, compared with new tyres
+          const s1Loss = r1 * pitLap;
+          const s2Loss = r2 * s2Laps;
+          if (s1Loss >= 3) {
+            warn.className = 'mt-6 p-4 rounded-xl bg-red-950/50 border border-[#E10600]/60 mono text-xs flex items-center gap-2.5 text-red-300';
+            warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#E10600]"></span>
+              <span>HEAVY WEAR: by Lap ${pitLap}, your ${state.stint1}s are ~${s1Loss.toFixed(1)}s/lap slower than new on ${track.shortName}. Try pitting earlier.</span>`;
+          } else if (s2Loss >= 3) {
+            warn.className = 'mt-6 p-4 rounded-xl bg-amber-950/50 border border-amber-500/50 mono text-xs flex items-center gap-2.5 text-amber-300';
+            warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>STINT 2 STRETCH: by the finish, your ${state.stint2}s will be ~${s2Loss.toFixed(1)}s/lap slower than new. Try pitting later.</span>`;
+          } else {
+            warn.className = 'mt-6 p-4 rounded-xl bg-white/5 border border-white/10 mono text-xs flex items-center gap-2.5 text-[#22C55E]';
+            warn.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#22C55E]"></span>
+              <span>Wear looks manageable: neither set gets more than ~${Math.max(s1Loss, s2Loss).toFixed(1)}s/lap slower than new.</span>`;
+          }
         }
 
+        const fuelText = fuelPerLap != null ? `${Math.abs(fuelPerLap).toFixed(3)}s/lap faster as fuel burns` : 'loading...';
         document.getElementById('detail-s1-title').textContent = `Stint 1 — ${state.stint1}`;
-        document.getElementById('detail-s1-info').textContent = `Cliff around ${s1Cliff} laps • Wear rate ${(s1Spec.linearDeg * track.degradationMult).toFixed(3)}s/lap`;
+        document.getElementById('detail-s1-info').textContent = r1 != null
+          ? `Loses ${r1.toFixed(3)}s per lap of age • ~${(r1 * pitLap).toFixed(1)}s/lap slower by Lap ${pitLap}`
+          : 'Loading real tyre data...';
         document.getElementById('detail-s2-title').textContent = `Stint 2 — ${state.stint2}`;
-        document.getElementById('detail-s2-info').textContent = `Cliff around ${s2Cliff} laps • Fuel burn saving -${track.fuelEffect}s/lap`;
+        document.getElementById('detail-s2-info').textContent = r2 != null
+          ? `Loses ${r2.toFixed(3)}s per lap of age • Fuel: ${fuelText}`
+          : 'Loading real tyre data...';
       }
+
+      // Real 2022 data for this track: seconds lost per lap of tyre age, and the fuel effect
+      let wear = {};
+      let fuelPerLap = null;
 
       render(slider.value);
       renderStrategyCarTracker('car-tracker-slot', 3);
+
+      (async () => {
+        try {
+          const sb = getSupabase();
+          if (!sb || !state.trackId) return;
+          const { data } = await sb.from('tracks')
+            .select('fuel_effect_per_lap, tyre_degradation(compound, seconds_lost_per_lap)')
+            .eq('id', state.trackId)
+            .single();
+          if (!data) return;
+          fuelPerLap = data.fuel_effect_per_lap != null ? Number(data.fuel_effect_per_lap) : null;
+          (data.tyre_degradation || []).forEach(t => { wear[t.compound] = Number(t.seconds_lost_per_lap); });
+          render(slider.value);
+        } catch (e) {
+          console.warn('[TrackLab] Could not load tyre data:', e);
+        }
+      })();
 
       slider.addEventListener('input', e => render(e.target.value));
       slider.addEventListener('change', e => {
