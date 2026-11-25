@@ -835,7 +835,7 @@ function renderStrategyCarTracker(containerEl, currentStep = 1) {
         <div class="p-2.5 rounded-lg flex items-center justify-between ${trackLocked ? 'bg-white/5 border border-white/10 text-white' : 'bg-black/30 text-zinc-500'}">
           <div class="flex items-center gap-2">
             <span class="${trackLocked ? 'text-[#22C55E]' : 'text-zinc-600'}">${trackLocked ? '✓' : '○'}</span>
-            <span class="font-semibold">1. Chassis: Norisring</span>
+            <span class="font-semibold">1. Circuit: ${state.track || 'Not selected'}</span>
           </div>
           <span class="text-[10px] ${trackLocked ? 'text-[#22C55E]' : 'text-zinc-500'}">${trackLocked ? 'LOCKED' : 'PENDING'}</span>
         </div>
